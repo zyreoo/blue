@@ -49,9 +49,8 @@ export default function SignInForm() {
     }
   };
 
-  // Show success message if registration was successful
   const showSuccessMessage = searchParams.get('registered') === 'true';
-  // Show error message if there was an auth error
+  
   const showErrorMessage = searchParams.get('error') === 'true';
 
   return (

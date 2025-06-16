@@ -82,7 +82,7 @@ const Footer = () => {
     setPrevSection(activeSection);
     setActiveSection(newSection);
     
-    // Get all buttons and find indices
+    
     const buttons = Array.from(document.querySelectorAll('.category-button'));
     const prevIndex = buttons.findIndex(btn => btn.textContent.trim() === locations[prevSection].title);
     const newIndex = buttons.findIndex(btn => btn.textContent.trim() === locations[newSection].title);
@@ -90,18 +90,16 @@ const Footer = () => {
     if (prevIndex !== -1 && newIndex !== -1) {
       const navRect = document.querySelector('.categories-nav').getBoundingClientRect();
       
-      // Get the start and end positions
+    
       const startButton = buttons[prevIndex];
       const endButton = buttons[newIndex];
       const startRect = startButton.getBoundingClientRect();
       const endRect = endButton.getBoundingClientRect();
       
-      // Calculate the total width to cover
       const startX = startRect.left - navRect.left;
       const endX = endRect.left - navRect.left;
       const totalWidth = endX + endRect.width - startX;
       
-      // Create the flowing underline
       const underline = document.createElement('div');
       underline.style.position = 'absolute';
       underline.style.bottom = '0';
@@ -109,23 +107,20 @@ const Footer = () => {
       underline.style.backgroundColor = '#F0BB78';
       underline.style.transition = 'all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1)';
       
-      // Set initial position
       underline.style.left = `${startX}px`;
       underline.style.width = `${startRect.width}px`;
       
       document.querySelector('.categories-nav').appendChild(underline);
       
-      // Trigger the flowing animation
+
       requestAnimationFrame(() => {
         if (newIndex > prevIndex) {
-          // Moving right: expand right then contract left
           underline.style.width = `${totalWidth}px`;
           setTimeout(() => {
             underline.style.left = `${endX}px`;
             underline.style.width = `${endRect.width}px`;
           }, 175);
         } else {
-          // Moving left: expand left then contract right
           underline.style.left = `${endX}px`;
           underline.style.width = `${totalWidth}px`;
           setTimeout(() => {
@@ -134,7 +129,6 @@ const Footer = () => {
         }
       });
       
-      // Clean up
       setTimeout(() => {
         underline.remove();
       }, 350);

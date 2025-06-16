@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { HomePageSkeleton } from '@/components/SkeletonLoader';
 import dynamic from 'next/dynamic';
 
-// Dynamically import heavy components
+
 const LocationSection = dynamic(() => import('@/components/LocationSection'), {
   loading: () => <HomePageSkeleton />,
   ssr: true

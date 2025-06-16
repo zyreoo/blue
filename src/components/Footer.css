@@ -67,7 +67,6 @@
   opacity: 1;
 }
 
-/* Remove hover and active underlines since we're handling them with JS */
 .category-button:hover::after,
 .category-button.active::after {
   width: 0;
