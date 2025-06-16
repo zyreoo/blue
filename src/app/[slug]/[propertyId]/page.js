@@ -3,14 +3,21 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
+
+
+const DateRangePicker = dynamic(() => import('@/components/DateRangePicker'), {
+  ssr: false,
+});
 
 export default function PropertyPage() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedDates, setSelectedDates] = useState(null);
   const params = useParams();
 
   useEffect(() => {
@@ -42,7 +49,9 @@ export default function PropertyPage() {
       console.log('📚 Attempting to book property:', {
         propertyId: params.propertyId,
         location: property.location,
-        propertyTitle: property.title
+        propertyTitle: property.title,
+        checkIn: selectedDates.startDate,
+        checkOut: selectedDates.endDate
       });
 
       const response = await fetch('/api/bookings', {
@@ -52,7 +61,9 @@ export default function PropertyPage() {
         },
         body: JSON.stringify({
           propertyId: params.propertyId,
-          location: property.location
+          location: property.location,
+          checkIn: selectedDates.startDate,
+          checkOut: selectedDates.endDate
         }),
       });
 
@@ -63,11 +74,13 @@ export default function PropertyPage() {
       const result = await response.json();
       console.log('✅ Booking successful:', {
         location: property.location,
-        newBookingCount: result.booking.bookingCount
+        newBookingCount: result.booking.bookingCount,
+        checkIn: selectedDates.startDate,
+        checkOut: selectedDates.endDate
       });
 
       // You could add additional booking flow here
-      alert(`Booking recorded successfully! This location now has ${result.booking.bookingCount} bookings.`);
+      alert(`Booking recorded successfully for ${new Date(selectedDates.startDate).toLocaleDateString()} to ${new Date(selectedDates.endDate).toLocaleDateString()}! This location now has ${result.booking.bookingCount} bookings.`);
     } catch (error) {
       console.error('❌ Error recording booking:', error);
       alert('Failed to record booking. Please try again.');
@@ -170,7 +183,15 @@ export default function PropertyPage() {
               <span className={styles.perNight}>per night</span>
             </div>
             
-            <button className={styles.bookButton} onClick={handleBooking}>
+            <DateRangePicker 
+              onDateChange={(ranges) => setSelectedDates(ranges)}
+            />
+            
+            <button 
+              className={styles.bookButton} 
+              onClick={handleBooking}
+              disabled={!selectedDates}
+            >
               Book Now
             </button>
 
