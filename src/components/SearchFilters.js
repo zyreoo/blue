@@ -141,188 +141,201 @@ export default function SearchFilters({ onFiltersChange }) {
         {isOpen ? '✕ Close Filters' : '☰ Open Filters'}
       </button>
 
-      {isOpen && (
-        <div className={styles.filtersContainer}>
-          <div className={styles.filtersHeader}>
-            <h2>Filters</h2>
-            <button 
-              className={styles.closeButton}
-              onClick={() => setIsOpen(false)}
-            >
-              ✕
-            </button>
-          </div>
+      <div 
+        className={styles.filtersOverlay} 
+        data-visible={isOpen}
+        onClick={() => {
+          setIsOpen(false);
+          setActiveModal(null);
+        }}
+      />
 
-          <div className={styles.filtersRow}>
-            <button 
-              className={`${styles.filterButton} ${activeModal === 'dates' ? styles.active : ''}`}
-              onClick={() => setActiveModal(activeModal === 'dates' ? null : 'dates')}
-            >
-              <span>Dates</span>
-              {filters.checkIn && filters.checkOut && (
-                <span className={styles.filterValue}>
-                  {new Date(filters.checkIn).toLocaleDateString()} - {new Date(filters.checkOut).toLocaleDateString()}
-                </span>
-              )}
-            </button>
+      <div 
+        className={styles.filtersContainer}
+        data-visible={isOpen}
+      >
+        <div className={styles.filtersHeader}>
+          <h2>Filters</h2>
+          <button 
+            className={styles.closeButton}
+            onClick={() => {
+              setIsOpen(false);
+              setActiveModal(null);
+            }}
+          >
+            ✕
+          </button>
+        </div>
 
-            <button 
-              className={`${styles.filterButton} ${activeModal === 'guests' ? styles.active : ''}`}
-              onClick={() => setActiveModal(activeModal === 'guests' ? null : 'guests')}
-            >
-              <span>Guests</span>
-              {filters.guests.adults + filters.guests.teens + filters.guests.babies > 0 && (
-                <span className={styles.filterValue}>
-                  {filters.guests.adults + filters.guests.teens + filters.guests.babies} guests
-                </span>
-              )}
-            </button>
-
-            <button 
-              className={`${styles.filterButton} ${activeModal === 'price' ? styles.active : ''}`}
-              onClick={() => setActiveModal(activeModal === 'price' ? null : 'price')}
-            >
-              <span>Price</span>
-              {filters.priceRange[0] > 0 && (
-                <span className={styles.filterValue}>${filters.priceRange[0]}+</span>
-              )}
-            </button>
-
-            <button 
-              className={`${styles.filterButton} ${activeModal === 'type' ? styles.active : ''}`}
-              onClick={() => setActiveModal(activeModal === 'type' ? null : 'type')}
-            >
-              <span>Property Type</span>
-              {filters.propertyType !== 'all' && (
-                <span className={styles.filterValue}>{filters.propertyType}</span>
-              )}
-            </button>
-
-            <button 
-              className={`${styles.filterButton} ${activeModal === 'amenities' ? styles.active : ''}`}
-              onClick={() => setActiveModal(activeModal === 'amenities' ? null : 'amenities')}
-            >
-              <span>Amenities</span>
-              {filters.amenities.length > 0 && (
-                <span className={styles.filterValue}>{filters.amenities.length} selected</span>
-              )}
-            </button>
-
-            {getActiveFiltersCount() > 0 && (
-              <button 
-                className={styles.clearButton}
-                onClick={() => {
-                  clearFilters();
-                  setActiveModal(null);
-                }}
-              >
-                Clear all
-              </button>
+        <div className={styles.filtersRow}>
+          <button 
+            className={`${styles.filterButton} ${activeModal === 'dates' ? styles.active : ''}`}
+            onClick={() => setActiveModal(activeModal === 'dates' ? null : 'dates')}
+          >
+            <span>Dates</span>
+            {filters.checkIn && filters.checkOut && (
+              <span className={styles.filterValue}>
+                {new Date(filters.checkIn).toLocaleDateString()} - {new Date(filters.checkOut).toLocaleDateString()}
+              </span>
             )}
-          </div>
+          </button>
 
-          {activeModal === 'dates' && (
-            <div className={styles.modal}>
-              <DateRangePicker onDateChange={handleDateChange} />
-            </div>
-          )}
+          <button 
+            className={`${styles.filterButton} ${activeModal === 'guests' ? styles.active : ''}`}
+            onClick={() => setActiveModal(activeModal === 'guests' ? null : 'guests')}
+          >
+            <span>Guests</span>
+            {filters.guests.adults + filters.guests.teens + filters.guests.babies > 0 && (
+              <span className={styles.filterValue}>
+                {filters.guests.adults + filters.guests.teens + filters.guests.babies} guests
+              </span>
+            )}
+          </button>
 
-          {activeModal === 'price' && (
-            <div className={styles.modal}>
-              <div className={styles.modalContent}>
-                <h3>Price range</h3>
-                <div className={styles.priceRange}>
-                  <div className={styles.priceInputs}>
-                    <div className={styles.priceInputGroup}>
-                      <label>min price</label>
-                      <div className={styles.priceInputWrapper}>
-                        <span>$</span>
-                        <input
-                          type="number"
-                          min="0"
-                          max={filters.priceRange[1]}
-                          value={filters.priceRange[0]}
-                          onChange={(e) => handlePriceChange(e, 'min')}
-                        />
-                      </div>
-                    </div>
-                    <div className={styles.priceSeparator}>-</div>
-                    <div className={styles.priceInputGroup}>
-                      <label>max price</label>
-                      <div className={styles.priceInputWrapper}>
-                        <span>$</span>
-                        <input
-                          type="number"
-                          min={filters.priceRange[0]}
-                          max="1000"
-                          value={filters.priceRange[1]}
-                          onChange={(e) => handlePriceChange(e, 'max')}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className={styles.priceSliders}>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1000"
-                      value={filters.priceRange[0]}
-                      onChange={(e) => handlePriceChange(e, 'min')}
-                      className={styles.minPriceSlider}
-                    />
-                    <input
-                      type="range"
-                      min="0"
-                      max="1000"
-                      value={filters.priceRange[1]}
-                      onChange={(e) => handlePriceChange(e, 'max')}
-                      className={styles.maxPriceSlider}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          <button 
+            className={`${styles.filterButton} ${activeModal === 'price' ? styles.active : ''}`}
+            onClick={() => setActiveModal(activeModal === 'price' ? null : 'price')}
+          >
+            <span>Price</span>
+            {filters.priceRange[0] > 0 && (
+              <span className={styles.filterValue}>${filters.priceRange[0]}+</span>
+            )}
+          </button>
 
-          {activeModal === 'type' && (
-            <div className={styles.modal}>
-              <div className={styles.modalContent}>
-                <h3>Property Type</h3>
-                <div className={styles.propertyTypes}>
-                  {['all', 'house', 'apartment', 'villa', 'cabin'].map(type => (
-                    <button
-                      key={type}
-                      className={`${styles.typeButton} ${filters.propertyType === type ? styles.active : ''}`}
-                      onClick={() => handlePropertyTypeChange(type)}
-                    >
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+          <button 
+            className={`${styles.filterButton} ${activeModal === 'type' ? styles.active : ''}`}
+            onClick={() => setActiveModal(activeModal === 'type' ? null : 'type')}
+          >
+            <span>Property Type</span>
+            {filters.propertyType !== 'all' && (
+              <span className={styles.filterValue}>{filters.propertyType}</span>
+            )}
+          </button>
 
-          {activeModal === 'amenities' && (
-            <div className={styles.modal}>
-              <div className={styles.modalContent}>
-                <h3>Amenities</h3>
-                <div className={styles.amenities}>
-                  {['wifi', 'pool', 'parking', 'ac', 'kitchen', 'tv'].map(amenity => (
-                    <button
-                      key={amenity}
-                      className={`${styles.amenityButton} ${filters.amenities.includes(amenity) ? styles.active : ''}`}
-                      onClick={() => handleAmenityToggle(amenity)}
-                    >
-                      {amenity.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <button 
+            className={`${styles.filterButton} ${activeModal === 'amenities' ? styles.active : ''}`}
+            onClick={() => setActiveModal(activeModal === 'amenities' ? null : 'amenities')}
+          >
+            <span>Amenities</span>
+            {filters.amenities.length > 0 && (
+              <span className={styles.filterValue}>{filters.amenities.length} selected</span>
+            )}
+          </button>
+
+          {getActiveFiltersCount() > 0 && (
+            <button 
+              className={styles.clearButton}
+              onClick={() => {
+                clearFilters();
+                setActiveModal(null);
+              }}
+            >
+              Clear all
+            </button>
           )}
         </div>
-      )}
+
+        {activeModal === 'dates' && (
+          <div className={styles.modal} data-visible={true}>
+            <DateRangePicker onDateChange={handleDateChange} />
+          </div>
+        )}
+
+        {activeModal === 'price' && (
+          <div className={styles.modal} data-visible={true}>
+            <div className={styles.modalContent}>
+              <h3>Price range</h3>
+              <div className={styles.priceRange}>
+                <div className={styles.priceInputs}>
+                  <div className={styles.priceInputGroup}>
+                    <label>min price</label>
+                    <div className={styles.priceInputWrapper}>
+                      <span>$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        max={filters.priceRange[1]}
+                        value={filters.priceRange[0]}
+                        onChange={(e) => handlePriceChange(e, 'min')}
+                      />
+                    </div>
+                  </div>
+                  <div className={styles.priceSeparator}>-</div>
+                  <div className={styles.priceInputGroup}>
+                    <label>max price</label>
+                    <div className={styles.priceInputWrapper}>
+                      <span>$</span>
+                      <input
+                        type="number"
+                        min={filters.priceRange[0]}
+                        max="1000"
+                        value={filters.priceRange[1]}
+                        onChange={(e) => handlePriceChange(e, 'max')}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.priceSliders}>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1000"
+                    value={filters.priceRange[0]}
+                    onChange={(e) => handlePriceChange(e, 'min')}
+                    className={styles.minPriceSlider}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="1000"
+                    value={filters.priceRange[1]}
+                    onChange={(e) => handlePriceChange(e, 'max')}
+                    className={styles.maxPriceSlider}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeModal === 'type' && (
+          <div className={styles.modal} data-visible={true}>
+            <div className={styles.modalContent}>
+              <h3>Property Type</h3>
+              <div className={styles.propertyTypes}>
+                {['all', 'house', 'apartment', 'villa', 'cabin'].map(type => (
+                  <button
+                    key={type}
+                    className={`${styles.typeButton} ${filters.propertyType === type ? styles.active : ''}`}
+                    onClick={() => handlePropertyTypeChange(type)}
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeModal === 'amenities' && (
+          <div className={styles.modal} data-visible={true}>
+            <div className={styles.modalContent}>
+              <h3>Amenities</h3>
+              <div className={styles.amenities}>
+                {['wifi', 'pool', 'parking', 'ac', 'kitchen', 'tv'].map(amenity => (
+                  <button
+                    key={amenity}
+                    className={`${styles.amenityButton} ${filters.amenities.includes(amenity) ? styles.active : ''}`}
+                    onClick={() => handleAmenityToggle(amenity)}
+                  >
+                    {amenity.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 } 
