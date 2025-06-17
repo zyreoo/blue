@@ -7,6 +7,7 @@ import Image from 'next/image';
 import styles from './location-properties.module.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useLanguage } from '@/components/LanguageProvider';
 import { LocationPageSkeleton } from '@/components/SkeletonLoader';
 
 export default function LocationProperties() {
@@ -15,7 +16,7 @@ export default function LocationProperties() {
   const [error, setError] = useState(null);
   const params = useParams();
   const locationSlug = params.slug;
-
+  const { t } = useLanguage();
 
   const formatSlugToLocation = (slug) => {
     return slug
@@ -75,7 +76,7 @@ export default function LocationProperties() {
     <div>
       <Header />
       <main className={styles.main}>
-        <h1 className={styles.title}> Welcome to {locationName}</h1>
+        <h1 className={styles.title}>{t('property.location')} {locationName}</h1>
         <div className={styles.contentContainer}>
           <div className={styles.grid}>
             {properties.map((property) => (
@@ -96,7 +97,7 @@ export default function LocationProperties() {
                     placeholder="blur"
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPjA+OjU/RUVHUFBQUFtbW1tbW1tbW1tbW1v/2wBDARUXFyAeIB4gHR4dICEgW1FRW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1v/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                   />
-                  <div className={styles.price}>${property.price}/night</div>
+                  <div className={styles.price}>${property.price}/{t('property.perNight')}</div>
                 </div>
                 <div className={styles.content}>
                   <h3>{property.title}</h3>

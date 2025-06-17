@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './Footer.css';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from './LanguageProvider';
 
 const Footer = () => {
   const [activeSection, setActiveSection] = useState('popular');
@@ -12,6 +13,7 @@ const Footer = () => {
     mountains: { title: "Mountains", locations: [] }
   });
   const router = useRouter();
+  const { language, changeLanguage, t } = useLanguage();
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -82,7 +84,6 @@ const Footer = () => {
     setPrevSection(activeSection);
     setActiveSection(newSection);
     
-    
     const buttons = Array.from(document.querySelectorAll('.category-button'));
     const prevIndex = buttons.findIndex(btn => btn.textContent.trim() === locations[prevSection].title);
     const newIndex = buttons.findIndex(btn => btn.textContent.trim() === locations[newSection].title);
@@ -90,7 +91,6 @@ const Footer = () => {
     if (prevIndex !== -1 && newIndex !== -1) {
       const navRect = document.querySelector('.categories-nav').getBoundingClientRect();
       
-    
       const startButton = buttons[prevIndex];
       const endButton = buttons[newIndex];
       const startRect = startButton.getBoundingClientRect();
@@ -111,7 +111,6 @@ const Footer = () => {
       underline.style.width = `${startRect.width}px`;
       
       document.querySelector('.categories-nav').appendChild(underline);
-      
 
       requestAnimationFrame(() => {
         if (newIndex > prevIndex) {
@@ -138,7 +137,7 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="destinations-wrapper">
-        <h2 className="destinations-header">Inspiration for future getaways</h2>
+        <h2 className="destinations-header">{t('common.footer.inspiration')}</h2>
         <div className="categories-nav">
           {Object.entries(locations).map(([key, { title }]) => (
             <button
@@ -166,29 +165,37 @@ const Footer = () => {
 
       <div className="footer-content">
         <div className="footer-section">
-          <h3>Contact</h3>
-          <p>
-            Get in touch with us to plan your perfect trip to these amazing destinations.
-            Our travel experts are here to help you create unforgettable memories.
-          </p>
+          <h3>{t('common.footer.contact.title')}</h3>
+          <p>{t('common.footer.contact.description')}</p>
         </div>
         <div className="footer-section">
-          <h3>About Us</h3>
-          <p>
-            We specialize in showcasing the best destinations across the Bay Area,
-            from the vibrant streets of San Francisco to the tech hub of Palo Alto.
-          </p>
+          <h3>{t('common.footer.about.title')}</h3>
+          <p>{t('common.footer.about.description')}</p>
         </div>
         <div className="footer-section">
-          <h3>Quick Links</h3>
-          <p>
-            Discover more about our services, travel guides, and special offers
-            to make your Bay Area adventure unforgettable.
-          </p>
+          <h3>{t('common.footer.quickLinks.title')}</h3>
+          <p>{t('common.footer.quickLinks.description')}</p>
+        </div>
+        <div className="footer-section language-section">
+          <h3>{t('common.footer.language')}</h3>
+          <div className="language-buttons">
+            <button 
+              className={`language-button ${language === 'en' ? 'active' : ''}`}
+              onClick={() => changeLanguage('en')}
+            >
+              English
+            </button>
+            <button 
+              className={`language-button ${language === 'ro' ? 'active' : ''}`}
+              onClick={() => changeLanguage('ro')}
+            >
+              Română
+            </button>
+          </div>
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; 2024 Simone Marton. All rights reserved.</p>
+        <p>{t('common.footer.copyright')}</p>
       </div>
     </footer>
   );

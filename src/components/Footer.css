@@ -235,6 +235,15 @@
     margin-top: 1.5rem;
     padding-top: 1.5rem;
   }
+
+  .language-buttons {
+    gap: 0.5rem;
+  }
+
+  .language-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -321,4 +330,35 @@
 
 .locations-list li:hover {
   opacity: 1;
+}
+
+.language-section {
+  margin-top: 1rem;
+}
+
+.language-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.language-button {
+  background: none;
+  border: 1px solid #F5ECD5;
+  color: #F5ECD5;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.language-button:hover {
+  background: #F5ECD5;
+  color: #626F47;
+}
+
+.language-button.active {
+  background: #F5ECD5;
+  color: #626F47;
 } 

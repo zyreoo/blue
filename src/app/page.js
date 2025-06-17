@@ -7,8 +7,8 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
 import { HomePageSkeleton } from '@/components/SkeletonLoader';
+import { useLanguage } from '@/components/LanguageProvider';
 import dynamic from 'next/dynamic';
-
 
 const LocationSection = dynamic(() => import('@/components/LocationSection'), {
   loading: () => <HomePageSkeleton />,
@@ -20,6 +20,7 @@ export default function Home() {
   const [topLocations, setTopLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -89,7 +90,7 @@ export default function Home() {
     <div>
       <Header />
       <main className={styles.main}>
-        <h1 className={styles.mainTitle}>Find Your Perfect Stay</h1>
+        <h1 className={styles.mainTitle}>{t('home.title')}</h1>
         <Suspense fallback={<HomePageSkeleton />}>
           {topLocations.map((locationData) => {
             const locationProperties = groupedProperties[locationData.location] || [];
@@ -97,7 +98,7 @@ export default function Home() {
               <section key={locationData.location} className={styles.locationSection}>
                 <Link href={`/${formatLocationUrl(locationData.location)}`} className={styles.locationLink}>
                   <h2 className={styles.locationTitle}>
-                    Stay in {locationData.location} 
+                    {t('property.location')} {locationData.location}
                   </h2>
                 </Link>
                 <div className={styles.cardsContainer}>
@@ -119,7 +120,7 @@ export default function Home() {
                             loading="lazy"
                             quality={75}
                           />
-                          <div className={styles.price}>${property.price}/night</div>
+                          <div className={styles.price}>${property.price}/{t('property.perNight')}</div>
                         </div>
                         <div className={styles.content}>
                           <h3>{property.title}</h3>

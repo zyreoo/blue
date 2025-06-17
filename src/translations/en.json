@@ -1,0 +1,65 @@
+{
+  "common": {
+    "title": "Blue - Find Your Perfect Stay",
+    "description": "Discover and book the perfect accommodation for your next trip",
+    "navigation": {
+      "home": "Home",
+      "profile": "Profile",
+      "back": "Back"
+    },
+    "footer": {
+      "inspiration": "Inspiration for future getaways",
+      "contact": {
+        "title": "Contact",
+        "description": "Get in touch with us to plan your perfect trip to these amazing destinations. Our travel experts are here to help you create unforgettable memories."
+      },
+      "about": {
+        "title": "About Us",
+        "description": "We specialize in showcasing the best destinations across the Bay Area, from the vibrant streets of San Francisco to the tech hub of Palo Alto."
+      },
+      "quickLinks": {
+        "title": "Quick Links",
+        "description": "Discover more about our services, travel guides, and special offers to make your Bay Area adventure unforgettable."
+      },
+      "copyright": "© 2024 Simone Marton. All rights reserved.",
+      "language": "Language"
+    }
+  },
+  "home": {
+    "title": "Find Your Perfect Stay",
+    "propertyTypes": {
+      "hotel": "Hotel",
+      "guesthouse": "Pensiune",
+      "cabin": "Cabana"
+    },
+    "search": {
+      "placeholder": "Search destinations...",
+      "button": "Search"
+    }
+  },
+  "property": {
+    "perNight": "per night",
+    "guests": "Guests",
+    "bedrooms": "Bedroom",
+    "bedroomPlural": "Bedrooms",
+    "bathrooms": "Bathroom",
+    "bathroomPlural": "Bathrooms",
+    "perfect": "Perfect for your stay",
+    "fresh": "Fresh and clean",
+    "spacious": "Spacious accommodation",
+    "type": "Property type",
+    "about": "About this place",
+    "bookNow": "Book Now",
+    "cancellation": "Free cancellation before check-in",
+    "selfCheckIn": "Self check-in with keypad",
+    "location": "Great location with high ratings"
+  },
+  "profile": {
+    "welcome": "Welcome",
+    "email": "Email",
+    "stats": {
+      "bookings": "Bookings",
+      "reviews": "Reviews"
+    }
+  }
+} 
