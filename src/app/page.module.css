@@ -171,6 +171,22 @@
   font-weight: normal;
 }
 
+.amenitiesPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.amenityTag {
+  padding: 0.25rem 0.5rem;
+  background-color: #A4B465;
+  color: #F5ECD5;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
 @media (max-width: 1024px) {
   .main {
     padding: 15rem 3rem 3rem 3rem;

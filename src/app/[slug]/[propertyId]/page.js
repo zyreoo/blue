@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
@@ -19,6 +19,63 @@ export default function PropertyPage() {
   const [error, setError] = useState(null);
   const [selectedDates, setSelectedDates] = useState(null);
   const params = useParams();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // First try to get dates from URL parameters
+    const checkIn = searchParams.get('checkIn');
+    const checkOut = searchParams.get('checkOut');
+    const adults = parseInt(searchParams.get('adults') || '0');
+    const teens = parseInt(searchParams.get('teens') || '0');
+    const babies = parseInt(searchParams.get('babies') || '0');
+    const rooms = parseInt(searchParams.get('rooms') || '1');
+
+    if (checkIn && checkOut) {
+      const dates = {
+        startDate: new Date(checkIn),
+        endDate: new Date(checkOut),
+        persons: {
+          adults,
+          teens,
+          babies
+        },
+        rooms
+      };
+      setSelectedDates(dates);
+      // Save to localStorage
+      localStorage.setItem('searchFilters', JSON.stringify({
+        checkIn: dates.startDate,
+        checkOut: dates.endDate,
+        guests: dates.persons,
+        rooms: dates.rooms
+      }));
+    } else {
+      // If no URL parameters, try to get from localStorage
+      const savedFilters = localStorage.getItem('searchFilters');
+      if (savedFilters) {
+        const parsedFilters = JSON.parse(savedFilters);
+        if (parsedFilters.checkIn && parsedFilters.checkOut) {
+          setSelectedDates({
+            startDate: new Date(parsedFilters.checkIn),
+            endDate: new Date(parsedFilters.checkOut),
+            persons: parsedFilters.guests,
+            rooms: parsedFilters.rooms
+          });
+        }
+      }
+    }
+  }, [searchParams]);
+
+  const handleDateChange = (ranges) => {
+    setSelectedDates(ranges);
+    // Save to localStorage
+    localStorage.setItem('searchFilters', JSON.stringify({
+      checkIn: ranges.startDate,
+      checkOut: ranges.endDate,
+      guests: ranges.persons,
+      rooms: ranges.rooms
+    }));
+  };
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -184,7 +241,8 @@ export default function PropertyPage() {
             </div>
             
             <DateRangePicker 
-              onDateChange={(ranges) => setSelectedDates(ranges)}
+              onDateChange={handleDateChange}
+              initialValues={selectedDates}
             />
             
             <button 

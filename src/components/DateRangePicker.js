@@ -18,18 +18,18 @@ const flexibleOptions = [
 
 const WEEKDAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
 
-export default function DateRangePicker({ onDateChange }) {
+export default function DateRangePicker({ onDateChange, initialValues }) {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('date');
-  const [dateRange, setDateRange] = useState([new Date(), new Date()]);
+  const [dateRange, setDateRange] = useState(initialValues ? [initialValues.startDate, initialValues.endDate] : [new Date(), new Date()]);
   const [flexibleDays, setFlexibleDays] = useState(0);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [persons, setPersons] = useState({
+  const [persons, setPersons] = useState(initialValues?.persons || {
     babies: 0,
     teens: 0,
     adults: 0
   });
-  const [rooms, setRooms] = useState(1);
+  const [rooms, setRooms] = useState(initialValues?.rooms || 1);
   const [isPersonsDropdownOpen, setIsPersonsDropdownOpen] = useState(false);
   const personsDropdownRef = useRef(null);
 
@@ -45,6 +45,18 @@ export default function DateRangePicker({ onDateChange }) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Notify parent of initial values if they exist
+  useEffect(() => {
+    if (initialValues && onDateChange) {
+      onDateChange({
+        startDate: initialValues.startDate,
+        endDate: initialValues.endDate,
+        persons: initialValues.persons,
+        rooms: initialValues.rooms
+      });
+    }
+  }, [initialValues, onDateChange]);
 
   const handleDateChange = (value) => {
     setDateRange(value);

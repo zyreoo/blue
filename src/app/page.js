@@ -9,6 +9,8 @@ import Image from 'next/image';
 import { HomePageSkeleton } from '@/components/SkeletonLoader';
 import { useLanguage } from '@/components/LanguageProvider';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
+import SearchFilters from '@/components/SearchFilters';
 
 const LocationSection = dynamic(() => import('@/components/LocationSection'), {
   loading: () => <HomePageSkeleton />,
@@ -21,6 +23,20 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { t } = useLanguage();
+  const [filters, setFilters] = useState(() => {
+    // Try to load initial filters from localStorage
+    if (typeof window !== 'undefined') {
+      const savedFilters = localStorage.getItem('searchFilters');
+      if (savedFilters) {
+        const parsedFilters = JSON.parse(savedFilters);
+        // Convert date strings back to Date objects
+        if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
+        if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
+        return parsedFilters;
+      }
+    }
+    return null;
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -68,6 +84,26 @@ export default function Home() {
     return encodeURIComponent(location.toLowerCase().replace(/\s+/g, '-'));
   };
 
+  const formatSearchParams = (filters) => {
+    if (!filters) return '';
+    
+    const params = new URLSearchParams();
+    if (filters.checkIn) params.set('checkIn', filters.checkIn.toISOString());
+    if (filters.checkOut) params.set('checkOut', filters.checkOut.toISOString());
+    if (filters.guests) {
+      params.set('adults', filters.guests.adults || 0);
+      params.set('teens', filters.guests.teens || 0);
+      params.set('babies', filters.guests.babies || 0);
+    }
+    if (filters.rooms) params.set('rooms', filters.rooms);
+    
+    return params.toString() ? `?${params.toString()}` : '';
+  };
+
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
   const groupedProperties = properties.reduce((acc, property) => {
     if (!acc[property.location]) {
       acc[property.location] = [];
@@ -91,6 +127,7 @@ export default function Home() {
       <Header />
       <main className={styles.main}>
         <h1 className={styles.mainTitle}>{t('home.title')}</h1>
+        <SearchFilters onFiltersChange={handleFiltersChange} />
         <Suspense fallback={<HomePageSkeleton />}>
           {topLocations.map((locationData) => {
             const locationProperties = groupedProperties[locationData.location] || [];
@@ -106,7 +143,7 @@ export default function Home() {
                     {locationProperties.map((property) => (
                       <Link 
                         key={property._id} 
-                        href={`/${formatLocationUrl(locationData.location)}/${property._id}`}
+                        href={`/${formatLocationUrl(locationData.location)}/${property._id}${formatSearchParams(filters)}`}
                         className={styles.card}
                       >
                         <div className={styles.imageContainer}>
