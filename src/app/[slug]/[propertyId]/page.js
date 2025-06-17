@@ -82,7 +82,7 @@ export default function PropertyPage() {
       // You could add additional booking flow here
       alert(`Booking recorded successfully for ${new Date(selectedDates.startDate).toLocaleDateString()} to ${new Date(selectedDates.endDate).toLocaleDateString()}! This location now has ${result.booking.bookingCount} bookings.`);
     } catch (error) {
-      console.error('❌ Error recording booking:', error);
+      console.error('Error recording booking:', error);
       alert('Failed to record booking. Please try again.');
     }
   };

@@ -20,6 +20,9 @@ const flexibleOptions = [
   { label: '± 14 zile', value: 14 }
 ];
 
+
+const WEEKDAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+
 export default function DateRangePicker({ onDateChange }) {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('date');
@@ -76,15 +79,31 @@ export default function DateRangePicker({ onDateChange }) {
           minDate={new Date()}
           className={styles.calendar}
           showDoubleView={true}
-          showFixedNumberOfWeeks={false}
+          showFixedNumberOfWeeks={true}
           prev2Label={null}
           next2Label={null}
           minDetail="month"
-          formatShortWeekday={(locale, date) => 
-            ['D', 'L', 'M', 'M', 'J', 'V', 'S'][date.getDay()]
-          }
+          formatShortWeekday={(locale, date) => {
+            const weekday = WEEKDAYS[date.getDay()];
+            return `  ${weekday}`;
+          }}
           showNeighboringMonth={false}
-          calendarType="gregory"
+          formatMonthYear={(locale, date) => {
+            const month = date.toLocaleString('ro-RO', { month: 'long' });
+            return `${month} ${date.getFullYear()}`;
+          }}
+          tileClassName={({ date, view }) => {
+            if (view === 'month') {
+              return styles.calendarTile;
+            }
+          }}
+          navigationLabel={({ date, label, locale, view }) => {
+            if (view === 'month') {
+              const month = date.toLocaleString('ro-RO', { month: 'long' });
+              return `${month} ${date.getFullYear()}`;
+            }
+            return label;
+          }}
         />
       </div>
 
