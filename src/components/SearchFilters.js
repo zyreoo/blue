@@ -33,58 +33,13 @@ const debounce = (func, wait) => {
 };
 
 export default function SearchFilters({ onFiltersChange }) {
-  const [filters, setFilters] = useState(() => {
-    if (typeof window === 'undefined') return defaultFilters;
-    try {
-      const savedFilters = localStorage.getItem('searchFilters');
-      if (!savedFilters) return defaultFilters;
-      const parsedFilters = JSON.parse(savedFilters);
-      if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
-      if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
-      return { ...defaultFilters, ...parsedFilters };
-    } catch (error) {
-      console.error('Error parsing saved filters:', error);
-      return defaultFilters;
-    }
-  });
-
+  // State hooks
+  const [mounted, setMounted] = useState(false);
+  const [filters, setFilters] = useState(defaultFilters);
   const [isOpen, setIsOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
 
-  // Memoize the filters change handler
-  const debouncedFiltersChange = useMemo(
-    () => debounce((newFilters) => {
-      if (onFiltersChange) {
-        onFiltersChange(newFilters);
-      }
-      try {
-        localStorage.setItem('searchFilters', JSON.stringify(newFilters));
-      } catch (error) {
-        console.error('Error saving filters:', error);
-      }
-    }, 300),
-    [onFiltersChange]
-  );
-
-  // Use useCallback for event handlers
-  const handleClickOutside = useCallback((e) => {
-    if (!e.target.closest(`.${styles.filtersContainer}`) && !e.target.closest(`.${styles.toggleButton}`)) {
-      setIsOpen(false);
-      setActiveModal(null);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen, handleClickOutside]);
-
-  useEffect(() => {
-    debouncedFiltersChange(filters);
-  }, [filters, debouncedFiltersChange]);
-
+  // Callback hooks - all defined at the top level
   const handleDateChange = useCallback(({ startDate, endDate, persons, rooms }) => {
     setFilters(prev => ({
       ...prev,
@@ -134,21 +89,79 @@ export default function SearchFilters({ onFiltersChange }) {
     });
   }, []);
 
+  const handleClickOutside = useCallback((e) => {
+    if (!e.target.closest(`.${styles.filtersContainer}`) && !e.target.closest(`.${styles.toggleButton}`)) {
+      setIsOpen(false);
+      setActiveModal(null);
+    }
+  }, []);
+
   const clearFilters = useCallback(() => {
     setFilters(defaultFilters);
     localStorage.removeItem('searchFilters');
   }, []);
 
-  // Memoize expensive computations
+  // Memo hooks
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filters.propertyType !== 'all') count++;
     if (filters.amenities.length > 0) count += filters.amenities.length;
     if (filters.priceRange[0] > 0) count++;
     if (filters.guests.adults + filters.guests.teens + filters.guests.babies > 0) count++;
+    if (filters.checkIn && filters.checkOut) count++;
     return count;
   }, [filters]);
 
+  const debouncedFiltersChange = useMemo(
+    () => debounce((newFilters) => {
+      if (onFiltersChange) {
+        onFiltersChange(newFilters);
+      }
+      if (mounted) {
+        try {
+          localStorage.setItem('searchFilters', JSON.stringify(newFilters));
+        } catch (error) {
+          console.error('Error saving filters:', error);
+        }
+      }
+    }, 300),
+    [onFiltersChange, mounted]
+  );
+
+  // Effect hooks
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const savedFilters = localStorage.getItem('searchFilters');
+      if (savedFilters) {
+        const parsedFilters = JSON.parse(savedFilters);
+        if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
+        if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
+        setFilters({ ...defaultFilters, ...parsedFilters });
+      }
+    } catch (error) {
+      console.error('Error parsing saved filters:', error);
+    }
+    return () => setMounted(false);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen, handleClickOutside]);
+
+  useEffect(() => {
+    debouncedFiltersChange(filters);
+  }, [filters, debouncedFiltersChange]);
+
+  // Early return for non-mounted state
+  if (!mounted) {
+    return <div className={styles.filtersContainer} />;
+  }
+
+  // Render component
   return (
     <div className={styles.wrapper}>
       <button 

@@ -30,17 +30,15 @@ const formatMonthYear = (locale, date) => {
 export default function DateRangePicker({ onDateChange, initialValues }) {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('date');
-  const [dateRange, setDateRange] = useState(
-    initialValues ? [initialValues.startDate, initialValues.endDate] : [new Date(), new Date()]
-  );
+  const [dateRange, setDateRange] = useState(null);
   const [flexibleDays, setFlexibleDays] = useState(0);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [persons, setPersons] = useState(initialValues?.persons || {
+  const [selectedYear, setSelectedYear] = useState(null);
+  const [persons, setPersons] = useState({
     babies: 0,
     teens: 0,
     adults: 0
   });
-  const [rooms, setRooms] = useState(initialValues?.rooms || 1);
+  const [rooms, setRooms] = useState(1);
   const [isPersonsDropdownOpen, setIsPersonsDropdownOpen] = useState(false);
   const personsDropdownRef = useRef(null);
 
@@ -50,6 +48,28 @@ export default function DateRangePicker({ onDateChange, initialValues }) {
     return [currentYear, currentYear + 1];
   }, []);
 
+  // Initialize state after mounting
+  useEffect(() => {
+    setMounted(true);
+    setSelectedYear(new Date().getFullYear());
+    
+    if (initialValues) {
+      setDateRange(initialValues.startDate && initialValues.endDate 
+        ? [initialValues.startDate, initialValues.endDate] 
+        : [new Date(), new Date()]);
+      
+      setPersons(initialValues.persons || {
+        babies: 0,
+        teens: 0,
+        adults: 0
+      });
+      
+      setRooms(initialValues.rooms || 1);
+    } else {
+      setDateRange([new Date(), new Date()]);
+    }
+  }, [initialValues]);
+
   const handleClickOutside = useCallback((event) => {
     if (personsDropdownRef.current && !personsDropdownRef.current.contains(event.target)) {
       setIsPersonsDropdownOpen(false);
@@ -57,25 +77,13 @@ export default function DateRangePicker({ onDateChange, initialValues }) {
   }, []);
 
   useEffect(() => {
-    setMounted(true);
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [handleClickOutside]);
 
-  useEffect(() => {
-    if (initialValues && onDateChange) {
-      onDateChange({
-        startDate: initialValues.startDate,
-        endDate: initialValues.endDate,
-        persons: initialValues.persons,
-        rooms: initialValues.rooms
-      });
-    }
-  }, [initialValues, onDateChange]);
-
   const handleDateChange = useCallback((value) => {
     setDateRange(value);
-    if (value[0] && value[1] && onDateChange) {
+    if (value && value[0] && value[1] && onDateChange) {
       onDateChange({
         startDate: value[0],
         endDate: value[1],
@@ -90,24 +98,22 @@ export default function DateRangePicker({ onDateChange, initialValues }) {
     const newYear = parseInt(e.target.value);
     setSelectedYear(newYear);
     
-    setDateRange(prev => prev.map(date => {
-      const newDate = new Date(date);
-      newDate.setFullYear(newYear);
-      return newDate;
-    }));
-  }, []);
-
-  useEffect(() => {
-    if (dateRange[0] && dateRange[1] && onDateChange) {
-      onDateChange({
-        startDate: dateRange[0],
-        endDate: dateRange[1],
-        flexibility: flexibleDays,
-        persons,
-        rooms
-      });
+    if (dateRange) {
+      setDateRange(prev => prev.map(date => {
+        const newDate = new Date(date);
+        newDate.setFullYear(newYear);
+        return newDate;
+      }));
     }
-  }, [dateRange, flexibleDays, onDateChange, persons, rooms]);
+  }, [dateRange]);
+
+  const isFormComplete = useMemo(() => {
+    if (!dateRange || !persons) return false;
+    
+    return dateRange[0] && dateRange[1] && 
+           (persons.babies > 0 || persons.teens > 0 || persons.adults > 0) && 
+           rooms > 0;
+  }, [dateRange, persons, rooms]);
 
   const handlePersonChange = useCallback((type, value) => {
     setPersons(prev => {
@@ -133,12 +139,6 @@ export default function DateRangePicker({ onDateChange, initialValues }) {
     }
     return parts.length > 0 ? parts.join(', ') : 'Selectează persoane';
   }, [persons]);
-
-  const isFormComplete = useMemo(() => {
-    return dateRange[0] && dateRange[1] && 
-           (persons.babies > 0 || persons.teens > 0 || persons.adults > 0) && 
-           rooms > 0;
-  }, [dateRange, persons, rooms]);
 
   const handleFlexibleOptionClick = useCallback((days) => {
     setFlexibleDays(days);
@@ -166,7 +166,10 @@ export default function DateRangePicker({ onDateChange, initialValues }) {
     }
   }), [dateRange, selectedYear, handleDateChange]);
 
-  if (!mounted) return null;
+  // Return null on server-side and initial render
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className={styles.datePickerContainer}>

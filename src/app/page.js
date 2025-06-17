@@ -60,7 +60,7 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
             loading="lazy"
             quality={75}
             placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx0eHh0dHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx0eHh0dHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
@@ -78,22 +78,23 @@ export default function Home() {
   const { properties = [], isLoading: propertiesLoading, isError: propertiesError } = useProperties();
   const { bookings: topLocations = [], isLoading: bookingsLoading, isError: bookingsError } = useBookings();
   const { t } = useLanguage();
-  
-  // Memoize the filters initialization
-  const [filters, setFilters] = useState(() => {
-    if (typeof window === 'undefined') return null;
+  const [mounted, setMounted] = useState(false);
+  const [filters, setFilters] = useState(null);
+
+  useEffect(() => {
+    setMounted(true);
     try {
       const savedFilters = localStorage.getItem('searchFilters');
-      if (!savedFilters) return null;
-      const parsedFilters = JSON.parse(savedFilters);
-      if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
-      if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
-      return parsedFilters;
+      if (savedFilters) {
+        const parsedFilters = JSON.parse(savedFilters);
+        if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
+        if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
+        setFilters(parsedFilters);
+      }
     } catch (e) {
       console.error('Error loading filters:', e);
-      return null;
     }
-  });
+  }, []);
 
   // Memoize expensive computations
   const groupedProperties = useMemo(() => {
@@ -127,6 +128,17 @@ export default function Home() {
   const loading = propertiesLoading || bookingsLoading;
   const error = propertiesError || bookingsError;
 
+  // Return loading state if not mounted
+  if (!mounted) {
+    return (
+      <div>
+        <Header />
+        <HomePageSkeleton />
+        <Footer />
+      </div>
+    );
+  }
+  
   if (loading) return (
     <div>
       <Header />
