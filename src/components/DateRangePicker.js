@@ -5,11 +5,6 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import styles from './DateRangePicker.module.css';
 
-const tabs = [
-  { id: 'date', label: 'Date' },
-  { id: 'month', label: 'Luni' },
-  { id: 'flexible', label: 'Flexibilă' }
-];
 
 const flexibleOptions = [
   { label: 'Date exacte', value: 0 },
@@ -28,6 +23,7 @@ export default function DateRangePicker({ onDateChange }) {
   const [activeTab, setActiveTab] = useState('date');
   const [dateRange, setDateRange] = useState([new Date(), new Date()]);
   const [flexibleDays, setFlexibleDays] = useState(0);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     setMounted(true);
@@ -42,6 +38,32 @@ export default function DateRangePicker({ onDateChange }) {
         flexibility: flexibleDays
       });
     }
+  };
+
+  const handleYearChange = (e) => {
+    const newYear = parseInt(e.target.value);
+    setSelectedYear(newYear);
+    
+    // Update the date range to the new year while keeping the same months and days
+    const newDateRange = dateRange.map(date => {
+      const newDate = new Date(date);
+      newDate.setFullYear(newYear);
+      return newDate;
+    });
+    setDateRange(newDateRange);
+    
+    if (onDateChange && newDateRange[0] && newDateRange[1]) {
+      onDateChange({
+        startDate: newDateRange[0],
+        endDate: newDateRange[1],
+        flexibility: flexibleDays
+      });
+    }
+  };
+
+  const generateYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    return [currentYear, currentYear + 1];
   };
 
   const handleFlexibleOptionClick = (days) => {
@@ -59,24 +81,24 @@ export default function DateRangePicker({ onDateChange }) {
 
   return (
     <div className={styles.datePickerContainer}>
-      <div className={styles.tabsContainer}>
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            className={`${styles.tab} ${activeTab === tab.id ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className={styles.yearSelectorContainer}>
+        <select 
+          value={selectedYear}
+          onChange={handleYearChange}
+          className={styles.yearSelector}
+        >
+          {generateYearOptions().map(year => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </select>
       </div>
 
       <div className={styles.calendarContainer}>
         <Calendar
           onChange={handleDateChange}
-          value={dateRange}
+          value={dateRange} 
           selectRange={true}
-          minDate={new Date()}
+          minDate={new Date(selectedYear, 0, 1)}
           className={styles.calendar}
           showDoubleView={true}
           showFixedNumberOfWeeks={true}
@@ -100,7 +122,7 @@ export default function DateRangePicker({ onDateChange }) {
           navigationLabel={({ date, label, locale, view }) => {
             if (view === 'month') {
               const month = date.toLocaleString('ro-RO', { month: 'long' });
-              return `${month} ${date.getFullYear()}`;
+              return `${month}`;
             }
             return label;
           }}
