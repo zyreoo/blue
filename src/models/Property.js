@@ -48,6 +48,32 @@ const PropertySchema = new mongoose.Schema({
     type: Number,
     default: 2,
     min: [1, 'Maximum guests must be at least 1']
+  },
+  roomCapacity: {
+    type: Number,
+    required: [true, 'Room capacity is required'],
+    min: [1, 'Room capacity must be at least 1']
+  },
+  personCapacity: {
+    type: Number,
+    required: [true, 'Person capacity is required'],
+    min: [1, 'Person capacity must be at least 1']
+  },
+  petsAllowed: {
+    type: Boolean,
+    default: false
+  },
+  maxPets: {
+    type: Number,
+    default: 0,
+    min: [0, 'Maximum number of pets cannot be negative'],
+    validate: {
+      validator: function(value) {
+        // If pets are not allowed, maxPets should be 0
+        return this.petsAllowed ? value >= 0 : value === 0;
+      },
+      message: 'Maximum pets must be 0 when pets are not allowed'
+    }
   }
 }, {
   timestamps: true

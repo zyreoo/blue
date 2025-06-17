@@ -10,8 +10,9 @@ export async function GET(request) {
     console.log('Search params:', { location });
 
     console.log('Connecting to database...');
-    await connectDB();
+    const conn = await connectDB();
     console.log('Database connected successfully');
+    console.log('Connected to database:', conn.connection.db.databaseName);
     
     let query = {};
     if (location) {
@@ -20,8 +21,12 @@ export async function GET(request) {
     }
     
     console.log('Executing database query...');
-    const properties = await Property.find(query);
-    console.log(`Found ${properties.length} properties`);
+    const properties = await Property.find(query).lean();
+    console.log('Query result:', {
+      count: properties.length,
+      collectionName: Property.collection.name,
+      databaseName: conn.connection.db.databaseName
+    });
     
     return NextResponse.json(properties);
   } catch (error) {
