@@ -99,6 +99,7 @@ export default function DateRangePicker({ onDateChange }) {
           value={dateRange} 
           selectRange={true}
           minDate={new Date(selectedYear, 0, 1)}
+          maxDate={new Date(new Date().getFullYear() + 1, 11, 31)}
           className={styles.calendar}
           showFixedNumberOfWeeks={true}
           prev2Label={null}
@@ -124,6 +125,12 @@ export default function DateRangePicker({ onDateChange }) {
               return `${month}`;
             }
             return label;
+          }}
+          onActiveStartDateChange={({ activeStartDate }) => {
+            const newYear = activeStartDate.getFullYear();
+            if (newYear !== selectedYear) {
+              setSelectedYear(newYear);
+            }
           }}
         />
       </div>
