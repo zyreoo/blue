@@ -100,7 +100,6 @@ export default function DateRangePicker({ onDateChange }) {
           selectRange={true}
           minDate={new Date(selectedYear, 0, 1)}
           className={styles.calendar}
-          showDoubleView={true}
           showFixedNumberOfWeeks={true}
           prev2Label={null}
           next2Label={null}
