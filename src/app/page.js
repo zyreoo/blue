@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
 import styles from './page.module.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,106 +11,121 @@ import { useLanguage } from '@/components/LanguageProvider';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import SearchFilters from '@/components/SearchFilters';
+import { useProperties, useBookings } from '@/lib/hooks';
+import { useInView } from 'react-intersection-observer';
 
 const LocationSection = dynamic(() => import('@/components/LocationSection'), {
   loading: () => <HomePageSkeleton />,
   ssr: true
 });
 
-export default function Home() {
-  const [properties, setProperties] = useState([]);
-  const [topLocations, setTopLocations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { t } = useLanguage();
-  const [filters, setFilters] = useState(() => {
-    // Try to load initial filters from localStorage
-    if (typeof window !== 'undefined') {
-      const savedFilters = localStorage.getItem('searchFilters');
-      if (savedFilters) {
-        const parsedFilters = JSON.parse(savedFilters);
-        // Convert date strings back to Date objects
-        if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
-        if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
-        return parsedFilters;
-      }
-    }
-    return null;
+// Move formatSearchParams outside components since it doesn't depend on component state
+const formatSearchParams = (filters) => {
+  if (!filters) return '';
+  
+  const params = new URLSearchParams();
+  if (filters.checkIn) params.set('checkIn', filters.checkIn.toISOString());
+  if (filters.checkOut) params.set('checkOut', filters.checkOut.toISOString());
+  if (filters.guests) {
+    params.set('adults', filters.guests.adults || 0);
+    params.set('teens', filters.guests.teens || 0);
+    params.set('babies', filters.guests.babies || 0);
+  }
+  if (filters.rooms) params.set('rooms', filters.rooms);
+  
+  return params.toString() ? `?${params.toString()}` : '';
+};
+
+const PropertyCard = ({ property, locationUrl, filters, t }) => {
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1
   });
 
-  useEffect(() => {
-    const controller = new AbortController();
-    
-    fetchData(controller.signal);
-    
-    return () => controller.abort();
+  return (
+    <Link 
+      ref={ref}
+      href={`/${locationUrl}/${property._id}${formatSearchParams(filters)}`}
+      className={styles.card}
+    >
+      <div className={styles.imageContainer}>
+        {inView && (
+          <Image 
+            src={property.imageUrl} 
+            alt={property.title}
+            className={styles.image}
+            width={300}
+            height={200}
+            priority={false}
+            loading="lazy"
+            quality={75}
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx0eHh0dHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        )}
+        <div className={styles.price}>${property.price}/{t('property.perNight')}</div>
+      </div>
+      <div className={styles.content}>
+        <h3>{property.title}</h3>
+        <p className={styles.description}>{property.description}</p>
+      </div>
+    </Link>
+  );
+};
+
+export default function Home() {
+  const { properties = [], isLoading: propertiesLoading, isError: propertiesError } = useProperties();
+  const { bookings: topLocations = [], isLoading: bookingsLoading, isError: bookingsError } = useBookings();
+  const { t } = useLanguage();
+  
+  // Memoize the filters initialization
+  const [filters, setFilters] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const savedFilters = localStorage.getItem('searchFilters');
+      if (!savedFilters) return null;
+      const parsedFilters = JSON.parse(savedFilters);
+      if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
+      if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
+      return parsedFilters;
+    } catch (e) {
+      console.error('Error loading filters:', e);
+      return null;
+    }
+  });
+
+  // Memoize expensive computations
+  const groupedProperties = useMemo(() => {
+    if (!Array.isArray(properties)) return {};
+    return properties.reduce((acc, property) => {
+      if (!acc[property.location]) {
+        acc[property.location] = [];
+      }
+      acc[property.location].push(property);
+      return acc;
+    }, {});
+  }, [properties]);
+
+  // Memoize the format functions
+  const formatLocationUrl = useCallback((location) => {
+    return encodeURIComponent(location.toLowerCase().replace(/\s+/g, '-'));
   }, []);
 
-  const fetchData = async (signal) => {
-    try {
-      const [propertiesResponse, bookingsResponse] = await Promise.all([
-        fetch('/api/properties', { 
-          signal,
-          headers: {
-            'Cache-Control': 'public, max-age=31536000, immutable',
-          }
-        }),
-        fetch('/api/bookings', { 
-          signal,
-          headers: {
-            'Cache-Control': 'public, max-age=31536000, immutable',
-          }
-        })
-      ]);
-
-      if (!propertiesResponse.ok || !bookingsResponse.ok) {
-        throw new Error('Failed to fetch data');
-      }
-
-      const propertiesData = await propertiesResponse.json();
-      const bookingsData = await bookingsResponse.json();
-
-      setProperties(propertiesData);
-      setTopLocations(bookingsData);
-    } catch (err) {
-      if (err.name === 'AbortError') return;
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatLocationUrl = (location) => {
-    return encodeURIComponent(location.toLowerCase().replace(/\s+/g, '-'));
-  };
-
-  const formatSearchParams = (filters) => {
-    if (!filters) return '';
-    
-    const params = new URLSearchParams();
-    if (filters.checkIn) params.set('checkIn', filters.checkIn.toISOString());
-    if (filters.checkOut) params.set('checkOut', filters.checkOut.toISOString());
-    if (filters.guests) {
-      params.set('adults', filters.guests.adults || 0);
-      params.set('teens', filters.guests.teens || 0);
-      params.set('babies', filters.guests.babies || 0);
-    }
-    if (filters.rooms) params.set('rooms', filters.rooms);
-    
-    return params.toString() ? `?${params.toString()}` : '';
-  };
-
-  const handleFiltersChange = (newFilters) => {
+  // Memoize the filters change handler
+  const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
-  };
-
-  const groupedProperties = properties.reduce((acc, property) => {
-    if (!acc[property.location]) {
-      acc[property.location] = [];
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('searchFilters', JSON.stringify(newFilters));
+      } catch (e) {
+        console.error('Error saving filters:', e);
+      }
     }
-    acc[property.location].push(property);
-    return acc;
-  }, {});
+  }, []);
+
+  const loading = propertiesLoading || bookingsLoading;
+  const error = propertiesError || bookingsError;
 
   if (loading) return (
     <div>
@@ -120,7 +135,7 @@ export default function Home() {
     </div>
   );
   
-  if (error) return <div className={styles.error}>{error}</div>;
+  if (error) return <div className={styles.error}>{error.message}</div>;
 
   return (
     <div>
@@ -131,9 +146,11 @@ export default function Home() {
         <Suspense fallback={<HomePageSkeleton />}>
           {topLocations.map((locationData) => {
             const locationProperties = groupedProperties[locationData.location] || [];
+            const locationUrl = formatLocationUrl(locationData.location);
+            
             return (
               <section key={locationData.location} className={styles.locationSection}>
-                <Link href={`/${formatLocationUrl(locationData.location)}`} className={styles.locationLink}>
+                <Link href={`/${locationUrl}`} className={styles.locationLink}>
                   <h2 className={styles.locationTitle}>
                     {t('property.location')} {locationData.location}
                   </h2>
@@ -141,29 +158,13 @@ export default function Home() {
                 <div className={styles.cardsContainer}>
                   <div className={styles.cardsScroll}>
                     {locationProperties.map((property) => (
-                      <Link 
-                        key={property._id} 
-                        href={`/${formatLocationUrl(locationData.location)}/${property._id}${formatSearchParams(filters)}`}
-                        className={styles.card}
-                      >
-                        <div className={styles.imageContainer}>
-                          <Image 
-                            src={property.imageUrl} 
-                            alt={property.title}
-                            className={styles.image}
-                            width={300}
-                            height={200}
-                            priority={false}
-                            loading="lazy"
-                            quality={75}
-                          />
-                          <div className={styles.price}>${property.price}/{t('property.perNight')}</div>
-                        </div>
-                        <div className={styles.content}>
-                          <h3>{property.title}</h3>
-                          <p className={styles.description}>{property.description}</p>
-                        </div>
-                      </Link>
+                      <PropertyCard
+                        key={property._id}
+                        property={property}
+                        locationUrl={locationUrl}
+                        filters={filters}
+                        t={t}
+                      />
                     ))}
                   </div>
                 </div>

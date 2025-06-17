@@ -1,136 +1,153 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import styles from './SearchFilters.module.css';
 import DateRangePicker from './DateRangePicker';
 
-export default function SearchFilters({ onFiltersChange }) {
-  const defaultFilters = {
-    checkIn: null,
-    checkOut: null,
-    guests: {
-      adults: 0,
-      teens: 0,
-      babies: 0
-    },
-    rooms: 1,
-    priceRange: [0, 1000],
-    propertyType: 'all',
-    amenities: []
-  };
+// Move constants outside component to prevent recreation
+const defaultFilters = {
+  checkIn: null,
+  checkOut: null,
+  guests: {
+    adults: 0,
+    teens: 0,
+    babies: 0
+  },
+  rooms: 1,
+  priceRange: [0, 1000],
+  propertyType: 'all',
+  amenities: []
+};
 
+// Debounce function
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
+export default function SearchFilters({ onFiltersChange }) {
   const [filters, setFilters] = useState(() => {
-    // Try to load initial filters from localStorage
-    if (typeof window !== 'undefined') {
+    if (typeof window === 'undefined') return defaultFilters;
+    try {
       const savedFilters = localStorage.getItem('searchFilters');
-      if (savedFilters) {
-        try {
-          const parsedFilters = JSON.parse(savedFilters);
-          // Convert date strings back to Date objects
-          if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
-          if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
-          // Ensure all required properties exist
-          return {
-            ...defaultFilters,
-            ...parsedFilters
-          };
-        } catch (error) {
-          console.error('Error parsing saved filters:', error);
-          return defaultFilters;
-        }
-      }
+      if (!savedFilters) return defaultFilters;
+      const parsedFilters = JSON.parse(savedFilters);
+      if (parsedFilters.checkIn) parsedFilters.checkIn = new Date(parsedFilters.checkIn);
+      if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
+      return { ...defaultFilters, ...parsedFilters };
+    } catch (error) {
+      console.error('Error parsing saved filters:', error);
+      return defaultFilters;
     }
-    return defaultFilters;
   });
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
 
-  // Close modal when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(`.${styles.filtersContainer}`) && !e.target.closest(`.${styles.toggleButton}`)) {
-        setIsOpen(false);
-        setActiveModal(null);
+  // Memoize the filters change handler
+  const debouncedFiltersChange = useMemo(
+    () => debounce((newFilters) => {
+      if (onFiltersChange) {
+        onFiltersChange(newFilters);
       }
-    };
-    
+      try {
+        localStorage.setItem('searchFilters', JSON.stringify(newFilters));
+      } catch (error) {
+        console.error('Error saving filters:', error);
+      }
+    }, 300),
+    [onFiltersChange]
+  );
+
+  // Use useCallback for event handlers
+  const handleClickOutside = useCallback((e) => {
+    if (!e.target.closest(`.${styles.filtersContainer}`) && !e.target.closest(`.${styles.toggleButton}`)) {
+      setIsOpen(false);
+      setActiveModal(null);
+    }
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isOpen]);
+  }, [isOpen, handleClickOutside]);
 
-  // Notify parent and save to localStorage whenever filters change
   useEffect(() => {
-    if (onFiltersChange) {
-      onFiltersChange(filters);
-    }
-    localStorage.setItem('searchFilters', JSON.stringify(filters));
-  }, [filters, onFiltersChange]);
+    debouncedFiltersChange(filters);
+  }, [filters, debouncedFiltersChange]);
 
-  const handleDateChange = ({ startDate, endDate, persons, rooms }) => {
-    const newFilters = {
-      ...filters,
+  const handleDateChange = useCallback(({ startDate, endDate, persons, rooms }) => {
+    setFilters(prev => ({
+      ...prev,
       checkIn: startDate,
       checkOut: endDate,
       guests: persons,
       rooms
-    };
-    setFilters(newFilters);
-  };
+    }));
+  }, []);
 
-  const handlePriceChange = (event, type) => {
+  const handlePriceChange = useCallback((event, type) => {
     const value = parseInt(event.target.value);
-    let newMin = type === 'min' ? value : filters.priceRange[0];
-    let newMax = type === 'max' ? value : filters.priceRange[1];
+    setFilters(prev => {
+      let newMin = type === 'min' ? value : prev.priceRange[0];
+      let newMax = type === 'max' ? value : prev.priceRange[1];
 
-    if (type === 'min' && value > filters.priceRange[1]) {
-      newMin = filters.priceRange[1];
-    } else if (type === 'max' && value < filters.priceRange[0]) {
-      newMax = filters.priceRange[0];
-    }
+      if (type === 'min' && value > prev.priceRange[1]) {
+        newMin = prev.priceRange[1];
+      } else if (type === 'max' && value < prev.priceRange[0]) {
+        newMax = prev.priceRange[0];
+      }
 
-    const newFilters = {
-      ...filters,
-      priceRange: [newMin, newMax]
-    };
-    setFilters(newFilters);
-  };
+      return {
+        ...prev,
+        priceRange: [newMin, newMax]
+      };
+    });
+  }, []);
 
-  const handlePropertyTypeChange = (type) => {
-    const newFilters = {
-      ...filters,
+  const handlePropertyTypeChange = useCallback((type) => {
+    setFilters(prev => ({
+      ...prev,
       propertyType: type
-    };
-    setFilters(newFilters);
-  };
+    }));
+  }, []);
 
-  const handleAmenityToggle = (amenity) => {
-    const newAmenities = filters.amenities.includes(amenity)
-      ? filters.amenities.filter(a => a !== amenity)
-      : [...filters.amenities, amenity];
-    
-    const newFilters = {
-      ...filters,
-      amenities: newAmenities
-    };
-    setFilters(newFilters);
-  };
+  const handleAmenityToggle = useCallback((amenity) => {
+    setFilters(prev => {
+      const newAmenities = prev.amenities.includes(amenity)
+        ? prev.amenities.filter(a => a !== amenity)
+        : [...prev.amenities, amenity];
+      
+      return {
+        ...prev,
+        amenities: newAmenities
+      };
+    });
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters(defaultFilters);
     localStorage.removeItem('searchFilters');
-  };
+  }, []);
 
-  const getActiveFiltersCount = () => {
+  // Memoize expensive computations
+  const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filters.propertyType !== 'all') count++;
     if (filters.amenities.length > 0) count += filters.amenities.length;
     if (filters.priceRange[0] > 0) count++;
     if (filters.guests.adults + filters.guests.teens + filters.guests.babies > 0) count++;
     return count;
-  };
+  }, [filters]);
 
   return (
     <div className={styles.wrapper}>
@@ -222,7 +239,7 @@ export default function SearchFilters({ onFiltersChange }) {
             )}
           </button>
 
-          {getActiveFiltersCount() > 0 && (
+          {activeFiltersCount > 0 && (
             <button 
               className={styles.clearButton}
               onClick={() => {
