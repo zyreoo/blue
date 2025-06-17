@@ -263,4 +263,156 @@
 .yearSelector:focus {
   border-color: #626F47;
   box-shadow: 0 0 0 2px rgba(98, 111, 71, 0.1);
+}
+
+.personCounterContainer,
+.roomCounterContainer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.selectionContainer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.personsDropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdownButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.dropdownButton:hover {
+  border-color: #626F47;
+}
+
+.buttonLabel {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.buttonSummary {
+  font-size: 1rem;
+  color: #111827;
+  font-weight: 500;
+}
+
+.dropdownContent {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.personCounter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.personCounter label {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #f3f4f6;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.counterButton {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #626F47;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.counterButton:hover {
+  background-color: #626F47;
+  color: white;
+}
+
+.counter span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #111827;
+  min-width: 24px;
+  text-align: center;
+}
+
+.roomCounterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.roomCounterContainer .counter {
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.validationMessage {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.errorMessage {
+  color: #dc2626;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .selectionContainer {
+    padding: 16px;
+  }
+
+  .dropdownContent {
+    position: fixed;
+    top: 50%;
+    left: 16px;
+    right: 16px;
+    transform: translateY(-50%);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
 } 
