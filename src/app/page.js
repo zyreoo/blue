@@ -13,6 +13,7 @@ import { useTranslations } from 'next-intl';
 import SearchFilters from '@/components/SearchFilters';
 import { useProperties, useBookings } from '@/lib/hooks';
 import { useInView } from 'react-intersection-observer';
+import { useSearchParams } from 'next/navigation';
 
 const LocationSection = dynamic(() => import('@/components/LocationSection'), {
   loading: () => <HomePageSkeleton />,
@@ -60,7 +61,7 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
             loading="lazy"
             quality={75}
             placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx0eHh0dHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx0eHh0dHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
@@ -80,6 +81,8 @@ export default function Home() {
   const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [filters, setFilters] = useState(null);
+  const [selectedPropertyType, setSelectedPropertyType] = useState(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     setMounted(true);
@@ -91,22 +94,87 @@ export default function Home() {
         if (parsedFilters.checkOut) parsedFilters.checkOut = new Date(parsedFilters.checkOut);
         setFilters(parsedFilters);
       }
+
+      // Check for propertyType in URL and update filters
+      const propertyType = searchParams.get('propertyType');
+      if (propertyType) {
+        setFilters(prev => ({
+          ...prev || defaultFilters,
+          propertyType
+        }));
+      }
     } catch (e) {
       console.error('Error loading filters:', e);
     }
+  }, [searchParams]);
+
+  // Handle property type changes from Header
+  const handleTypeChange = useCallback((type) => {
+    setSelectedPropertyType(type);
   }, []);
 
-  // Memoize expensive computations
+  // Filter properties based on current filters and selected type
+  const filteredProperties = useMemo(() => {
+    if (!Array.isArray(properties)) return properties;
+
+    return properties.filter(property => {
+      // Apply all filters if they exist
+      if (filters) {
+        // Apply property type filter (either from quick filter or regular filter)
+        if (filters.propertyType && filters.propertyType !== 'all') {
+          if (property.type !== filters.propertyType) {
+            return false;
+          }
+        }
+
+        // Apply price range filter
+        if (filters.priceRange) {
+          const [minPrice, maxPrice] = filters.priceRange;
+          if (property.price < minPrice || property.price > maxPrice) {
+            return false;
+          }
+        }
+
+        // Apply date filters if present
+        if (filters.checkIn && filters.checkOut) {
+          // Add your date filtering logic here
+          // For example, check if the property is available between these dates
+        }
+
+        // Apply guest count filter if present
+        if (filters.guests) {
+          const totalGuests = filters.guests.adults + filters.guests.teens + filters.guests.babies;
+          if (totalGuests > property.maxGuests) {
+            return false;
+          }
+        }
+
+        // Apply amenities filter
+        if (filters.amenities && filters.amenities.length > 0) {
+          const hasAllAmenities = filters.amenities.every(amenity => 
+            property.amenities?.includes(amenity)
+          );
+          if (!hasAllAmenities) {
+            return false;
+          }
+        }
+      }
+
+      return true;
+    });
+  }, [properties, filters]);
+
+  // Group filtered properties by location
   const groupedProperties = useMemo(() => {
-    if (!Array.isArray(properties)) return {};
-    return properties.reduce((acc, property) => {
+    if (!Array.isArray(filteredProperties)) return {};
+    return filteredProperties.reduce((acc, property) => {
       if (!acc[property.location]) {
         acc[property.location] = [];
       }
       acc[property.location].push(property);
       return acc;
     }, {});
-  }, [properties]);
+  }, [filteredProperties]);
 
   // Memoize the format functions
   const formatLocationUrl = useCallback((location) => {
@@ -151,13 +219,20 @@ export default function Home() {
 
   return (
     <div>
-      <Header />
+      <Header onTypeChange={handleTypeChange} />
       <main className={styles.main}>
         <h1 className={styles.mainTitle}>{t('home.title')}</h1>
-        <SearchFilters onFiltersChange={handleFiltersChange} />
+        <SearchFilters 
+          onFiltersChange={handleFiltersChange} 
+          selectedQuickFilter={selectedPropertyType}
+        />
         <Suspense fallback={<HomePageSkeleton />}>
           {topLocations.map((locationData) => {
             const locationProperties = groupedProperties[locationData.location] || [];
+            
+            // Don't render sections with no properties after filtering
+            if (locationProperties.length === 0) return null;
+            
             const locationUrl = formatLocationUrl(locationData.location);
             
             return (

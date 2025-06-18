@@ -16,7 +16,6 @@ export default function AdminPage() {
     },
   });
 
-  // State management
   const [showForm, setShowForm] = useState(false);
   const [properties, setProperties] = useState([]);
   const [editingProperty, setEditingProperty] = useState(null);
@@ -41,14 +40,14 @@ export default function AdminPage() {
 
   const propertyTypes = ['Villa', 'Apartment', 'Cabin', 'House', 'Loft', 'Other'];
 
-  // Fetch user's properties when session is available
+
   useEffect(() => {
     if (session) {
       fetchUserProperties();
     }
   }, [session]);
 
-  // API calls
+
   const fetchUserProperties = async () => {
     try {
       const response = await fetch('/api/properties/user');
@@ -60,7 +59,7 @@ export default function AdminPage() {
     }
   };
 
-  // Form handlers
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     let processedValue = value;
@@ -106,7 +105,7 @@ export default function AdminPage() {
     }
   };
 
-  // Property actions
+
   const handleEdit = (property) => {
     setEditingProperty(property);
     setFormData({
@@ -183,7 +182,7 @@ export default function AdminPage() {
     );
   }
 
-  // Main render
+
   return (
     <div className={styles.adminPage}>
       <Header />

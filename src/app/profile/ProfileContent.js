@@ -14,6 +14,10 @@ export default function ProfileContent({ session }) {
     router.push('/');
   };
 
+  const goToAdmin = () => {
+    router.push('/admin');
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.profileCard}>
@@ -38,9 +42,14 @@ export default function ProfileContent({ session }) {
               <span className={styles.statValue}>0</span>
             </div>
           </div>
-          <button onClick={handleSignOut} className={styles.signOutButton}>
-            {t('profile.signOut') || 'Sign Out'}
-          </button>
+          <div className={styles.buttonContainer}>
+            <button onClick={goToAdmin} className={styles.adminButton}>
+              {t('profile.adminDashboard') || 'Admin Dashboard'}
+            </button>
+            <button onClick={handleSignOut} className={styles.signOutButton}>
+              {t('profile.signOut') || 'Sign Out'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

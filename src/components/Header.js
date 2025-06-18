@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './Header.module.css';
 
-export default function Header() {
+export default function Header({ onTypeChange }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedType, setSelectedType] = useState(null);
   const suggestionsRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -59,6 +60,23 @@ export default function Header() {
     return () => clearTimeout(debounceTimer);
   }, [searchQuery]);
 
+  const handleTypeClick = (type) => {
+    if (isLocationPage) {
+      router.push('/');
+    }
+    
+    const newType = type === selectedType ? null : type;
+    setSelectedType(newType);
+    
+    const typeMap = {
+      'hotel': 'House',
+      'pensiune': 'Villa',
+      'cabana': 'Cabin'
+    };
+    
+    onTypeChange?.(newType ? typeMap[newType] : null);
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -67,6 +85,7 @@ export default function Header() {
       setShowSuggestions(false);
     }
   };
+
   const handleSuggestionClick = (location) => {
     const formattedLocation = location.toLowerCase().replace(/\s+/g, '-');
     router.push(`/${formattedLocation}`);
@@ -105,15 +124,24 @@ export default function Header() {
             </a>
           </div>
           <div className={styles.accommodationTypes}>
-            <button className={styles.typeButton}>
+            <button 
+              className={`${styles.typeButton} ${selectedType === 'hotel' ? styles.selected : ''}`}
+              onClick={() => handleTypeClick('hotel')}
+            >
               <span className={styles.typeIcon}>🏨</span>
               <span>Hotel</span>
             </button>
-            <button className={styles.typeButton}>
+            <button 
+              className={`${styles.typeButton} ${selectedType === 'pensiune' ? styles.selected : ''}`}
+              onClick={() => handleTypeClick('pensiune')}
+            >
               <span className={styles.typeIcon}>🏡</span>
               <span>Pensiune</span>
             </button>
-            <button className={styles.typeButton}>
+            <button 
+              className={`${styles.typeButton} ${selectedType === 'cabana' ? styles.selected : ''}`}
+              onClick={() => handleTypeClick('cabana')}
+            >
               <span className={styles.typeIcon}>🌲</span>
               <span>Cabana</span>
             </button>
