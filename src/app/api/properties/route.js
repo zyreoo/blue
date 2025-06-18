@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Property from '@/models/Property';
 import dbConnect from '@/lib/dbConnect';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function GET(request) {
   try {
@@ -49,29 +51,36 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    // Get the user's session
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Connect to the database
     await dbConnect();
 
+    // Get the request body
     const body = await request.json();
 
-    // Convert string values to numbers where needed
+    // Add the owner field to the property data
     const propertyData = {
       ...body,
-      price: Number(body.price),
-      bedrooms: Number(body.bedrooms),
-      bathrooms: Number(body.bathrooms),
-      maxGuests: Number(body.maxGuests),
-      roomCapacity: Number(body.roomCapacity),
-      personCapacity: Number(body.personCapacity),
-      maxPets: Number(body.maxPets)
+      owner: session.user.id
     };
 
+    // Create the new property
     const property = await Property.create(propertyData);
 
-    return NextResponse.json(property, { status: 201 });
+    return NextResponse.json(property);
   } catch (error) {
     console.error('Error creating property:', error);
     return NextResponse.json(
-      { message: error.message || 'Failed to create property' },
+      { error: error.message || 'Failed to create property' },
       { status: 500 }
     );
   }

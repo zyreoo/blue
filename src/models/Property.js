@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const PropertySchema = new mongoose.Schema({
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Property owner is required']
+  },
   title: {
     type: String,
     required: [true, 'Title is required'],
