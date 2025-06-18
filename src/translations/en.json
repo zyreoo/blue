@@ -60,6 +60,7 @@
     "stats": {
       "bookings": "Bookings",
       "reviews": "Reviews"
-    }
+    },
+    "signOut": "Sign Out"
   }
 } 

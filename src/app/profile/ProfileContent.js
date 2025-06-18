@@ -1,10 +1,18 @@
 'use client';
 
 import { useLanguage } from '@/components/LanguageProvider';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 export default function ProfileContent({ session }) {
   const { t } = useLanguage();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    router.push('/');
+  };
 
   return (
     <div className={styles.container}>
@@ -30,6 +38,9 @@ export default function ProfileContent({ session }) {
               <span className={styles.statValue}>0</span>
             </div>
           </div>
+          <button onClick={handleSignOut} className={styles.signOutButton}>
+            {t('profile.signOut') || 'Sign Out'}
+          </button>
         </div>
       </div>
     </div>
