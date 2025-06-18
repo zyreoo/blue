@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Property from '@/models/Property';
+import dbConnect from '@/lib/dbConnect';
 
 export async function GET(request) {
   try {
@@ -48,29 +49,29 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    console.log('Creating new property...');
-    await connectDB();
-    console.log('Database connected successfully');
+    await dbConnect();
 
-    const data = await request.json();
-    console.log('Received property data:', data);
+    const body = await request.json();
 
-    const property = await Property.create(data);
-    console.log('Property created successfully:', property._id);
-    
+    // Convert string values to numbers where needed
+    const propertyData = {
+      ...body,
+      price: Number(body.price),
+      bedrooms: Number(body.bedrooms),
+      bathrooms: Number(body.bathrooms),
+      maxGuests: Number(body.maxGuests),
+      roomCapacity: Number(body.roomCapacity),
+      personCapacity: Number(body.personCapacity),
+      maxPets: Number(body.maxPets)
+    };
+
+    const property = await Property.create(propertyData);
+
     return NextResponse.json(property, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/properties:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
-    
+    console.error('Error creating property:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to create property',
-        details: error.message
-      },
+      { message: error.message || 'Failed to create property' },
       { status: 500 }
     );
   }
