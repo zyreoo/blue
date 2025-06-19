@@ -1,74 +1,59 @@
 import mongoose from 'mongoose';
 
-const PropertySchema = new mongoose.Schema({
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: false
-  },
+const propertySchema = new mongoose.Schema({
   title: {
     type: String,
-    required: [true, 'Title is required'],
+    required: true,
     trim: true,
-    minlength: [3, 'Title must be at least 3 characters long']
-  },
-  location: {
-    type: String,
-    required: [true, 'Location is required'],
-    trim: true
-  },
-  adminEmail: {
-    type: String,
-    required: [true, 'Admin email is required'],
-    trim: true,
-    lowercase: true
-  },
-  price: {
-    type: Number,
-    required: [true, 'Price is required'],
-    min: [0, 'Price cannot be negative']
-  },
-  imageUrl: {
-    type: String,
-    required: [true, 'Image URL is required'],
-    trim: true
-  },
-  type: {
-    type: String,
-    enum: {
-      values: ['Villa', 'Apartment', 'Cabin', 'House', 'Loft', 'Other'],
-      message: '{VALUE} is not a valid property type'
-    },
-    default: 'House'
+    minlength: 3,
+    maxlength: 100
   },
   description: {
     type: String,
+    required: true,
+    trim: true,
+    minlength: 10,
+    maxlength: 1000
+  },
+  location: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  price: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  imageUrl: {
+    type: String,
+    required: true,
     trim: true
   },
   bedrooms: {
     type: Number,
-    default: 1,
-    min: [0, 'Number of bedrooms cannot be negative']
+    required: true,
+    min: 1
   },
   bathrooms: {
     type: Number,
-    default: 1,
-    min: [0, 'Number of bathrooms cannot be negative']
+    required: true,
+    min: 1
   },
   maxGuests: {
     type: Number,
-    default: 2,
-    min: [1, 'Maximum guests must be at least 1']
+    required: true,
+    min: 1
   },
-  roomCapacity: {
-    type: Number,
-    required: [true, 'Room capacity is required'],
-    min: [1, 'Room capacity must be at least 1']
-  },
-  personCapacity: {
-    type: Number,
-    required: [true, 'Person capacity is required'],
-    min: [1, 'Person capacity must be at least 1']
+  amenities: [{
+    type: String,
+    trim: true
+  }],
+  adminEmail: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true
   },
   petsAllowed: {
     type: Boolean,
@@ -77,18 +62,12 @@ const PropertySchema = new mongoose.Schema({
   maxPets: {
     type: Number,
     default: 0,
-    min: [0, 'Maximum number of pets cannot be negative'],
     validate: {
       validator: function(value) {
-        // If pets are not allowed, maxPets should be 0
-        return this.petsAllowed ? value >= 0 : value === 0;
-      },
-      message: 'Maximum pets must be 0 when pets are not allowed'
+        if (!this.petsAllowed) return value === 0;
+        return value >= 0;
+      }
     }
-  },
-  amenities: {
-    type: [String],
-    default: []
   },
   createdAt: {
     type: Date,
@@ -102,22 +81,14 @@ const PropertySchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Add index for faster queries
-PropertySchema.index({ location: 1 });
-PropertySchema.index({ type: 1 });
-PropertySchema.index({ price: 1 });
-PropertySchema.index({ adminEmail: 1 });
+propertySchema.index({ location: 1, price: 1 });
 
-// Add error handling for save operations
-PropertySchema.pre('save', function(next) {
+propertySchema.pre('save', function(next) {
   try {
-    // Additional validation if needed
     next();
   } catch (error) {
     next(error);
   }
 });
 
-const Property = mongoose.models.Property || mongoose.model('Property', PropertySchema);
-
-export default Property; 
+export default mongoose.models.Property || mongoose.model('Property', propertySchema); 

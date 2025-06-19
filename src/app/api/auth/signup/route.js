@@ -5,17 +5,15 @@ import User from '@/models/User';
 
 export async function POST(request) {
   try {
-    const { name, email, phoneNumber, password } = await request.json();
+    const { firstName, lastName, email, phoneNumber, idNumber, password } = await request.json();
 
-    // Validate required fields
-    if (!name || !email || !phoneNumber || !password) {
+    if (!firstName || !lastName || !email || !phoneNumber || !idNumber || !password) {
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
       );
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -24,7 +22,6 @@ export async function POST(request) {
       );
     }
 
-    // Validate password length
     if (password.length < 6) {
       return NextResponse.json(
         { error: 'Password must be at least 6 characters long' },
@@ -34,7 +31,6 @@ export async function POST(request) {
 
     await connectDB();
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return NextResponse.json(
@@ -43,19 +39,18 @@ export async function POST(request) {
       );
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
     const user = await User.create({
-      name,
+      firstName,
+      lastName,
       email: email.toLowerCase(),
       phoneNumber,
+      idNumber,
       password: hashedPassword
     });
 
-    // Remove password from response
     const { password: _, ...userWithoutPassword } = user.toObject();
 
     return NextResponse.json({

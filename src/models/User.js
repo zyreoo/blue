@@ -36,12 +36,10 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Virtual for full name
 userSchema.virtual('fullName').get(function() {
   return `${this.firstName} ${this.lastName}`;
 });
 
-// Ensure virtuals are included in JSON output
 userSchema.set('toJSON', { virtuals: true });
 userSchema.set('toObject', { virtuals: true });
 

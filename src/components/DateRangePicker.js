@@ -5,7 +5,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import styles from './DateRangePicker.module.css';
 
-// Move constants outside component
+
 const WEEKDAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
 const flexibleOptions = [
   { label: 'Date exacte', value: 0 },
@@ -16,7 +16,7 @@ const flexibleOptions = [
   { label: '± 14 zile', value: 14 }
 ];
 
-// Memoize formatters
+
 const formatWeekday = (locale, date) => {
   const weekday = WEEKDAYS[date.getDay()];
   return `  ${weekday}`;
@@ -42,13 +42,13 @@ export default function DateRangePicker({ onDateChange, initialValues }) {
   const [isPersonsDropdownOpen, setIsPersonsDropdownOpen] = useState(false);
   const personsDropdownRef = useRef(null);
 
-  // Memoize year options
+
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
     return [currentYear, currentYear + 1];
   }, []);
 
-  // Initialize state after mounting
+
   useEffect(() => {
     setMounted(true);
     setSelectedYear(new Date().getFullYear());
@@ -144,7 +144,7 @@ export default function DateRangePicker({ onDateChange, initialValues }) {
     setFlexibleDays(days);
   }, []);
 
-  // Memoize calendar props
+
   const calendarProps = useMemo(() => ({
     onChange: handleDateChange,
     value: dateRange,
@@ -166,7 +166,7 @@ export default function DateRangePicker({ onDateChange, initialValues }) {
     }
   }), [dateRange, selectedYear, handleDateChange]);
 
-  // Return null on server-side and initial render
+
   if (!mounted) {
     return null;
   }

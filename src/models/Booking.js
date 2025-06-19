@@ -1,19 +1,16 @@
 import mongoose from 'mongoose';
 
-// Delete the existing model if it exists
 if (mongoose.models.Booking) {
   delete mongoose.models.Booking;
 }
 
 const bookingSchema = new mongoose.Schema({
-  // Booking Reference
   bookingNumber: {
     type: String,
     unique: true,
     sparse: true
   },
   
-  // Property Reference
   propertyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Property',
@@ -30,7 +27,6 @@ const bookingSchema = new mongoose.Schema({
     lowercase: true
   },
   
-  // Customer Information
   customer: {
     name: {
       type: String,
@@ -51,7 +47,6 @@ const bookingSchema = new mongoose.Schema({
     }
   },
   
-  // Booking Details
   checkIn: {
     type: Date,
     required: [true, 'Check-in date is required']
@@ -75,7 +70,6 @@ const bookingSchema = new mongoose.Schema({
     maxlength: [500, 'Special requests cannot exceed 500 characters']
   },
   
-  // Payment and Status
   totalPrice: {
     type: Number,
     required: [true, 'Total price is required']
@@ -91,7 +85,6 @@ const bookingSchema = new mongoose.Schema({
     default: 'pending'
   },
   
-  // Timestamps
   createdAt: {
     type: Date,
     default: Date.now
@@ -104,26 +97,21 @@ const bookingSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Add indexes for faster queries
 bookingSchema.index({ propertyId: 1, status: 1 });
 bookingSchema.index({ customerEmail: 1, status: 1 });
 bookingSchema.index({ checkIn: 1, checkOut: 1 });
 bookingSchema.index({ adminEmail: 1 });
 bookingSchema.index({ bookingNumber: 1 }, { unique: true });
 
-// Pre-save middleware to generate booking number
 bookingSchema.pre('save', async function(next) {
   if (this.isNew) {
     try {
-      // Get the current year
       const year = new Date().getFullYear();
       
-      // Find the highest booking number for this year
       const lastBooking = await mongoose.model('Booking').findOne({
         bookingNumber: new RegExp(`^${year}-`)
       }).sort({ bookingNumber: -1 });
       
-      // Extract the sequence number or start from 1
       let sequence = 1;
       if (lastBooking && lastBooking.bookingNumber) {
         const lastSequence = parseInt(lastBooking.bookingNumber.split('-')[1]);
@@ -132,7 +120,6 @@ bookingSchema.pre('save', async function(next) {
         }
       }
       
-      // Generate the new booking number (YYYY-NNNNNN)
       this.bookingNumber = `${year}-${sequence.toString().padStart(6, '0')}`;
     } catch (error) {
       return next(error);
@@ -143,7 +130,6 @@ bookingSchema.pre('save', async function(next) {
   next();
 });
 
-// Virtual for booking duration
 bookingSchema.virtual('duration').get(function() {
   return Math.ceil((this.checkOut - this.checkIn) / (1000 * 60 * 60 * 24));
 });

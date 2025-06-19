@@ -4,9 +4,8 @@ if (!process.env.MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-// Parse the database name from MONGODB_URI or default to 'blue'
 const MONGODB_URI = process.env.MONGODB_URI;
-const dbName = 'blue';  // Force using the 'blue' database
+const dbName = 'blue';
 
 let cached = global.mongoose;
 
@@ -28,7 +27,7 @@ async function connectDB() {
       retryWrites: true,
       retryReads: true,
       w: 'majority',
-      dbName: dbName  // Explicitly set the database name
+      dbName: dbName
     };
 
     mongoose.connection.on('connected', () => {

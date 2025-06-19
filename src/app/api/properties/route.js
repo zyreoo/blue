@@ -13,7 +13,6 @@ export async function GET(request) {
     const isAdmin = searchParams.get('admin') === 'true';
     console.log('Search params:', { location, isAdmin });
 
-    // Get user session if in admin mode
     let session = null;
     if (isAdmin) {
       session = await getServerSession(authOptions);
@@ -29,12 +28,10 @@ export async function GET(request) {
     
     let query = {};
     
-    // Add location filter if provided
     if (location) {
       query.location = new RegExp('^' + location + '$', 'i');
     }
     
-    // Add admin email filter if in admin mode
     if (isAdmin && session) {
       query.adminEmail = session.user.email;
     }
@@ -67,7 +64,6 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    // Get the user's session
     const session = await getServerSession(authOptions);
     
     if (!session) {
@@ -77,19 +73,15 @@ export async function POST(request) {
       );
     }
 
-    // Connect to the database
     await dbConnect();
 
-    // Get the request body
     const body = await request.json();
 
-    // Add the admin email to the property data
     const propertyData = {
       ...body,
       adminEmail: session.user.email
     };
 
-    // Create the new property
     const property = await Property.create(propertyData);
 
     return NextResponse.json(property);

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import styles from './SearchFilters.module.css';
 import DateRangePicker from './DateRangePicker';
 
-// Move constants outside component to prevent recreation
 const defaultFilters = {
   checkIn: null,
   checkOut: null,
@@ -19,7 +18,6 @@ const defaultFilters = {
   amenities: []
 };
 
-// Debounce function
 const debounce = (func, wait) => {
   let timeout;
   return function executedFunction(...args) {
@@ -33,13 +31,11 @@ const debounce = (func, wait) => {
 };
 
 export default function SearchFilters({ onFiltersChange }) {
-  // State hooks
   const [mounted, setMounted] = useState(false);
   const [filters, setFilters] = useState(defaultFilters);
   const [isOpen, setIsOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
 
-  // Callback hooks - all defined at the top level
   const handleDateChange = useCallback(({ startDate, endDate, persons, rooms }) => {
     setFilters(prev => ({
       ...prev,
@@ -101,7 +97,6 @@ export default function SearchFilters({ onFiltersChange }) {
     localStorage.removeItem('searchFilters');
   }, []);
 
-  // Memo hooks
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (filters.propertyType !== 'all') count++;
@@ -128,7 +123,6 @@ export default function SearchFilters({ onFiltersChange }) {
     [onFiltersChange, mounted]
   );
 
-  // Effect hooks
   useEffect(() => {
     setMounted(true);
     try {
@@ -156,12 +150,10 @@ export default function SearchFilters({ onFiltersChange }) {
     debouncedFiltersChange(filters);
   }, [filters, debouncedFiltersChange]);
 
-  // Early return for non-mounted state
   if (!mounted) {
     return <div className={styles.filtersContainer} />;
   }
 
-  // Render component
   return (
     <div className={styles.wrapper}>
       <button 

@@ -39,7 +39,11 @@ export default function BookingsList() {
         body: JSON.stringify({ status: newStatus }),
       });
 
-      if (!response.ok) throw new Error('Failed to update booking status');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update booking status');
+      }
       
       // Update booking in the list
       setBookings(bookings.map(booking => 
@@ -47,7 +51,11 @@ export default function BookingsList() {
           ? { ...booking, status: newStatus }
           : booking
       ));
+
+      // Show success message
+      alert('Booking status updated successfully');
     } catch (err) {
+      console.error('Error updating booking status:', err);
       alert('Error updating booking status: ' + err.message);
     }
   };

@@ -15,8 +15,8 @@ export function useProperties() {
   const { data, error } = useSWR('/api/properties', fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
-    dedupingInterval: 600000, // 10 minutes
-    fallbackData: [], // Provide a default value while loading
+    dedupingInterval: 600000,
+    fallbackData: []
   });
 
   return {
@@ -30,8 +30,8 @@ export function useBookings() {
   const { data, error } = useSWR('/api/bookings', fetcher, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
-    dedupingInterval: 600000, // 10 minutes
-    fallbackData: [], // Provide a default value while loading
+    dedupingInterval: 600000,
+    fallbackData: []
   });
 
   return {
