@@ -5,41 +5,67 @@ import User from '@/models/User';
 
 export async function POST(request) {
   try {
-    await connectDB();
     const { name, email, phoneNumber, password } = await request.json();
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    // Validate required fields
+    if (!name || !email || !phoneNumber || !password) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: 'All fields are required' },
         { status: 400 }
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
 
+    // Validate password length
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters long' },
+        { status: 400 }
+      );
+    }
+
+    await connectDB();
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'Email already registered' },
+        { status: 400 }
+      );
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create new user
     const user = await User.create({
       name,
-      email,
+      email: email.toLowerCase(),
       phoneNumber,
-      password: hashedPassword,
+      password: hashedPassword
     });
 
-    const userWithoutPassword = {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-    };
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = user.toObject();
 
-    return NextResponse.json(
-      { message: 'User created successfully', user: userWithoutPassword },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      message: 'User registered successfully',
+      user: userWithoutPassword
+    });
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('Signup Error:', error);
     return NextResponse.json(
-      { error: 'Error creating user' },
+      { error: 'Failed to create account' },
       { status: 500 }
     );
   }

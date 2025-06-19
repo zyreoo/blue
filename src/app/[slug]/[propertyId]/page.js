@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
+import { useSession } from 'next-auth/react';
 
 
 const DateRangePicker = dynamic(() => import('@/components/DateRangePicker'), {
@@ -14,10 +15,20 @@ const DateRangePicker = dynamic(() => import('@/components/DateRangePicker'), {
 });
 
 export default function PropertyPage() {
+  const { data: session } = useSession();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDates, setSelectedDates] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [bookingForm, setBookingForm] = useState({
+    firstName: '',
+    lastName: '',
+    guestEmail: '',
+    guestPhone: '',
+    idNumber: '',
+    specialRequests: ''
+  });
   const params = useParams();
   const searchParams = useSearchParams();
 
@@ -101,14 +112,65 @@ export default function PropertyPage() {
 
     fetchProperty();
   }, [params.propertyId]);
+
+  // Pre-fill form with user data when session is available
+  useEffect(() => {
+    if (session?.user) {
+      setBookingForm(prev => ({
+        ...prev,
+        firstName: session.user.firstName || '',
+        lastName: session.user.lastName || '',
+        guestEmail: session.user.email || '',
+        guestPhone: session.user.phoneNumber || '',
+        idNumber: session.user.idNumber || ''
+      }));
+    }
+  }, [session]);
+
+  const handleBookingFormChange = (e) => {
+    const { name, value } = e.target;
+    setBookingForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const toggleEditMode = () => {
+    setEditMode(!editMode);
+    if (!editMode) {
+      // When enabling edit mode, keep current values
+      setBookingForm(prev => ({
+        ...prev
+      }));
+    } else {
+      // When disabling edit mode, reset to user's info
+      setBookingForm({
+        firstName: session?.user?.firstName || '',
+        lastName: session?.user?.lastName || '',
+        guestEmail: session?.user?.email || '',
+        guestPhone: session?.user?.phoneNumber || '',
+        idNumber: session?.user?.idNumber || '',
+        specialRequests: bookingForm.specialRequests // Keep special requests
+      });
+    }
+  };
+
   const handleBooking = async () => {
     try {
+      if (!selectedDates || !selectedDates.startDate || !selectedDates.endDate) {
+        alert('Please select check-in and check-out dates');
+        return;
+      }
+
+      if (!bookingForm.firstName || !bookingForm.lastName || !bookingForm.guestEmail || !bookingForm.guestPhone || !bookingForm.idNumber) {
+        alert('Please fill in all required guest information');
+        return;
+      }
+
       console.log('📚 Attempting to book property:', {
         propertyId: params.propertyId,
-        location: property.location,
-        propertyTitle: property.title,
-        checkIn: selectedDates.startDate,
-        checkOut: selectedDates.endDate
+        ...selectedDates,
+        ...bookingForm
       });
 
       const response = await fetch('/api/bookings', {
@@ -118,9 +180,16 @@ export default function PropertyPage() {
         },
         body: JSON.stringify({
           propertyId: params.propertyId,
-          location: property.location,
           checkIn: selectedDates.startDate,
-          checkOut: selectedDates.endDate
+          checkOut: selectedDates.endDate,
+          numberOfGuests: selectedDates.persons,
+          numberOfRooms: selectedDates.rooms,
+          firstName: bookingForm.firstName,
+          lastName: bookingForm.lastName,
+          guestEmail: bookingForm.guestEmail,
+          guestPhone: bookingForm.guestPhone,
+          idNumber: bookingForm.idNumber,
+          specialRequests: bookingForm.specialRequests
         }),
       });
 
@@ -129,15 +198,21 @@ export default function PropertyPage() {
       }
 
       const result = await response.json();
-      console.log('✅ Booking successful:', {
-        location: property.location,
-        newBookingCount: result.booking.bookingCount,
-        checkIn: selectedDates.startDate,
-        checkOut: selectedDates.endDate
-      });
+      console.log('✅ Booking successful:', result);
 
-      // You could add additional booking flow here
-      alert(`Booking recorded successfully for ${new Date(selectedDates.startDate).toLocaleDateString()} to ${new Date(selectedDates.endDate).toLocaleDateString()}! This location now has ${result.booking.bookingCount} bookings.`);
+      alert('Booking recorded successfully! You will receive a confirmation email shortly.');
+      
+      // Reset form
+      setBookingForm({
+        firstName: session?.user?.firstName || '',
+        lastName: session?.user?.lastName || '',
+        guestEmail: session?.user?.email || '',
+        guestPhone: session?.user?.phoneNumber || '',
+        idNumber: session?.user?.idNumber || '',
+        specialRequests: ''
+      });
+      setEditMode(false);
+      
     } catch (error) {
       console.error('Error recording booking:', error);
       alert('Failed to record booking. Please try again.');
@@ -244,11 +319,92 @@ export default function PropertyPage() {
               onDateChange={handleDateChange}
               initialValues={selectedDates}
             />
+
+            <div className={styles.bookingForm}>
+              <div className={styles.formHeader}>
+                <h3>Guest Information</h3>
+                {session?.user && (
+                  <button
+                    type="button"
+                    onClick={toggleEditMode}
+                    className={styles.editButton}
+                  >
+                    {editMode ? 'Use My Info' : 'Edit Info'}
+                  </button>
+                )}
+              </div>
+
+              <div className={styles.nameGroup}>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={bookingForm.firstName}
+                  onChange={handleBookingFormChange}
+                  placeholder="First Name *"
+                  className={styles.bookingInput}
+                  disabled={!editMode && session?.user}
+                  required
+                />
+                
+                <input
+                  type="text"
+                  name="lastName"
+                  value={bookingForm.lastName}
+                  onChange={handleBookingFormChange}
+                  placeholder="Last Name *"
+                  className={styles.bookingInput}
+                  disabled={!editMode && session?.user}
+                  required
+                />
+              </div>
+              
+              <input
+                type="email"
+                name="guestEmail"
+                value={bookingForm.guestEmail}
+                onChange={handleBookingFormChange}
+                placeholder="Email Address *"
+                className={styles.bookingInput}
+                disabled={!editMode && session?.user}
+                required
+              />
+              
+              <input
+                type="tel"
+                name="guestPhone"
+                value={bookingForm.guestPhone}
+                onChange={handleBookingFormChange}
+                placeholder="Phone Number *"
+                className={styles.bookingInput}
+                disabled={!editMode && session?.user}
+                required
+              />
+
+              <input
+                type="text"
+                name="idNumber"
+                value={bookingForm.idNumber}
+                onChange={handleBookingFormChange}
+                placeholder="ID/Passport Number *"
+                className={styles.bookingInput}
+                disabled={!editMode && session?.user}
+                required
+              />
+              
+              <textarea
+                name="specialRequests"
+                value={bookingForm.specialRequests}
+                onChange={handleBookingFormChange}
+                placeholder="Special Requests (optional)"
+                className={styles.bookingTextarea}
+                rows={4}
+              />
+            </div>
             
             <button 
               className={styles.bookButton} 
               onClick={handleBooking}
-              disabled={!selectedDates}
+              disabled={!selectedDates || !bookingForm.firstName || !bookingForm.lastName || !bookingForm.guestEmail || !bookingForm.guestPhone || !bookingForm.idNumber}
             >
               Book Now
             </button>

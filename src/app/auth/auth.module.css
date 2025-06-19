@@ -1,0 +1,137 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7fafc;
+  padding: 20px;
+}
+
+.formWrapper {
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 480px;
+}
+
+.formWrapper h1 {
+  margin: 0 0 24px 0;
+  color: #2d3748;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.error {
+  background-color: #FEE2E2;
+  color: #DC2626;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formGroup label {
+  font-size: 0.95rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.input {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #626F47;
+}
+
+.button {
+  background-color: #626F47;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 8px;
+}
+
+.button:hover {
+  background-color: #4a5438;
+}
+
+.button:disabled {
+  background-color: #A0AEC0;
+  cursor: not-allowed;
+}
+
+.switchText {
+  margin: 24px 0 0 0;
+  text-align: center;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.switchText a {
+  color: #626F47;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.switchText a:hover {
+  text-decoration: underline;
+}
+
+.nameGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 16px;
+  }
+
+  .formWrapper {
+    padding: 24px;
+  }
+
+  .formWrapper h1 {
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+  }
+
+  .form {
+    gap: 12px;
+  }
+
+  .button {
+    padding: 10px;
+  }
+
+  .nameGroup {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+} 

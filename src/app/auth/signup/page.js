@@ -3,16 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import styles from '../signin/page.module.css';
+import styles from '../auth.module.css';
 
 export default function SignUp() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phoneNumber: '',
+    idNumber: '',
     password: '',
-    confirmPassword: '',
+    confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,7 +32,7 @@ export default function SignUp() {
     setError('');
     setLoading(true);
 
-    // Basic validation
+    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
@@ -38,29 +40,31 @@ export default function SignUp() {
     }
 
     try {
-      const res = await fetch('/api/auth/signup', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
           email: formData.email,
           phoneNumber: formData.phoneNumber,
-          password: formData.password,
+          idNumber: formData.idNumber,
+          password: formData.password
         }),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Something went wrong');
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create account');
       }
 
-      // Redirect to sign in page after successful registration
-      router.push('/auth/signin?registered=true');
-    } catch (err) {
-      setError(err.message);
+      // Redirect to sign in page on success
+      router.push('/auth/signin');
+    } catch (error) {
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -68,30 +72,50 @@ export default function SignUp() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>Create Account</h1>
-        <p className={styles.subtitle}>Fill in your details to get started</p>
-
-        {error && <p className={styles.error}>{error}</p>}
+      <div className={styles.formWrapper}>
+        <h1>Create Account</h1>
+        
+        {error && (
+          <div className={styles.error}>
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.inputGroup}>
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className={styles.input}
-            />
+          <div className={styles.nameGroup}>
+            <div className={styles.formGroup}>
+              <label htmlFor="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                required
+                className={styles.input}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                required
+                className={styles.input}
+              />
+            </div>
           </div>
 
-          <div className={styles.inputGroup}>
+          <div className={styles.formGroup}>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
+              id="email"
               name="email"
-              placeholder="Email"
               value={formData.email}
               onChange={handleChange}
               required
@@ -99,11 +123,12 @@ export default function SignUp() {
             />
           </div>
 
-          <div className={styles.inputGroup}>
+          <div className={styles.formGroup}>
+            <label htmlFor="phoneNumber">Phone Number</label>
             <input
               type="tel"
+              id="phoneNumber"
               name="phoneNumber"
-              placeholder="Phone Number"
               value={formData.phoneNumber}
               onChange={handleChange}
               required
@@ -111,44 +136,58 @@ export default function SignUp() {
             />
           </div>
 
-          <div className={styles.inputGroup}>
+          <div className={styles.formGroup}>
+            <label htmlFor="idNumber">ID/Passport Number</label>
+            <input
+              type="text"
+              id="idNumber"
+              name="idNumber"
+              value={formData.idNumber}
+              onChange={handleChange}
+              required
+              className={styles.input}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="password">Password</label>
             <input
               type="password"
+              id="password"
               name="password"
-              placeholder="Password"
               value={formData.password}
               onChange={handleChange}
               required
+              minLength={6}
               className={styles.input}
             />
           </div>
 
-          <div className={styles.inputGroup}>
+          <div className={styles.formGroup}>
+            <label htmlFor="confirmPassword">Confirm Password</label>
             <input
               type="password"
+              id="confirmPassword"
               name="confirmPassword"
-              placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleChange}
               required
+              minLength={6}
               className={styles.input}
             />
           </div>
 
-          <button
-            type="submit"
-            className={styles.submitButton}
+          <button 
+            type="submit" 
+            className={styles.button}
             disabled={loading}
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
         </form>
 
         <p className={styles.switchText}>
-          Already have an account?{' '}
-          <Link href="/auth/signin" className={styles.link}>
-            Sign In
-          </Link>
+          Already have an account? <Link href="/auth/signin">Sign In</Link>
         </p>
       </div>
     </div>
