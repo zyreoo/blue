@@ -4,7 +4,7 @@ const PropertySchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'Property owner is required']
+    required: false
   },
   title: {
     type: String,
@@ -16,6 +16,12 @@ const PropertySchema = new mongoose.Schema({
     type: String,
     required: [true, 'Location is required'],
     trim: true
+  },
+  adminEmail: {
+    type: String,
+    required: [true, 'Admin email is required'],
+    trim: true,
+    lowercase: true
   },
   price: {
     type: Number,
@@ -79,6 +85,18 @@ const PropertySchema = new mongoose.Schema({
       },
       message: 'Maximum pets must be 0 when pets are not allowed'
     }
+  },
+  amenities: {
+    type: [String],
+    default: []
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
 }, {
   timestamps: true
@@ -88,6 +106,7 @@ const PropertySchema = new mongoose.Schema({
 PropertySchema.index({ location: 1 });
 PropertySchema.index({ type: 1 });
 PropertySchema.index({ price: 1 });
+PropertySchema.index({ adminEmail: 1 });
 
 // Add error handling for save operations
 PropertySchema.pre('save', function(next) {

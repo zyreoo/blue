@@ -1,20 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import styles from './BookingsList.module.css';
 
 export default function BookingsList() {
+  const { data: session } = useSession();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchBookings();
-  }, []);
+    if (session) {
+      fetchBookings();
+    }
+  }, [session]);
 
   const fetchBookings = async () => {
     try {
-      const response = await fetch('/api/bookings?role=owner');
+      const response = await fetch('/api/bookings?role=admin');
       if (!response.ok) throw new Error('Failed to fetch bookings');
       const data = await response.json();
       setBookings(data);
@@ -37,36 +41,30 @@ export default function BookingsList() {
 
       if (!response.ok) throw new Error('Failed to update booking status');
       
-      // Refresh bookings list
-      fetchBookings();
+      // Update booking in the list
+      setBookings(bookings.map(booking => 
+        booking._id === bookingId 
+          ? { ...booking, status: newStatus }
+          : booking
+      ));
     } catch (err) {
-      setError(err.message);
+      alert('Error updating booking status: ' + err.message);
     }
   };
 
-  const formatGuestCount = (booking) => {
-    const guests = booking.numberOfGuests || {};
-    const adults = (guests.adults || 0) + (guests.teens || 0);
-    const babies = guests.babies || 0;
-    
-    let guestText = `${adults} adult${adults !== 1 ? 's' : ''}`;
-    if (babies > 0) {
-      guestText += `, ${babies} ${babies === 1 ? 'child' : 'children'}`;
-    }
-    return guestText;
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
-  if (loading) {
-    return <div className={styles.loading}>Loading bookings...</div>;
-  }
-
-  if (error) {
-    return <div className={styles.error}>{error}</div>;
-  }
-
-  if (bookings.length === 0) {
-    return <div className={styles.empty}>No bookings found.</div>;
-  }
+  if (!session) return <div className={styles.error}>Please sign in to access the admin panel</div>;
+  if (loading) return <div className={styles.loading}>Loading bookings...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
+  if (bookings.length === 0) return <div className={styles.empty}>No bookings found.</div>;
 
   return (
     <div className={styles.bookingsList}>
@@ -88,51 +86,52 @@ export default function BookingsList() {
             <div className={styles.cell}>
               <div className={styles.propertyInfo}>
                 <img 
-                  src={booking.propertyId?.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='} 
-                  alt={booking.propertyId?.title || 'Property'}
+                  src={booking.propertyId?.imageUrl} 
+                  alt={booking.propertyId?.title}
                   className={styles.propertyImage}
                 />
                 <div>
-                  <div className={styles.propertyTitle}>{booking.propertyId?.title || 'Property Unavailable'}</div>
-                  <div className={styles.propertyLocation}>{booking.propertyId?.location || 'Location Unavailable'}</div>
+                  <div className={styles.propertyTitle}>{booking.propertyId?.title}</div>
+                  <div className={styles.propertyLocation}>{booking.propertyId?.location}</div>
                 </div>
               </div>
             </div>
             
             <div className={styles.cell}>
               <div className={styles.guestInfo}>
-                <div>{booking.firstName} {booking.lastName}</div>
-                <div className={styles.guestEmail}>{booking.guestEmail}</div>
-                <div className={styles.guestPhone}>{booking.guestPhone}</div>
+                <div className={styles.guestName}>{booking.customer.name}</div>
+                <div className={styles.guestEmail}>{booking.customer.email}</div>
+                <div className={styles.guestPhone}>{booking.customer.phone}</div>
               </div>
             </div>
             
             <div className={styles.cell}>
               <div className={styles.dates}>
-                <div>Check-in: {new Date(booking.checkIn).toLocaleDateString()}</div>
-                <div>Check-out: {new Date(booking.checkOut).toLocaleDateString()}</div>
-                <div className={styles.guests}>
-                  Guests: {formatGuestCount(booking)}
-                </div>
+                <div>Check-in: {formatDate(booking.checkIn)}</div>
+                <div>Check-out: {formatDate(booking.checkOut)}</div>
+              </div>
+              <div className={styles.guests}>
+                {booking.numberOfGuests.adults + booking.numberOfGuests.teens} adults
+                {booking.numberOfGuests.babies > 0 && `, ${booking.numberOfGuests.babies} infants`}
               </div>
             </div>
-            
+
             <div className={styles.cell}>
-              <span className={`${styles.status} ${styles[booking.status || 'pending']}`}>
-                {booking.status || 'pending'}
-              </span>
+              <div className={`${styles.status} ${styles[booking.status]}`}>
+                {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+              </div>
             </div>
-            
+
             <div className={styles.cell}>
               <select
-                value={booking.status || 'pending'}
+                value={booking.status}
                 onChange={(e) => handleStatusChange(booking._id, e.target.value)}
                 className={styles.statusSelect}
               >
                 <option value="pending">Pending</option>
-                <option value="confirmed">Confirm</option>
-                <option value="cancelled">Cancel</option>
-                <option value="completed">Complete</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="completed">Completed</option>
               </select>
             </div>
           </div>

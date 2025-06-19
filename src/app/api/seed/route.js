@@ -6,6 +6,7 @@ const sampleProperties = [
   {
     title: "Modern Studio in Downtown",
     location: "San Mateo",
+    adminEmail: "sanmateo.admin@blue.com",
     price: 150,
     imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
     type: "Apartment",
@@ -16,11 +17,13 @@ const sampleProperties = [
     roomCapacity: 2,
     personCapacity: 2,
     petsAllowed: true,
-    maxPets: 1
+    maxPets: 1,
+    amenities: ["WiFi", "Kitchen", "Air Conditioning"]
   },
   {
     title: "Luxury Villa with Pool",
     location: "Tiburon",
+    adminEmail: "tiburon.admin@blue.com",
     price: 550,
     imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750",
     type: "Villa",
@@ -31,11 +34,13 @@ const sampleProperties = [
     roomCapacity: 6,
     personCapacity: 10,
     petsAllowed: true,
-    maxPets: 2
+    maxPets: 2,
+    amenities: ["Pool", "WiFi", "Kitchen", "Parking", "Ocean View"]
   },
   {
     title: "Cozy Mountain Cabin",
     location: "Mill Valley",
+    adminEmail: "millvalley.admin@blue.com",
     price: 220,
     imageUrl: "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8",
     type: "Cabin",
@@ -46,11 +51,13 @@ const sampleProperties = [
     roomCapacity: 3,
     personCapacity: 4,
     petsAllowed: true,
-    maxPets: 2
+    maxPets: 2,
+    amenities: ["Fireplace", "WiFi", "Kitchen", "Forest View"]
   },
   {
     title: "Downtown Loft",
     location: "San Francisco",
+    adminEmail: "sf.admin@blue.com",
     price: 300,
     imageUrl: "https://images.unsplash.com/photo-1536376072261-38c75010e6c9",
     type: "Loft",
@@ -61,11 +68,13 @@ const sampleProperties = [
     roomCapacity: 2,
     personCapacity: 3,
     petsAllowed: false,
-    maxPets: 0
+    maxPets: 0,
+    amenities: ["WiFi", "Kitchen", "City View", "Air Conditioning"]
   },
   {
     title: "Family House with Garden",
     location: "San Carlos",
+    adminEmail: "sancarlos.admin@blue.com",
     price: 275,
     imageUrl: "https://images.unsplash.com/photo-1518780664697-55e3ad937233",
     type: "House",
@@ -76,11 +85,13 @@ const sampleProperties = [
     roomCapacity: 4,
     personCapacity: 6,
     petsAllowed: true,
-    maxPets: 3
+    maxPets: 3,
+    amenities: ["Garden", "WiFi", "Kitchen", "Parking", "BBQ"]
   },
   {
     title: "Tech Hub Apartment",
     location: "Palo Alto",
+    adminEmail: "paloalto.admin@blue.com",
     price: 495,
     imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9",
     type: "Apartment",
@@ -91,7 +102,8 @@ const sampleProperties = [
     roomCapacity: 3,
     personCapacity: 4,
     petsAllowed: false,
-    maxPets: 0
+    maxPets: 0,
+    amenities: ["WiFi", "Kitchen", "Gym", "Parking", "Air Conditioning"]
   }
 ];
 

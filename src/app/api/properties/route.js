@@ -10,7 +10,17 @@ export async function GET(request) {
     console.log('Fetching properties...');
     const { searchParams } = new URL(request.url);
     const location = searchParams.get('location');
-    console.log('Search params:', { location });
+    const isAdmin = searchParams.get('admin') === 'true';
+    console.log('Search params:', { location, isAdmin });
+
+    // Get user session if in admin mode
+    let session = null;
+    if (isAdmin) {
+      session = await getServerSession(authOptions);
+      if (!session) {
+        return NextResponse.json({ error: 'Authentication required for admin access' }, { status: 401 });
+      }
+    }
 
     console.log('Connecting to database...');
     const conn = await connectDB();
@@ -18,12 +28,18 @@ export async function GET(request) {
     console.log('Connected to database:', conn.connection.db.databaseName);
     
     let query = {};
+    
+    // Add location filter if provided
     if (location) {
       query.location = new RegExp('^' + location + '$', 'i');
-      console.log('Search query:', query);
     }
     
-    console.log('Executing database query...');
+    // Add admin email filter if in admin mode
+    if (isAdmin && session) {
+      query.adminEmail = session.user.email;
+    }
+    
+    console.log('Executing database query:', query);
     const properties = await Property.find(query).lean();
     console.log('Query result:', {
       count: properties.length,
@@ -67,10 +83,10 @@ export async function POST(request) {
     // Get the request body
     const body = await request.json();
 
-    // Add the owner field to the property data
+    // Add the admin email to the property data
     const propertyData = {
       ...body,
-      owner: session.user.id
+      adminEmail: session.user.email
     };
 
     // Create the new property

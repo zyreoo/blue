@@ -77,7 +77,6 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
 
 export default function Home() {
   const { properties = [], isLoading: propertiesLoading, isError: propertiesError } = useProperties();
-  const { bookings: topLocations = [], isLoading: bookingsLoading, isError: bookingsError } = useBookings();
   const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [filters, setFilters] = useState(null);
@@ -99,7 +98,7 @@ export default function Home() {
       const propertyType = searchParams.get('propertyType');
       if (propertyType) {
         setFilters(prev => ({
-          ...prev || defaultFilters,
+          ...prev || {},
           propertyType
         }));
       }
@@ -108,26 +107,21 @@ export default function Home() {
     }
   }, [searchParams]);
 
-  // Handle property type changes from Header
   const handleTypeChange = useCallback((type) => {
     setSelectedPropertyType(type);
   }, []);
 
-  // Filter properties based on current filters and selected type
   const filteredProperties = useMemo(() => {
-    if (!Array.isArray(properties)) return properties;
+    if (!Array.isArray(properties)) return [];
 
     return properties.filter(property => {
-      // Apply all filters if they exist
       if (filters) {
-        // Apply property type filter (either from quick filter or regular filter)
         if (filters.propertyType && filters.propertyType !== 'all') {
           if (property.type !== filters.propertyType) {
             return false;
           }
         }
 
-        // Apply price range filter
         if (filters.priceRange) {
           const [minPrice, maxPrice] = filters.priceRange;
           if (property.price < minPrice || property.price > maxPrice) {
@@ -135,13 +129,6 @@ export default function Home() {
           }
         }
 
-        // Apply date filters if present
-        if (filters.checkIn && filters.checkOut) {
-          // Add your date filtering logic here
-          // For example, check if the property is available between these dates
-        }
-
-        // Apply guest count filter if present
         if (filters.guests) {
           const totalGuests = filters.guests.adults + filters.guests.teens + filters.guests.babies;
           if (totalGuests > property.maxGuests) {
@@ -149,7 +136,6 @@ export default function Home() {
           }
         }
 
-        // Apply amenities filter
         if (filters.amenities && filters.amenities.length > 0) {
           const hasAllAmenities = filters.amenities.every(amenity => 
             property.amenities?.includes(amenity)
@@ -164,9 +150,8 @@ export default function Home() {
     });
   }, [properties, filters]);
 
-  // Group filtered properties by location
+  // Group properties by location
   const groupedProperties = useMemo(() => {
-    if (!Array.isArray(filteredProperties)) return {};
     return filteredProperties.reduce((acc, property) => {
       if (!acc[property.location]) {
         acc[property.location] = [];
@@ -176,12 +161,10 @@ export default function Home() {
     }, {});
   }, [filteredProperties]);
 
-  // Memoize the format functions
   const formatLocationUrl = useCallback((location) => {
     return encodeURIComponent(location.toLowerCase().replace(/\s+/g, '-'));
   }, []);
 
-  // Memoize the filters change handler
   const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
     if (typeof window !== 'undefined') {
@@ -193,10 +176,6 @@ export default function Home() {
     }
   }, []);
 
-  const loading = propertiesLoading || bookingsLoading;
-  const error = propertiesError || bookingsError;
-
-  // Return loading state if not mounted
   if (!mounted) {
     return (
       <div>
@@ -207,7 +186,7 @@ export default function Home() {
     );
   }
   
-  if (loading) return (
+  if (propertiesLoading) return (
     <div>
       <Header />
       <HomePageSkeleton />
@@ -215,7 +194,7 @@ export default function Home() {
     </div>
   );
   
-  if (error) return <div className={styles.error}>{error.message}</div>;
+  if (propertiesError) return <div className={styles.error}>{propertiesError.message}</div>;
 
   return (
     <div>
@@ -227,19 +206,14 @@ export default function Home() {
           selectedQuickFilter={selectedPropertyType}
         />
         <Suspense fallback={<HomePageSkeleton />}>
-          {topLocations.map((locationData) => {
-            const locationProperties = groupedProperties[locationData.location] || [];
-            
-            // Don't render sections with no properties after filtering
-            if (locationProperties.length === 0) return null;
-            
-            const locationUrl = formatLocationUrl(locationData.location);
+          {Object.entries(groupedProperties).map(([location, locationProperties]) => {
+            const locationUrl = formatLocationUrl(location);
             
             return (
-              <section key={locationData.location} className={styles.locationSection}>
+              <section key={location} className={styles.locationSection}>
                 <Link href={`/${locationUrl}`} className={styles.locationLink}>
                   <h2 className={styles.locationTitle}>
-                    {t('property.location')} {locationData.location}
+                    {t('property.location')} {location}
                   </h2>
                 </Link>
                 <div className={styles.cardsContainer}>

@@ -1,21 +1,33 @@
 import mongoose from 'mongoose';
 
+// Delete the existing model if it exists
+if (mongoose.models.Booking) {
+  delete mongoose.models.Booking;
+}
+
 const bookingSchema = new mongoose.Schema({
+  // Booking Reference
+  bookingNumber: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  
   // Property Reference
   propertyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Property',
     required: [true, 'Property is required']
   },
-  propertyOwnerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'Property owner is required']
+  adminEmail: {
+    type: String,
+    required: [true, 'Admin email is required'],
+    lowercase: true
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'User ID is required']
+  customerEmail: {
+    type: String,
+    required: [true, 'Customer email is required'],
+    lowercase: true
   },
   
   // Customer Information
@@ -94,12 +106,39 @@ const bookingSchema = new mongoose.Schema({
 
 // Add indexes for faster queries
 bookingSchema.index({ propertyId: 1, status: 1 });
-bookingSchema.index({ userId: 1, status: 1 });
+bookingSchema.index({ customerEmail: 1, status: 1 });
 bookingSchema.index({ checkIn: 1, checkOut: 1 });
-bookingSchema.index({ propertyOwnerId: 1 });
+bookingSchema.index({ adminEmail: 1 });
+bookingSchema.index({ bookingNumber: 1 }, { unique: true });
 
-// Pre-save middleware to update timestamps
-bookingSchema.pre('save', function(next) {
+// Pre-save middleware to generate booking number
+bookingSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    try {
+      // Get the current year
+      const year = new Date().getFullYear();
+      
+      // Find the highest booking number for this year
+      const lastBooking = await mongoose.model('Booking').findOne({
+        bookingNumber: new RegExp(`^${year}-`)
+      }).sort({ bookingNumber: -1 });
+      
+      // Extract the sequence number or start from 1
+      let sequence = 1;
+      if (lastBooking && lastBooking.bookingNumber) {
+        const lastSequence = parseInt(lastBooking.bookingNumber.split('-')[1]);
+        if (!isNaN(lastSequence)) {
+          sequence = lastSequence + 1;
+        }
+      }
+      
+      // Generate the new booking number (YYYY-NNNNNN)
+      this.bookingNumber = `${year}-${sequence.toString().padStart(6, '0')}`;
+    } catch (error) {
+      return next(error);
+    }
+  }
+  
   this.updatedAt = new Date();
   next();
 });
@@ -109,6 +148,6 @@ bookingSchema.virtual('duration').get(function() {
   return Math.ceil((this.checkOut - this.checkIn) / (1000 * 60 * 60 * 24));
 });
 
-const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
+const Booking = mongoose.model('Booking', bookingSchema);
 
 export default Booking; 
