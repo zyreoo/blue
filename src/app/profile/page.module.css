@@ -26,9 +26,14 @@
 }
 
 .profileHeader {
-  margin-bottom: 40px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .userInfo h1 {
@@ -162,6 +167,22 @@
   color: #2d3748;
   font-size: 0.95rem;
   line-height: 1.5;
+}
+
+.becomeHostButton {
+  background-color: #FF385C;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.becomeHostButton:hover {
+  background-color: #E31C5F;
 }
 
 @media (max-width: 768px) {

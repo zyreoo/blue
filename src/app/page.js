@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
+import { useState, useEffect, Suspense, useMemo, useCallback, useRef } from 'react';
 import styles from './page.module.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -38,15 +38,20 @@ const formatSearchParams = (filters) => {
 };
 
 const PropertyCard = ({ property, locationUrl, filters, t }) => {
-  const { ref, inView } = useInView({
+  const ref = useRef();
+  const inView = useInView(ref, {
     triggerOnce: true,
     threshold: 0.1
   });
 
+  const formattedLocation = typeof property.location === 'object' 
+    ? `${property.location.city}-${property.location.country}`.toLowerCase().replace(/\s+/g, '-')
+    : locationUrl;
+
   return (
     <Link 
       ref={ref}
-      href={`/${locationUrl}/${property._id}${formatSearchParams(filters)}`}
+      href={`/${formattedLocation}/${property._id}${formatSearchParams(filters)}`}
       className={styles.card}
     >
       <div className={styles.imageContainer}>
@@ -162,6 +167,11 @@ export default function Home() {
   }, [filteredProperties]);
 
   const formatLocationUrl = useCallback((location) => {
+    if (typeof location === 'object') {
+      // If location is an object, use city and country
+      return encodeURIComponent(`${location.city}-${location.country}`.toLowerCase().replace(/\s+/g, '-'));
+    }
+    // If location is a string, use it directly
     return encodeURIComponent(location.toLowerCase().replace(/\s+/g, '-'));
   }, []);
 

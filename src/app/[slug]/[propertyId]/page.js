@@ -101,6 +101,11 @@ export default function PropertyPage() {
         if (!foundProperty) {
           throw new Error('Property not found');
         }
+
+        // Format the location if it's an object
+        if (foundProperty.location && typeof foundProperty.location === 'object') {
+          foundProperty.formattedLocation = `${foundProperty.location.city}, ${foundProperty.location.country}`;
+        }
         
         setProperty(foundProperty);
       } catch (err) {
@@ -250,7 +255,11 @@ export default function PropertyPage() {
       <main className={styles.main}>
         <div className={styles.titleSection}>
           <h1>{property.title}</h1>
-          <p className={styles.location}>{property.location}</p>
+          <p className={styles.location}>
+            {property.formattedLocation || (typeof property.location === 'object' 
+              ? `${property.location.city}, ${property.location.country}`
+              : property.location)}
+          </p>
         </div>
         
         <div className={styles.imageGallery}>
@@ -273,7 +282,7 @@ export default function PropertyPage() {
               <div className={styles.detailCard}>
                 <span className={styles.detailIcon}>🛏️</span>
                 <div>
-                  <h3>{property.bedrooms} Bedroom{property.bedrooms !== 1 ? 's' : ''}</h3>
+                  <h3>{property.details?.bedrooms || property.bedrooms} Bedroom{(property.details?.bedrooms || property.bedrooms) !== 1 ? 's' : ''}</h3>
                   <p>Perfect for your stay</p>
                 </div>
               </div>
@@ -281,7 +290,7 @@ export default function PropertyPage() {
               <div className={styles.detailCard}>
                 <span className={styles.detailIcon}>🚿</span>
                 <div>
-                  <h3>{property.bathrooms} Bathroom{property.bathrooms !== 1 ? 's' : ''}</h3>
+                  <h3>{property.details?.bathrooms || property.bathrooms} Bathroom{(property.details?.bathrooms || property.bathrooms) !== 1 ? 's' : ''}</h3>
                   <p>Fresh and clean</p>
                 </div>
               </div>
@@ -289,7 +298,7 @@ export default function PropertyPage() {
               <div className={styles.detailCard}>
                 <span className={styles.detailIcon}>👥</span>
                 <div>
-                  <h3>Up to {property.maxGuests} Guests</h3>
+                  <h3>Up to {property.details?.maxGuests || property.maxGuests} Guests</h3>
                   <p>Spacious accommodation</p>
                 </div>
               </div>
@@ -297,7 +306,7 @@ export default function PropertyPage() {
               <div className={styles.detailCard}>
                 <span className={styles.detailIcon}>🏠</span>
                 <div>
-                  <h3>{property.type || 'House'}</h3>
+                  <h3>{property.propertyType || property.type || 'House'}</h3>
                   <p>Property type</p>
                 </div>
               </div>
@@ -307,6 +316,34 @@ export default function PropertyPage() {
               <h2>About this place</h2>
               <p>{property.description}</p>
             </div>
+
+            {property.amenities && property.amenities.length > 0 && (
+              <div className={styles.amenities}>
+                <h2>Amenities</h2>
+                <div className={styles.amenitiesGrid}>
+                  {property.amenities.map((amenity, index) => (
+                    <div key={index} className={styles.amenityItem}>
+                      <span className={styles.amenityIcon}>
+                        {amenity === 'wifi' && '📶'}
+                        {amenity === 'tv' && '📺'}
+                        {amenity === 'kitchen' && '🍳'}
+                        {amenity === 'washer' && '🧺'}
+                        {amenity === 'pool' && '🏊‍♂️'}
+                        {amenity === 'parking' && '🅿️'}
+                        {amenity === 'ac' && '❄️'}
+                        {amenity === 'heating' && '🔥'}
+                        {amenity === 'workspace' && '💻'}
+                        {amenity === 'gym' && '💪'}
+                        {!['wifi', 'tv', 'kitchen', 'washer', 'pool', 'parking', 'ac', 'heating', 'workspace', 'gym'].includes(amenity) && '✨'}
+                      </span>
+                      <span className={styles.amenityLabel}>
+                        {amenity.charAt(0).toUpperCase() + amenity.slice(1).replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className={styles.bookingCard}>
@@ -412,7 +449,9 @@ export default function PropertyPage() {
             <div className={styles.bookingDetails}>
               <p>Free cancellation before check-in</p>
               <p>Self check-in with keypad</p>
-              <p>Great location with high ratings</p>
+              <p>Great location in {property.formattedLocation || (typeof property.location === 'object' 
+                ? `${property.location.city}, ${property.location.country}`
+                : property.location)}</p>
             </div>
           </div>
         </div>

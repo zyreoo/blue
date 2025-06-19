@@ -1,73 +1,143 @@
 import mongoose from 'mongoose';
 
 const propertySchema = new mongoose.Schema({
-  title: {
+  host: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  hostEmail: {
+    type: String,
+    required: true
+  },
+  propertyType: {
     type: String,
     required: true,
-    trim: true,
-    minlength: 3,
-    maxlength: 100
+    enum: ['house', 'apartment', 'barn', 'guesthouse', 'boat', 'cabin', 'camper', 'villa', 'castle', 'cave', 'container', 'cycladic']
+  },
+  spaceType: {
+    type: String,
+    required: true,
+    enum: ['entire_place', 'private_room', 'shared_room']
+  },
+  location: {
+    address: {
+      type: String,
+      required: true
+    },
+    city: {
+      type: String,
+      required: true
+    },
+    country: {
+      type: String,
+      required: true
+    },
+    coordinates: {
+      lat: Number,
+      lng: Number
+    }
+  },
+  details: {
+    maxGuests: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+    bedrooms: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+    beds: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+    bathrooms: {
+      type: Number,
+      required: true,
+      min: 1
+    }
+  },
+  amenities: [{
+    type: String
+  }],
+  photos: [{
+    url: {
+      type: String,
+      required: true
+    },
+    caption: String,
+    isMain: {
+      type: Boolean,
+      default: false
+    }
+  }],
+  pricing: {
+    basePrice: {
+      type: Number,
+      required: true,
+      min: 0
+    },
+    cleaningFee: {
+      type: Number,
+      default: 0
+    },
+    serviceFee: {
+      type: Number,
+      default: 0
+    }
   },
   description: {
     type: String,
     required: true,
-    trim: true,
-    minlength: 10,
-    maxlength: 1000
+    minLength: 50
   },
-  location: {
+  status: {
     type: String,
-    required: true,
-    trim: true
+    enum: ['draft', 'pending', 'active', 'inactive'],
+    default: 'pending'
   },
-  price: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  imageUrl: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  bedrooms: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  bathrooms: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  maxGuests: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  amenities: [{
-    type: String,
-    trim: true
+  reviews: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
   }],
-  adminEmail: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true
-  },
-  petsAllowed: {
-    type: Boolean,
-    default: false
-  },
-  maxPets: {
+  averageRating: {
     type: Number,
     default: 0,
-    validate: {
-      validator: function(value) {
-        if (!this.petsAllowed) return value === 0;
-        return value >= 0;
-      }
-    }
+    min: 0,
+    max: 5
+  },
+  bookings: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Booking'
+  }],
+  rules: {
+    smokingAllowed: {
+      type: Boolean,
+      default: false
+    },
+    petsAllowed: {
+      type: Boolean,
+      default: false
+    },
+    partiesAllowed: {
+      type: Boolean,
+      default: false
+    },
+    additionalRules: [String]
+  },
+  availability: {
+    alwaysAvailable: {
+      type: Boolean,
+      default: true
+    },
+    unavailableDates: [{
+      startDate: Date,
+      endDate: Date,
+      reason: String
+    }]
   },
   createdAt: {
     type: Date,
@@ -77,18 +147,22 @@ const propertySchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-}, {
-  timestamps: true
 });
 
-propertySchema.index({ location: 1, price: 1 });
-
+// Update timestamps on save
 propertySchema.pre('save', function(next) {
-  try {
-    next();
-  } catch (error) {
-    next(error);
-  }
+  this.updatedAt = Date.now();
+  next();
 });
 
-export default mongoose.models.Property || mongoose.model('Property', propertySchema); 
+// Add indexes for common queries
+propertySchema.index({ 'location.city': 1 });
+propertySchema.index({ 'location.country': 1 });
+propertySchema.index({ propertyType: 1 });
+propertySchema.index({ status: 1 });
+propertySchema.index({ 'pricing.basePrice': 1 });
+propertySchema.index({ averageRating: -1 });
+
+const Property = mongoose.models.Property || mongoose.model('Property', propertySchema);
+
+export default Property; 

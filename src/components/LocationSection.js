@@ -41,7 +41,7 @@ const LocationSection = ({ locationData, properties, formatLocationUrl }) => {
     <section ref={sectionRef} className={styles.locationSection}>
       <Link href={`/${formatLocationUrl(locationData.location)}`} className={styles.locationLink}>
         <h2 className={styles.locationTitle}>
-          Stay in {locationData.location} 
+          Stay in {typeof locationData.location === 'object' ? `${locationData.location.city}, ${locationData.location.country}` : locationData.location} 
         </h2>
       </Link>
       <div className={styles.cardsContainer}>

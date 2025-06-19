@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -98,6 +100,12 @@ export default function ProfilePage() {
             <h1>My Profile</h1>
             <p className={styles.email}>{session.user.email}</p>
           </div>
+          <button 
+            className={styles.becomeHostButton}
+            onClick={() => router.push('/become-host')}
+          >
+            Become a Host
+          </button>
         </div>
 
         <div className={styles.bookingsSection}>
