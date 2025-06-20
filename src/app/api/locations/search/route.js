@@ -28,7 +28,7 @@ export async function GET(request) {
 
     return NextResponse.json(sortedLocations);
   } catch (error) {
-    console.error('Error searching locations:', error);
+
     return NextResponse.json(
       { error: error.message },
       { status: 500 }

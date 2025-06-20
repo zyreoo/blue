@@ -108,7 +108,7 @@ export default function Home() {
         }));
       }
     } catch (e) {
-      console.error('Error loading filters:', e);
+
     }
   }, [searchParams]);
 
@@ -181,7 +181,7 @@ export default function Home() {
       try {
         localStorage.setItem('searchFilters', JSON.stringify(newFilters));
       } catch (e) {
-        console.error('Error saving filters:', e);
+  
       }
     }
   }, []);

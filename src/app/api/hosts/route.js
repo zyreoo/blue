@@ -116,7 +116,7 @@ export async function POST(req) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Error creating property:', error);
+
     return NextResponse.json(
       { error: 'Failed to create property' },
       { status: 500 }
@@ -127,5 +127,5 @@ export async function POST(req) {
 // Helper function to send admin notification
 async function sendAdminNotification(data) {
   // You'll need to implement this function to send emails
-  console.log('Admin notification:', data);
+  
 } 

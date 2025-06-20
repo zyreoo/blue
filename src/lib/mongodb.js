@@ -21,18 +21,19 @@ async function connectDB() {
   if (!cached.promise) {
     const opts = {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 45000,
       family: 4,
       retryWrites: true,
       retryReads: true,
       w: 'majority',
-      dbName: dbName
+      dbName: dbName,
+      connectTimeoutMS: 30000,
+      heartbeatFrequencyMS: 2000,
     };
 
     mongoose.connection.on('connected', () => {
       console.log('MongoDB connected successfully');
-      console.log('Using database:', mongoose.connection.db.databaseName);
     });
 
     mongoose.connection.on('error', (err) => {

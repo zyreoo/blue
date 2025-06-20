@@ -172,11 +172,7 @@ export default function PropertyPage() {
         return;
       }
 
-      console.log('📚 Attempting to book property:', {
-        propertyId: params.propertyId,
-        ...selectedDates,
-        ...bookingForm
-      });
+
 
       const response = await fetch('/api/bookings', {
         method: 'POST',
@@ -203,7 +199,7 @@ export default function PropertyPage() {
       }
 
       const result = await response.json();
-      console.log('✅ Booking successful:', result);
+
 
       alert('Booking recorded successfully! You will receive a confirmation email shortly.');
       
@@ -219,7 +215,7 @@ export default function PropertyPage() {
       setEditMode(false);
       
     } catch (error) {
-      console.error('Error recording booking:', error);
+
       alert('Failed to record booking. Please try again.');
     }
   };

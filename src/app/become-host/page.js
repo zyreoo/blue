@@ -10,7 +10,7 @@ import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import Image from 'next/image';
 
-// Translations object (we'll move this to a separate file later)
+
 const translations = {
   common: {
     next: "Continuă",
@@ -117,7 +117,7 @@ const translations = {
   }
 };
 
-// Helper function to get translation
+
 const t = (key) => {
   const keys = key.split('.');
   let value = translations;
@@ -336,7 +336,7 @@ export default function BecomeHostPage() {
         throw new Error(error.message || 'Failed to create property');
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
+
       alert(t('common.error') + ': ' + error.message);
     } finally {
       setIsSubmitting(false);

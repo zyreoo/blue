@@ -49,7 +49,7 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json(updatedProperty);
   } catch (error) {
-    console.error('Error updating property:', error);
+
     return NextResponse.json(
       { error: error.message || 'Failed to update property' },
       { status: 500 }
@@ -95,7 +95,7 @@ export async function DELETE(request, { params }) {
 
     return NextResponse.json({ message: 'Property deleted successfully' });
   } catch (error) {
-    console.error('Error deleting property:', error);
+
     return NextResponse.json(
       { error: error.message || 'Failed to delete property' },
       { status: 500 }

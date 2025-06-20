@@ -55,7 +55,7 @@ export default function BookingsList() {
       // Show success message
       alert('Booking status updated successfully');
     } catch (err) {
-      console.error('Error updating booking status:', err);
+
       alert('Error updating booking status: ' + err.message);
     }
   };

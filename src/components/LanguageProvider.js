@@ -27,7 +27,7 @@ export function LanguageProvider({ children }) {
       const translations = await import(`@/translations/${lang}.json`);
       setTranslations(translations.default);
     } catch (error) {
-      console.error('Error loading translations:', error);
+      
       // Fallback to English if translation file not found
       if (lang !== 'en') {
         const enTranslations = await import('@/translations/en.json');
@@ -39,7 +39,6 @@ export function LanguageProvider({ children }) {
   const changeLanguage = async (newLanguage) => {
     setLanguage(newLanguage);
     localStorage.setItem('language', newLanguage);
-    await loadTranslations(newLanguage);
   };
 
   const t = (key) => {
@@ -50,7 +49,7 @@ export function LanguageProvider({ children }) {
       if (value && typeof value === 'object') {
         value = value[k];
       } else {
-        return key; // Return the key if translation not found
+        return key; 
       }
     }
     

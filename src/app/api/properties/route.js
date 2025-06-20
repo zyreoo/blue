@@ -7,11 +7,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function GET(request) {
   try {
-    console.log('Fetching properties...');
     const { searchParams } = new URL(request.url);
     const location = searchParams.get('location');
     const isAdmin = searchParams.get('admin') === 'true';
-    console.log('Search params:', { location, isAdmin });
 
     let session = null;
     if (isAdmin) {
@@ -21,10 +19,7 @@ export async function GET(request) {
       }
     }
 
-    console.log('Connecting to database...');
     const conn = await connectDB();
-    console.log('Database connected successfully');
-    console.log('Connected to database:', conn.connection.db.databaseName);
     
     let query = {};
     
@@ -36,21 +31,11 @@ export async function GET(request) {
       query.adminEmail = session.user.email;
     }
     
-    console.log('Executing database query:', query);
     const properties = await Property.find(query).lean();
-    console.log('Query result:', {
-      count: properties.length,
-      collectionName: Property.collection.name,
-      databaseName: conn.connection.db.databaseName
-    });
     
     return NextResponse.json(properties);
   } catch (error) {
-    console.error('Error in GET /api/properties:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
+
     
     return NextResponse.json(
       { 
@@ -86,7 +71,7 @@ export async function POST(request) {
 
     return NextResponse.json(property);
   } catch (error) {
-    console.error('Error creating property:', error);
+
     return NextResponse.json(
       { error: error.message || 'Failed to create property' },
       { status: 500 }

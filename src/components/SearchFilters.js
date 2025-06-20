@@ -116,7 +116,7 @@ export default function SearchFilters({ onFiltersChange }) {
         try {
           localStorage.setItem('searchFilters', JSON.stringify(newFilters));
         } catch (error) {
-          console.error('Error saving filters:', error);
+    
         }
       }
     }, 300),
@@ -134,7 +134,7 @@ export default function SearchFilters({ onFiltersChange }) {
         setFilters({ ...defaultFilters, ...parsedFilters });
       }
     } catch (error) {
-      console.error('Error parsing saved filters:', error);
+
     }
     return () => setMounted(false);
   }, []);

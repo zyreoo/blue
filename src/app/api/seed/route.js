@@ -120,15 +120,11 @@ export async function GET() {
     
     // Connect to the 'blue' database
     const conn = await mongoose.createConnection(uri).asPromise();
-    console.log('Connected to blue database');
-    
     // Delete all existing properties
     const deleteResult = await conn.collection('properties').deleteMany({});
-    console.log(`Deleted ${deleteResult.deletedCount} existing properties`);
 
     // Insert new properties
     const insertResult = await conn.collection('properties').insertMany(sampleProperties);
-    console.log(`Inserted ${Object.keys(insertResult.insertedIds).length} new properties`);
 
     // Close connection
     await conn.close();
@@ -140,7 +136,7 @@ export async function GET() {
       insertedCount: Object.keys(insertResult.insertedIds).length
     }, { status: 200 });
   } catch (error) {
-    console.error('Error seeding database:', error);
+
     return NextResponse.json({ 
       error: 'Error seeding database',
       details: error.message

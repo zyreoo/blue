@@ -21,9 +21,14 @@ export default function ProfilePage() {
       return;
     }
 
+    if (status === 'loading') {
+      return;
+    }
+
     if (status === 'authenticated' && session) {
       const fetchData = async () => {
         try {
+          setLoading(true);
           const bookingsResponse = await fetch('/api/bookings?role=guest');
           if (!bookingsResponse.ok) {
             throw new Error('Failed to fetch bookings');

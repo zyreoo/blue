@@ -57,7 +57,7 @@ export async function GET(request) {
 
     return NextResponse.json(sanitizedBookings);
   } catch (error) {
-    console.error('Booking GET Error:', error);
+
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -129,7 +129,7 @@ export async function POST(request) {
       }
     });
   } catch (error) {
-    console.error('Booking POST Error:', error);
+
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 } 

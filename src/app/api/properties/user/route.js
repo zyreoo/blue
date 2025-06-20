@@ -25,7 +25,7 @@ export async function GET() {
 
     return NextResponse.json(properties);
   } catch (error) {
-    console.error('Error fetching user properties:', error);
+
     return NextResponse.json(
       { error: 'Failed to fetch properties' },
       { status: 500 }

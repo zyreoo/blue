@@ -1,5 +1,4 @@
 .adminPage {
-  /* Variables */
   --primary-color: #626F47;
   --primary-hover: #4F5A39;
   --secondary-color: #A4B494;
@@ -18,7 +17,7 @@
   --radius-md: 12px;
 }
 
-/* Layout */
+
 .main {
   padding: 2rem;
   max-width: 1200px;
@@ -39,7 +38,7 @@
   font-weight: 600;
 }
 
-/* Properties List */
+
 .propertiesList {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -98,7 +97,7 @@
   margin-top: 1.5rem;
 }
 
-/* Form */
+
 .form {
   background: var(--bg-white);
   padding: 2rem;

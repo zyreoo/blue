@@ -7,7 +7,7 @@ import Link from 'next/link';
 import styles from './Header.module.css';
 
 export default function Header({ onTypeChange }) {
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -20,27 +20,17 @@ export default function Header({ onTypeChange }) {
   const router = useRouter();
   const isLocationPage = pathname !== '/';
 
-  console.log('🔵 Header Component Status:', {
-    authStatus: status,
-    hasSession: !!session,
-    userEmail: session?.user?.email,
-    pathname
-  });
-
   const handleSignOut = async () => {
-    console.log('🔑 Starting sign-out process from header');
     try {
-      console.log('📤 Calling NextAuth signOut...');
+      setShowProfileMenu(false);
       await signOut({ 
         redirect: false,
       });
       
-      console.log('🏠 Redirecting to home page');
-      router.push('/');
-      console.log('🔄 Refreshing router...');
-      router.refresh();
+      // Force a complete page reload
+      window.location.href = '/';
     } catch (error) {
-      console.error('💥 Error during sign-out:', error);
+      console.error('Sign out error:', error);
     }
   };
 
@@ -83,7 +73,7 @@ export default function Header({ onTypeChange }) {
         setSuggestions(data);
         setShowSuggestions(true);
       } catch (error) {
-        console.error('Error fetching suggestions:', error);
+
         setSuggestions([]);
       }
     };

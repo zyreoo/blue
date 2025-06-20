@@ -38,7 +38,7 @@ export const authOptions = {
             name: user.firstName + ' ' + user.lastName
           };
         } catch (error) {
-          console.error('Auth error:', error);
+      
           throw error;
         }
       }
