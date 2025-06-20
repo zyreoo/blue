@@ -14,26 +14,41 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await fetch('/api/bookings?role=guest');
-        if (!response.ok) {
-          throw new Error('Failed to fetch bookings');
-        }
-        const data = await response.json();
-        setBookings(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  console.log('🔵 Profile Page Status:', {
+    authStatus: status,
+    hasSession: !!session,
+    userEmail: session?.user?.email
+  });
 
-    if (session) {
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      console.log('🚫 User not authenticated, redirecting to sign in');
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (status === 'authenticated' && session) {
+      console.log('✅ User authenticated, fetching bookings');
+      const fetchBookings = async () => {
+        try {
+          const response = await fetch('/api/bookings?role=guest');
+          if (!response.ok) {
+            throw new Error('Failed to fetch bookings');
+          }
+          const data = await response.json();
+          console.log('📚 Bookings fetched:', data);
+          setBookings(data);
+        } catch (err) {
+          console.error('💥 Error fetching bookings:', err);
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
       fetchBookings();
     }
-  }, [session]);
+  }, [session, status, router]);
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -54,7 +69,8 @@ export default function ProfilePage() {
     return colors[status] || '#000000';
   };
 
-  if (status === 'loading' || loading) {
+  // Show loading state while checking session
+  if (status === 'loading') {
     return (
       <div>
         <Header />
@@ -66,18 +82,20 @@ export default function ProfilePage() {
     );
   }
 
-  if (!session) {
+  // Show loading state while fetching bookings
+  if (loading && status === 'authenticated') {
     return (
       <div>
         <Header />
-        <div className={styles.container}>
-          <h1>Please sign in to view your profile</h1>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loader}></div>
         </div>
         <Footer />
       </div>
     );
   }
 
+  // Handle error state
   if (error) {
     return (
       <div>
@@ -91,26 +109,32 @@ export default function ProfilePage() {
     );
   }
 
+  // Show unauthorized message if not authenticated
+  if (status === 'unauthenticated') {
+    return (
+      <div>
+        <Header />
+        <div className={styles.container}>
+          <h1>Please sign in to view your profile</h1>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div>
       <Header />
       <main className={styles.container}>
         <div className={styles.profileHeader}>
           <div className={styles.userInfo}>
-            <h1>My Profile</h1>
+            <h1>Welcome, {session.user.name || session.user.email}!</h1>
             <p className={styles.email}>{session.user.email}</p>
           </div>
-          <button 
-            className={styles.becomeHostButton}
-            onClick={() => router.push('/become-host')}
-          >
-            Become a Host
-          </button>
         </div>
 
         <div className={styles.bookingsSection}>
           <h2>My Bookings</h2>
-          
           {bookings.length === 0 ? (
             <div className={styles.noBookings}>
               <h3>No bookings found</h3>

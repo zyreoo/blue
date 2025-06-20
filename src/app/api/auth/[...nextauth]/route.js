@@ -15,51 +15,62 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error('Email and password are required');
         }
 
         try {
           await connectDB();
           const user = await User.findOne({ email: credentials.email.toLowerCase() });
           
-          if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
-            return null;
+          if (!user) {
+            throw new Error('No user found with this email');
+          }
+
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          
+          if (!isValid) {
+            throw new Error('Invalid password');
           }
 
           return {
             id: user._id.toString(),
-            name: user.name,
             email: user.email,
+            name: user.firstName + ' ' + user.lastName
           };
         } catch (error) {
           console.error('Auth error:', error);
-          return null;
+          throw error;
         }
       }
     })
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: '/auth/signin',
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
+        session.user.email = token.email;
+        session.user.name = token.name;
       }
       return session;
     }
-  }
+  },
+  debug: process.env.NODE_ENV === 'development'
 };
 
 const handler = NextAuth(authOptions);

@@ -2,18 +2,47 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link';
 import styles from './Header.module.css';
 
 export default function Header({ onTypeChange }) {
+  const { data: session, status } = useSession();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const suggestionsRef = useRef(null);
+  const profileMenuRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
   const isLocationPage = pathname !== '/';
+
+  console.log('🔵 Header Component Status:', {
+    authStatus: status,
+    hasSession: !!session,
+    userEmail: session?.user?.email,
+    pathname
+  });
+
+  const handleSignOut = async () => {
+    console.log('🔑 Starting sign-out process from header');
+    try {
+      console.log('📤 Calling NextAuth signOut...');
+      await signOut({ 
+        redirect: false,
+      });
+      
+      console.log('🏠 Redirecting to home page');
+      router.push('/');
+      console.log('🔄 Refreshing router...');
+      router.refresh();
+    } catch (error) {
+      console.error('💥 Error during sign-out:', error);
+    }
+  };
 
   useEffect(() => {
     if (isLocationPage) return;
@@ -28,6 +57,9 @@ export default function Header({ onTypeChange }) {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
       if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
         setShowSuggestions(false);
       }
@@ -119,9 +151,9 @@ export default function Header({ onTypeChange }) {
                 </svg>
               </button>
             )}
-            <a href="/" className={styles.homeLink}>
+            <Link href="/" className={styles.homeLink}>
               Cazari Romania
-            </a>
+            </Link>
           </div>
           <div className={styles.accommodationTypes}>
             <button 
@@ -146,22 +178,61 @@ export default function Header({ onTypeChange }) {
               <span>Cabana</span>
             </button>
           </div>
-          <a href="/profile" className={styles.profileButton} aria-label="Profile">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
+          <div className={styles.profileSection} ref={profileMenuRef}>
+            <button 
+              onClick={() => setShowProfileMenu(!showProfileMenu)} 
+              className={styles.profileButton} 
+              aria-label="Profile menu"
             >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </a>
+              {status === 'authenticated' && session?.user ? (
+                <div className={styles.userAvatar}>
+                  {session.user.name?.charAt(0) || session.user.email?.charAt(0)}
+                </div>
+              ) : (
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="24" 
+                  height="24" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              )}
+            </button>
+            {showProfileMenu && (
+              <div className={styles.profileMenu}>
+                {status === 'authenticated' && session?.user ? (
+                  <>
+                    <div className={styles.userInfo}>
+                      <span className={styles.userName}>{session.user.name || session.user.email}</span>
+                      <span className={styles.userEmail}>{session.user.email}</span>
+                    </div>
+                    <Link href="/profile" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
+                      My Profile
+                    </Link>
+                    <button onClick={handleSignOut} className={`${styles.menuItem} ${styles.signOutButton}`}>
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/signin" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
+                      Sign In
+                    </Link>
+                    <Link href="/auth/signup" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <div className={styles.searchContainer} ref={suggestionsRef}>
           <form onSubmit={handleSearch} className={styles.searchForm}>
