@@ -11,42 +11,40 @@ export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [bookings, setBookings] = useState([]);
+  const [userProperties, setUserProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  console.log('🔵 Profile Page Status:', {
-    authStatus: status,
-    hasSession: !!session,
-    userEmail: session?.user?.email
-  });
-
   useEffect(() => {
     if (status === 'unauthenticated') {
-      console.log('🚫 User not authenticated, redirecting to sign in');
       router.push('/auth/signin');
       return;
     }
 
     if (status === 'authenticated' && session) {
-      console.log('✅ User authenticated, fetching bookings');
-      const fetchBookings = async () => {
+      const fetchData = async () => {
         try {
-          const response = await fetch('/api/bookings?role=guest');
-          if (!response.ok) {
+          const bookingsResponse = await fetch('/api/bookings?role=guest');
+          if (!bookingsResponse.ok) {
             throw new Error('Failed to fetch bookings');
           }
-          const data = await response.json();
-          console.log('📚 Bookings fetched:', data);
-          setBookings(data);
+          const bookingsData = await bookingsResponse.json();
+          setBookings(bookingsData);
+
+          const propertiesResponse = await fetch('/api/properties?admin=true');
+          if (!propertiesResponse.ok) {
+            throw new Error('Failed to fetch properties');
+          }
+          const propertiesData = await propertiesResponse.json();
+          setUserProperties(propertiesData);
         } catch (err) {
-          console.error('💥 Error fetching bookings:', err);
           setError(err.message);
         } finally {
           setLoading(false);
         }
       };
 
-      fetchBookings();
+      fetchData();
     }
   }, [session, status, router]);
 
@@ -69,7 +67,14 @@ export default function ProfilePage() {
     return colors[status] || '#000000';
   };
 
-  // Show loading state while checking session
+  const handleBecomeHost = () => {
+    router.push('/become-host');
+  };
+
+  const handleGoToAdmin = () => {
+    router.push('/admin');
+  };
+
   if (status === 'loading') {
     return (
       <div>
@@ -82,7 +87,6 @@ export default function ProfilePage() {
     );
   }
 
-  // Show loading state while fetching bookings
   if (loading && status === 'authenticated') {
     return (
       <div>
@@ -95,7 +99,6 @@ export default function ProfilePage() {
     );
   }
 
-  // Handle error state
   if (error) {
     return (
       <div>
@@ -109,7 +112,6 @@ export default function ProfilePage() {
     );
   }
 
-  // Show unauthorized message if not authenticated
   if (status === 'unauthenticated') {
     return (
       <div>
@@ -130,6 +132,17 @@ export default function ProfilePage() {
           <div className={styles.userInfo}>
             <h1>Welcome, {session.user.name || session.user.email}!</h1>
             <p className={styles.email}>{session.user.email}</p>
+          </div>
+          <div className={styles.actions}>
+            {userProperties.length > 0 ? (
+              <button onClick={handleGoToAdmin} className={styles.adminButton}>
+                Manage Properties
+              </button>
+            ) : (
+              <button onClick={handleBecomeHost} className={styles.becomeHostButton}>
+                Become a Host
+              </button>
+            )}
           </div>
         </div>
 
