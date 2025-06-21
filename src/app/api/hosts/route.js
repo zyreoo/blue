@@ -97,7 +97,9 @@ export async function POST(req) {
       photos: updatedPhotos
     });
 
-
+    // For now, we'll skip the admin notification since it's not critical
+    // If you want to implement email notifications later, you can uncomment this
+    /*
     await sendAdminNotification({
       type: 'new_property',
       propertyId: property._id,
@@ -105,6 +107,7 @@ export async function POST(req) {
       propertyType: data.propertyType,
       location: `${data.city}, ${data.country}`
     });
+    */
 
     return NextResponse.json({
       success: true,
@@ -116,7 +119,7 @@ export async function POST(req) {
     }, { status: 201 });
 
   } catch (error) {
-
+    console.error('Error creating property:', error);
     return NextResponse.json(
       { error: 'Failed to create property' },
       { status: 500 }
@@ -124,8 +127,7 @@ export async function POST(req) {
   }
 }
 
-// Helper function to send admin notification
-async function sendAdminNotification(data) {
-  // You'll need to implement this function to send emails
-  
-} 
+// Remove the unimplemented helper function
+// async function sendAdminNotification(data) {
+//   // You'll need to implement this function to send emails
+// } 

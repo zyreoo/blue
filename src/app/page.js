@@ -20,7 +20,7 @@ const LocationSection = dynamic(() => import('@/components/LocationSection'), {
   ssr: true
 });
 
-// Move formatSearchParams outside components since it doesn't depend on component state
+
 const formatSearchParams = (filters) => {
   if (!filters) return '';
   
@@ -44,9 +44,25 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
     threshold: 0.1
   });
 
-  const formattedLocation = typeof property.location === 'object' 
+  // Get the main photo URL
+  const mainPhotoUrl = property.photos && property.photos.length > 0
+    ? property.photos.find(photo => photo.isMain)?.url || property.photos[0].url
+    : property.imageUrl || '/placeholder-property.jpg';
+
+  // Handle location formatting based on the location object structure
+  const formattedLocation = property.location && typeof property.location === 'object' 
     ? `${property.location.city}-${property.location.country}`.toLowerCase().replace(/\s+/g, '-')
-    : locationUrl;
+    : property.location?.toLowerCase().replace(/\s+/g, '-') || locationUrl;
+
+  // Get the price from either the new or old data structure
+  const price = property.pricing?.basePrice || property.price;
+
+  // Get property details from either structure
+  const details = property.details || {
+    maxGuests: property.maxGuests,
+    bedrooms: property.bedrooms,
+    bathrooms: property.bathrooms
+  };
 
   return (
     <Link 
@@ -57,7 +73,7 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
       <div className={styles.imageContainer}>
         {inView && (
           <Image 
-            src={property.imageUrl} 
+            src={mainPhotoUrl}
             alt={property.title}
             className={styles.image}
             width={300}
@@ -66,15 +82,23 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
             loading="lazy"
             quality={75}
             placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx0eHh0dHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx0eHh0dHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/2wBDAR0XFx4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
-        <div className={styles.price}>${property.price}/{t('property.perNight')}</div>
+        <div className={styles.price}>${price}/{t('property.perNight')}</div>
       </div>
       <div className={styles.content}>
         <h3>{property.title}</h3>
         <p className={styles.description}>{property.description}</p>
+        <p className={styles.location}>
+          {typeof property.location === 'object' 
+            ? `${property.location.city}, ${property.location.country}`
+            : property.location}
+        </p>
+        <p className={styles.details}>
+          {details.bedrooms} {t('property.bedrooms')} • {details.bathrooms} {t('property.bathrooms')} • {t('property.maxGuests')} {details.maxGuests}
+        </p>
       </div>
     </Link>
   );
@@ -99,7 +123,7 @@ export default function Home() {
         setFilters(parsedFilters);
       }
 
-      // Check for propertyType in URL and update filters
+
       const propertyType = searchParams.get('propertyType');
       if (propertyType) {
         setFilters(prev => ({
@@ -155,23 +179,31 @@ export default function Home() {
     });
   }, [properties, filters]);
 
-  // Group properties by location
+
   const groupedProperties = useMemo(() => {
     return filteredProperties.reduce((acc, property) => {
-      if (!acc[property.location]) {
-        acc[property.location] = [];
+      // Get the location key for grouping
+      const locationKey = property.location && typeof property.location === 'object'
+        ? `${property.location.city}, ${property.location.country}`
+        : property.location;
+
+      // Initialize the array if it doesn't exist
+      if (!acc[locationKey]) {
+        acc[locationKey] = [];
       }
-      acc[property.location].push(property);
+
+      // Add the property to its location group
+      acc[locationKey].push(property);
       return acc;
     }, {});
   }, [filteredProperties]);
 
   const formatLocationUrl = useCallback((location) => {
     if (typeof location === 'object') {
-      // If location is an object, use city and country
       return encodeURIComponent(`${location.city}-${location.country}`.toLowerCase().replace(/\s+/g, '-'));
     }
-    // If location is a string, use it directly
+    
+    // If location is a string, it's already in "City, Country" format
     return encodeURIComponent(location.toLowerCase().replace(/\s+/g, '-'));
   }, []);
 

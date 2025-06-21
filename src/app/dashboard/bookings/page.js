@@ -11,8 +11,7 @@ export default function BookingsDashboard() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState('guest'); // 'guest' or 'owner'
-
+  const [viewMode, setViewMode] = useState('guest'); 
   useEffect(() => {
     const fetchBookings = async () => {
       try {

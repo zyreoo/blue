@@ -308,6 +308,11 @@ export default function BecomeHostPage() {
     setIsSubmitting(true);
 
     try {
+      // Ensure all required fields are present
+      if (!formData.location.city || !formData.location.country || !formData.location.address) {
+        throw new Error('Please fill in all location fields');
+      }
+
       const response = await fetch('/api/hosts', {
         method: 'POST',
         headers: {
@@ -316,7 +321,9 @@ export default function BecomeHostPage() {
         body: JSON.stringify({
           propertyType: formData.propertyType,
           spaceType: formData.spaceType,
-          location: formData.location,
+          address: formData.location.address,
+          city: formData.location.city,
+          country: formData.location.country,
           maxGuests: parseInt(formData.maxGuests),
           bedrooms: parseInt(formData.bedrooms),
           beds: parseInt(formData.beds),
@@ -324,7 +331,7 @@ export default function BecomeHostPage() {
           amenities: formData.amenities,
           photos: formData.photos,
           pricePerNight: parseFloat(formData.pricePerNight),
-          description: formData.description
+          description: formData.description || `Beautiful ${formData.propertyType} in ${formData.location.city}`
         }),
       });
 
@@ -336,7 +343,7 @@ export default function BecomeHostPage() {
         throw new Error(error.message || 'Failed to create property');
       }
     } catch (error) {
-
+      console.error('Error submitting property:', error);
       alert(t('common.error') + ': ' + error.message);
     } finally {
       setIsSubmitting(false);
