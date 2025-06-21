@@ -101,4 +101,45 @@ export async function DELETE(request, { params }) {
       { status: 500 }
     );
   }
+}
+
+export async function PATCH(req, { params }) {
+  try {
+    await dbConnect();
+
+    const { id } = params;
+    const updates = await req.json();
+
+    const property = await Property.findById(id);
+    if (!property) {
+      return NextResponse.json({ error: 'Property not found' }, { status: 404 });
+    }
+
+    // Update the property
+    Object.assign(property, updates);
+    await property.save();
+
+    return NextResponse.json(property);
+  } catch (error) {
+    console.error('Error updating property:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function GET(req, { params }) {
+  try {
+    await dbConnect();
+
+    const { id } = params;
+    const property = await Property.findById(id);
+
+    if (!property) {
+      return NextResponse.json({ error: 'Property not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(property);
+  } catch (error) {
+    console.error('Error fetching property:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 } 

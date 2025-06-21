@@ -171,7 +171,7 @@ export default function ProfilePage() {
                       />
                       <div>
                         <h3>{booking.propertyId?.title}</h3>
-                        <p>{booking.propertyId?.location}</p>
+                        <p>{booking.propertyId?.location?.city}, {booking.propertyId?.location?.country}</p>
                       </div>
                     </div>
                     <div 

@@ -7,8 +7,8 @@ if (mongoose.models.Booking) {
 const bookingSchema = new mongoose.Schema({
   bookingNumber: {
     type: String,
-    unique: true,
-    sparse: true
+    required: true,
+    unique: true
   },
   
   propertyId: {
@@ -97,12 +97,6 @@ const bookingSchema = new mongoose.Schema({
   timestamps: true
 });
 
-bookingSchema.index({ propertyId: 1, status: 1 });
-bookingSchema.index({ customerEmail: 1, status: 1 });
-bookingSchema.index({ checkIn: 1, checkOut: 1 });
-bookingSchema.index({ adminEmail: 1 });
-bookingSchema.index({ bookingNumber: 1 }, { unique: true });
-
 bookingSchema.pre('save', async function(next) {
   if (this.isNew) {
     try {
@@ -134,6 +128,4 @@ bookingSchema.virtual('duration').get(function() {
   return Math.ceil((this.checkOut - this.checkIn) / (1000 * 60 * 60 * 24));
 });
 
-const Booking = mongoose.model('Booking', bookingSchema);
-
-export default Booking; 
+export default mongoose.models.Booking || mongoose.model('Booking', bookingSchema); 

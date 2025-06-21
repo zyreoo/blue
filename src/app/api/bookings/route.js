@@ -5,6 +5,7 @@ import Booking from '@/models/Booking';
 import Property from '@/models/Property';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { generateBookingNumber } from '@/lib/utils';
 
 // Helper to calculate total price
 const calculateTotalPrice = (pricePerNight, checkIn, checkOut) => {
@@ -62,74 +63,95 @@ export async function GET(request) {
   }
 }
 
-export async function POST(request) {
+export async function POST(req) {
   try {
     await connectDB();
     
-    // Get the authenticated user session
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    const body = await req.json();
+    console.log('Received booking data:', body);
 
-    const bookingData = await request.json();
-    const {
-      propertyId,
-      checkIn,
-      checkOut,
-      numberOfGuests,
-      numberOfRooms,
-      firstName,
-      lastName,
-      guestEmail,
-      guestPhone,
-      idNumber,
-      specialRequests
-    } = bookingData;
+    // Get property details
+    const property = await Property.findById(body.propertyId);
+    console.log('Found property:', property);
 
-    // Validate property exists and get admin info
-    const property = await Property.findById(propertyId);
     if (!property) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     }
 
-    // Calculate total price
-    const totalPrice = calculateTotalPrice(property.price, checkIn, checkOut);
+    // Get the price - check both possible locations
+    const basePrice = property.price || property.pricing?.basePrice;
+    if (!basePrice || basePrice <= 0) {
+      console.error('Valid property price is missing:', property);
+      return NextResponse.json({ 
+        error: 'Property price is not set or is invalid',
+        details: {
+          price: property.price,
+          basePrice: property.pricing?.basePrice
+        }
+      }, { status: 400 });
+    }
 
-    // Create new booking
-    const booking = await Booking.create({
-      propertyId,
-      adminEmail: property.adminEmail,
-      customerEmail: session.user.email,
+    // Calculate total price
+    const start = new Date(body.checkIn);
+    const end = new Date(body.checkOut);
+    const numberOfNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    const cleaningFee = property.pricing?.cleaningFee || 0;
+    const serviceFee = property.pricing?.serviceFee || 0;
+    const totalPrice = (basePrice * numberOfNights) + cleaningFee + serviceFee;
+
+    console.log('Price calculation:', { 
+      basePrice,
+      numberOfNights,
+      cleaningFee,
+      serviceFee,
+      totalPrice
+    });
+
+    if (isNaN(totalPrice) || totalPrice <= 0) {
+      return NextResponse.json({ 
+        error: 'Invalid price calculation',
+        details: { basePrice, nights: numberOfNights, cleaningFee, serviceFee }
+      }, { status: 400 });
+    }
+
+    // Format the booking data according to schema
+    const bookingData = {
+      bookingNumber: generateBookingNumber(),
+      propertyId: body.propertyId,
+      adminEmail: property.adminEmail || property.hostEmail, // Try both email fields
+      customerEmail: body.guestEmail,
       customer: {
-        name: `${firstName} ${lastName}`,
-        email: guestEmail,
-        phone: guestPhone,
-        idNumber
+        name: `${body.firstName} ${body.lastName}`,
+        email: body.guestEmail,
+        phone: body.guestPhone,
+        idNumber: body.idNumber
       },
-      checkIn: new Date(checkIn),
-      checkOut: new Date(checkOut),
-      numberOfGuests,
-      numberOfRooms,
-      specialRequests,
-      totalPrice,
+      checkIn: start,
+      checkOut: end,
+      numberOfGuests: body.numberOfGuests,
+      numberOfRooms: body.numberOfRooms,
+      specialRequests: body.specialRequests,
+      totalPrice: totalPrice,
       status: 'pending',
       paymentStatus: 'pending'
-    });
+    };
 
-    return NextResponse.json({ 
-      success: true, 
-      booking: {
-        ...booking.toObject(),
-        property: {
-          title: property.title,
-          location: property.location,
-          imageUrl: property.imageUrl
-        }
-      }
-    });
+    console.log('Attempting to create booking with data:', bookingData);
+
+    const booking = await Booking.create(bookingData);
+    console.log('Booking created:', booking);
+
+    return NextResponse.json(booking, { status: 201 });
   } catch (error) {
-
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Booking creation error:', error);
+    
+    // More detailed error response
+    return NextResponse.json({
+      error: error.message,
+      validationErrors: error.errors ? Object.keys(error.errors).map(key => ({
+        field: key,
+        message: error.errors[key].message
+      })) : null
+    }, { status: 500 });
   }
 } 
