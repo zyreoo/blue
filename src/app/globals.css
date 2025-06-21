@@ -3,6 +3,16 @@
   --border-radius: 12px;
   --font-mono: var(--font-geist-mono);
   --font-sans: var(--font-geist-sans);
+  --primary-color: #626F47;
+  --primary-dark: #4A5437;
+  --primary-light: #A4B465;
+  --background-warm: #F5ECD5;
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --text-tertiary: #718096;
+  --border-color: #e2e8f0;
+  --hover-color: #526F47;
+  --disabled-color: #A8B2A8;
 }
 
 * {

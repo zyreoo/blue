@@ -19,7 +19,7 @@
 
 .progressFill {
   height: 100%;
-  background-color: #FF385C;
+  background-color: var(--primary-color);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -58,13 +58,13 @@
 }
 
 .propertyTypeCard:hover {
-  border-color: #FF385C;
+  border-color: var(--primary-color);
   transform: translateY(-2px);
 }
 
 .propertyTypeCard.selected {
-  border-color: #FF385C;
-  background-color: #FFF8F9;
+  border-color: var(--primary-color);
+  background-color: var(--primary-light);
 }
 
 .propertyIcon {
@@ -98,13 +98,13 @@
 }
 
 .spaceTypeCard:hover {
-  border-color: #FF385C;
+  border-color: var(--primary-color);
   transform: translateX(4px);
 }
 
 .spaceTypeCard.selected {
-  border-color: #FF385C;
-  background-color: #FFF8F9;
+  border-color: var(--primary-color);
+  background-color: var(--primary-light);
 }
 
 .spaceIcon {
@@ -141,73 +141,100 @@
 
 .formGroup label {
   display: block;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #484848;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
 }
 
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
   width: 100%;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid #e6e6e6;
+  border-radius: 12px;
   font-size: 1rem;
+  background-color: #fff;
+  color: #222;
   transition: all 0.2s ease;
+}
+
+.formGroup input::placeholder,
+.formGroup select::placeholder,
+.formGroup textarea::placeholder {
+  color: #a0a0a0;
+}
+
+.formGroup input:hover,
+.formGroup select:hover,
+.formGroup textarea:hover {
+  border-color: var(--primary-color);
 }
 
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
   outline: none;
-  border-color: #FF385C;
-  box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px var(--primary-light);
 }
 
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .nextButton {
-  background-color: #FF385C;
+  background-color: var(--primary-color);
   color: white;
   width: 100%;
-  padding: 1rem;
+  padding: 1.25rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
   margin-top: 2rem;
+  box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2);
 }
 
 .nextButton:hover {
-  background-color: #E31C5F;
+  background-color: var(--hover-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
+}
+
+.nextButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(52, 211, 153, 0.2);
 }
 
 .guestDetailsForm {
   max-width: 600px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2.5rem;
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .counterInput {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-top: 0.5rem;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 12px;
+  background: #fff;
 }
 
 .counterButton {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #ddd;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid #e6e6e6;
   border-radius: 50%;
   background: white;
   font-size: 1.5rem;
@@ -216,25 +243,31 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  color: #484848;
 }
 
 .counterButton:hover {
-  border-color: #FF385C;
-  color: #FF385C;
+  border-color: #626F47;
+  color: #626F47;
+  background-color: #FFF8F9;
 }
 
 .counterButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  border-color: #e6e6e6;
+  color: #a0a0a0;
+  background-color: #f5f5f5;
 }
 
 .counterValue {
   width: 60px !important;
   text-align: center;
   border: none !important;
-  font-size: 1.2rem !important;
+  font-size: 1.25rem !important;
   font-weight: 500;
   padding: 0 !important;
+  color: #222;
 }
 
 .counterValue::-webkit-inner-spin-button,
@@ -366,7 +399,7 @@
 
 .dropZone:hover,
 .dropZone.dragOver {
-  border-color: #FF385C;
+  border-color: #626F47;
   background: #FFF8F9;
 }
 
@@ -381,7 +414,7 @@
 }
 
 .dropZone span {
-  color: #FF385C;
+  color: #626F47;
   text-decoration: underline;
 }
 
@@ -585,27 +618,32 @@
 }
 
 .submitButton {
-  background: #4299e1;
+  background: var(--primary-color);
   color: white;
   font-weight: 600;
-  padding: 0.75rem 2rem;
-  border-radius: 0.5rem;
+  padding: 1.25rem 2.5rem;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 150px;
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2);
 }
 
 .submitButton:hover {
-  background: #3182ce;
+  background: var(--hover-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
 }
 
 .submitButton:disabled {
-  background: #a0aec0;
+  background: var(--disabled-color);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .pulsingButton {
@@ -663,4 +701,136 @@
   border-radius: 15px;
   font-size: 1.1rem;
   color: #666;
+}
+
+.priceSection {
+  margin: 2rem 0;
+}
+
+.priceCard {
+  background: white;
+  border-radius: 24px;
+  padding: 2rem;
+  margin-top: 1rem;
+}
+
+.priceLabel {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.priceInputWrapper {
+  position: relative;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.priceInput {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  color: #333;
+  background: white;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.priceInput:hover {
+  border-color: #626F47;
+}
+
+.priceInput:focus {
+  outline: none;
+  border-color: #626F47;
+  box-shadow: 0 0 0 2px rgba(98, 111, 71, 0.1);
+}
+
+.continueButton {
+  width: 100%;
+  padding: 1rem;
+  background: #626F47;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 2rem;
+}
+
+.continueButton:hover {
+  background: #4A5437;
+}
+
+.continueButton:disabled {
+  background: #A8B2A8;
+  cursor: not-allowed;
+}
+
+.formCard {
+  background: white;
+  border-radius: 24px;
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.descriptionSection {
+  margin: 2rem 0;
+}
+
+.descriptionTextarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  background-color: white;
+  transition: all 0.2s ease;
+  resize: vertical;
+}
+
+.descriptionTextarea:hover {
+  border-color: #626F47;
+}
+
+.descriptionTextarea:focus {
+  outline: none;
+  border-color: #626F47;
+  box-shadow: 0 0 0 2px rgba(98, 111, 71, 0.1);
+}
+
+.descriptionTextarea::placeholder {
+  color: #666;
+}
+
+.backButton {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.backButton:hover {
+  color: #626F47;
 } 
