@@ -67,6 +67,12 @@ export async function POST(req) {
   try {
     await connectDB();
     
+
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     const body = await req.json();
     console.log('Received booking data:', body);
 
@@ -91,9 +97,24 @@ export async function POST(req) {
       }, { status: 400 });
     }
 
-    // Calculate total price
+
     const start = new Date(body.checkIn);
     const end = new Date(body.checkOut);
+    
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return NextResponse.json({ 
+        error: 'Invalid dates provided',
+        details: { checkIn: body.checkIn, checkOut: body.checkOut }
+      }, { status: 400 });
+    }
+
+    if (start >= end) {
+      return NextResponse.json({ 
+        error: 'Check-out date must be after check-in date'
+      }, { status: 400 });
+    }
+
+    // Calculate total price
     const numberOfNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     const cleaningFee = property.pricing?.cleaningFee || 0;
     const serviceFee = property.pricing?.serviceFee || 0;
@@ -114,12 +135,33 @@ export async function POST(req) {
       }, { status: 400 });
     }
 
+    // Validate guest count
+    const totalGuests = (body.numberOfGuests.adults || 0) + 
+                       (body.numberOfGuests.teens || 0) + 
+                       (body.numberOfGuests.babies || 0);
+    
+    if (totalGuests === 0) {
+      return NextResponse.json({ 
+        error: 'At least one guest is required'
+      }, { status: 400 });
+    }
+
+    if (totalGuests > property.details?.maxGuests) {
+      return NextResponse.json({ 
+        error: 'Number of guests exceeds property capacity',
+        details: {
+          maxAllowed: property.details.maxGuests,
+          requested: totalGuests
+        }
+      }, { status: 400 });
+    }
+
     // Format the booking data according to schema
     const bookingData = {
       bookingNumber: generateBookingNumber(),
       propertyId: body.propertyId,
-      adminEmail: property.adminEmail || property.hostEmail, // Try both email fields
-      customerEmail: body.guestEmail,
+      adminEmail: property.adminEmail || property.hostEmail,
+      customerEmail: session.user.email, // Use authenticated user's email
       customer: {
         name: `${body.firstName} ${body.lastName}`,
         email: body.guestEmail,
@@ -130,7 +172,7 @@ export async function POST(req) {
       checkOut: end,
       numberOfGuests: body.numberOfGuests,
       numberOfRooms: body.numberOfRooms,
-      specialRequests: body.specialRequests,
+      specialRequests: body.specialRequests || '',
       totalPrice: totalPrice,
       status: 'pending',
       paymentStatus: 'pending'

@@ -5,11 +5,17 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import Image from 'next/image';
 
+// Dynamically import MapComponent with no SSR
+const MapComponent = dynamic(
+  () => import('@/components/MapComponent'),
+  { ssr: false }
+);
 
 const translations = {
   common: {
@@ -185,7 +191,9 @@ export default function BecomeHostPage() {
     location: {
       address: '',
       city: '',
-      country: ''
+      country: '',
+      lat: null,
+      lng: null
     },
     description: '',
     amenities: [],
@@ -417,6 +425,26 @@ export default function BecomeHostPage() {
           >
             <h2 className={styles.stepTitle}>{t('become_host.location.title')}</h2>
             <div className={styles.locationForm}>
+              <div className={styles.mapContainer}>
+                <MapComponent
+                  onLocationSelect={(locationData) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      location: {
+                        address: locationData.address,
+                        city: locationData.city,
+                        country: locationData.country,
+                        lat: locationData.lat,
+                        lng: locationData.lng
+                      }
+                    }));
+                  }}
+                  initialLocation={formData.location.lat && formData.location.lng 
+                    ? [formData.location.lat, formData.location.lng] 
+                    : null
+                  }
+                />
+              </div>
               <div className={styles.formGroup}>
                 <label htmlFor="address">{t('become_host.location.address')}</label>
                 <input
@@ -458,6 +486,7 @@ export default function BecomeHostPage() {
               <button
                 className={styles.nextButton}
                 onClick={() => setCurrentStep('details')}
+                disabled={!formData.location.address || !formData.location.city || !formData.location.country}
               >
                 {t('common.next')}
               </button>
