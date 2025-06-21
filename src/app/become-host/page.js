@@ -1003,43 +1003,20 @@ export default function BecomeHostPage() {
             className={styles.stepContainer}
           >
             <h2 className={styles.stepTitle}>{t('become_host.pricing.title')}</h2>
-            <div className={styles.guestDetailsForm}>
+            <div className={styles.priceCard}>
               <div className={styles.formGroup}>
                 <label>{t('become_host.pricing.price')}</label>
-                <div className={styles.counterInput}>
-                  <button 
-                    type="button"
-                    onClick={() => handleChange({ 
-                      target: { 
-                        name: 'pricePerNight', 
-                        value: Math.max(0, parseFloat(formData.pricePerNight || 0) - 0.1)
-                      }
-                    })}
-                    className={styles.counterButton}
-                  >
-                    -
-                  </button>
+                <div className={styles.priceInputWrapper}>
                   <input
                     type="number"
                     name="pricePerNight"
-                    value={formData.pricePerNight || 0}
+                    value={formData.pricePerNight || ''}
                     onChange={handleChange}
                     min="0"
-                    className={styles.counterValue}
-                    readOnly
+                    step="0.01"
+                    placeholder="0.00"
+                    className={styles.priceInput}
                   />
-                  <button 
-                    type="button"
-                    onClick={() => handleChange({ 
-                      target: { 
-                        name: 'pricePerNight', 
-                        value: parseFloat(formData.pricePerNight || 0) + 0.1
-                      }
-                    })}
-                    className={styles.counterButton}
-                  >
-                    +
-                  </button>
                 </div>
               </div>
 
@@ -1061,25 +1038,33 @@ export default function BecomeHostPage() {
             exit={{ x: -300, opacity: 0 }}
             className={styles.formStep}
           >
-            <h2>{t('become_host.description.title')}</h2>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder={t('become_host.description.placeholder')}
-              className={styles.textarea}
-              rows={6}
-            />
-            <div className={styles.navigationButtons}>
-              <button onClick={() => setCurrentStep('amenities')} className={styles.backButton}>
-                {t('common.back')}
-              </button>
-              <button 
-                onClick={() => setCurrentStep('final')}
-                className={styles.nextButton}
-                disabled={!formData.description || formData.description.length < 50}
-              >
-                {t('common.next')}
-              </button>
+            <h2 className={styles.stepTitle}>{t('become_host.description.title')}</h2>
+            <div className={styles.descriptionCard}>
+              <div className={styles.descriptionSection}>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder={t('become_host.description.placeholder')}
+                  className={styles.textarea}
+                  rows={8}
+                />
+                <div className={`${styles.characterCount} ${formData.description.length >= 50 ? styles.valid : styles.invalid}`}>
+                  {formData.description.length}/50 caractere minim
+                </div>
+              </div>
+
+              <div className={styles.navigationButtons}>
+                <button onClick={prevStep} className={styles.backButton}>
+                  {t('common.back')}
+                </button>
+                <button 
+                  onClick={() => setCurrentStep('final')}
+                  className={styles.nextButton}
+                  disabled={!formData.description || formData.description.length < 50}
+                >
+                  {t('common.next')}
+                </button>
+              </div>
             </div>
           </motion.div>
         );

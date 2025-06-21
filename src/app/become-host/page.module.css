@@ -189,27 +189,26 @@
 .nextButton {
   background-color: var(--primary-color);
   color: white;
-  width: 100%;
-  padding: 1.25rem;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 2rem;
-  box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2);
+  min-width: 120px;
+  text-align: center;
 }
 
 .nextButton:hover {
   background-color: var(--hover-color);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
 }
 
-.nextButton:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(52, 211, 153, 0.2);
+.nextButton:disabled {
+  background-color: #e6e6e6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .guestDetailsForm {
@@ -704,48 +703,74 @@
 }
 
 .priceSection {
-  margin: 2rem 0;
+  margin-bottom: 2rem;
 }
 
 .priceCard {
   background: white;
-  border-radius: 24px;
-  padding: 2rem;
-  margin-top: 1rem;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(98, 111, 71, 0.08);
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .priceLabel {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #484848;
+  margin-bottom: 0.75rem;
 }
 
 .priceInputWrapper {
   position: relative;
-  width: 100%;
-  margin: 1rem 0;
+  display: flex;
+  align-items: center;
 }
 
 .priceInput {
   width: 100%;
-  padding: 1rem;
-  border: 1px solid #e0e0e0;
+  padding: 0.75rem 4rem 0.75rem 1rem;
+  border: 2px solid #e6e6e6;
   border-radius: 12px;
-  font-size: 1.2rem;
-  color: #333;
-  background: white;
-  transition: all 0.2s ease;
-  text-align: center;
+  font-size: 1.1rem;
+  color: #222;
+  transition: all 0.3s ease;
+  background-color: white;
+  font-weight: 500;
+}
+
+/* Remove spinner buttons from number input */
+.priceInput::-webkit-outer-spin-button,
+.priceInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.priceInput[type=number] {
+  -moz-appearance: textfield;
 }
 
 .priceInput:hover {
-  border-color: #626F47;
+  border-color: var(--primary-color);
+  background-color: #fafafa;
 }
 
 .priceInput:focus {
   outline: none;
-  border-color: #626F47;
-  box-shadow: 0 0 0 2px rgba(98, 111, 71, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(98, 111, 71, 0.1);
+  background-color: white;
+}
+
+.priceInputWrapper::after {
+  content: "RON";
+  position: absolute;
+  right: 1rem;
+  color: #626F47;
+  font-size: 1rem;
+  font-weight: 500;
+  pointer-events: none;
 }
 
 .continueButton {
@@ -787,50 +812,90 @@
 }
 
 .descriptionSection {
-  margin: 2rem 0;
+  margin: 2rem auto;
+  max-width: 600px;
 }
 
-.descriptionTextarea {
+.textarea {
   width: 100%;
-  min-height: 150px;
-  padding: 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  min-height: 180px;
+  padding: 1.25rem;
+  border: 2px solid #e6e6e6;
+  border-radius: 16px;
   font-size: 1rem;
   line-height: 1.6;
-  color: #333;
+  color: #222;
   background-color: white;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   resize: vertical;
+  font-family: inherit;
+  margin-top: 1rem;
 }
 
-.descriptionTextarea:hover {
-  border-color: #626F47;
+.textarea::placeholder {
+  color: #a0a0a0;
+  font-size: 0.95rem;
 }
 
-.descriptionTextarea:focus {
+.textarea:hover {
+  border-color: var(--primary-color);
+  background-color: #fafafa;
+}
+
+.textarea:focus {
   outline: none;
-  border-color: #626F47;
-  box-shadow: 0 0 0 2px rgba(98, 111, 71, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(98, 111, 71, 0.1);
+  background-color: white;
 }
 
-.descriptionTextarea::placeholder {
-  color: #666;
+.navigationButtons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem;
+  width: 100%;
 }
 
 .backButton {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   background: none;
-  border: none;
-  color: #666;
+  border: 2px solid #e6e6e6;
+  border-radius: 12px;
+  color: #484848;
   font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  text-align: center;
 }
 
 .backButton:hover {
-  color: #626F47;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: #fafafa;
+}
+
+.descriptionCard {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(98, 111, 71, 0.08);
+}
+
+.characterCount {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #666;
+  text-align: right;
+}
+
+.characterCount.valid {
+  color: var(--primary-color);
+}
+
+.characterCount.invalid {
+  color: #dc3545;
 } 
