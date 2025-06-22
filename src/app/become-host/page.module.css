@@ -1,81 +1,132 @@
+.variables {
+  --primary-color: #626F47;
+  --primary-light: rgba(98, 111, 71, 0.1);
+  --hover-color: #4A5437;
+  --disabled-color: #A8B2A8;
+  --background-color: #F9F9F7;
+  --card-background: #FFFFFF;
+  --text-primary: #2D3748;
+  --text-secondary: #4A5568;
+  --border-color: #E2E8F0;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
 .container {
+  composes: variables;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2rem;
   min-height: calc(100vh - 160px);
+  background-color: var(--background-color);
 }
 
 .progressBar {
   width: 100%;
-  height: 4px;
-  background-color: #eee;
-  border-radius: 2px;
+  height: 6px;
+  background-color: var(--border-color);
+  border-radius: var(--radius-sm);
   margin-bottom: 2rem;
   position: fixed;
   top: 80px;
   left: 0;
   z-index: 100;
+  overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background-color: var(--primary-color);
-  border-radius: 2px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, var(--primary-color), var(--hover-color));
+  border-radius: var(--radius-sm);
+  transition: width 0.4s ease;
 }
 
 .stepContainer {
+  composes: variables;
   max-width: 800px;
   margin: 4rem auto 0;
-  padding: 2rem;
+  padding: 2.5rem;
+  background: var(--card-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .stepTitle {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 2rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2.5rem;
   text-align: center;
+  line-height: 1.2;
 }
 
 .propertyTypeGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
 }
 
 .propertyTypeCard {
+  composes: variables;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.5rem;
-  border: 2px solid #eee;
-  border-radius: 12px;
-  background: white;
+  padding: 2rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--card-background);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.propertyTypeCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, var(--primary-light), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .propertyTypeCard:hover {
   border-color: var(--primary-color);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.propertyTypeCard:hover::before {
+  opacity: 0.5;
 }
 
 .propertyTypeCard.selected {
   border-color: var(--primary-color);
-  background-color: var(--primary-light);
+  background: linear-gradient(45deg, var(--primary-light), transparent);
+  box-shadow: var(--shadow-md);
 }
 
 .propertyIcon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  font-size: 3rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 1;
 }
 
 .propertyLabel {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #222;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 1;
 }
 
 .spaceTypeGrid {
@@ -136,40 +187,35 @@
 }
 
 .formGroup {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .formGroup label {
   display: block;
-  font-weight: 500;
-  color: #484848;
-  margin-bottom: 0.75rem;
-  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
 }
 
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
   width: 100%;
-  padding: 1rem 1.25rem;
-  border: 1.5px solid #e6e6e6;
-  border-radius: 12px;
-  font-size: 1rem;
-  background-color: #fff;
-  color: #222;
-  transition: all 0.2s ease;
-}
-
-.formGroup input::placeholder,
-.formGroup select::placeholder,
-.formGroup textarea::placeholder {
-  color: #a0a0a0;
+  padding: 1.25rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  background-color: var(--card-background);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
 }
 
 .formGroup input:hover,
 .formGroup select:hover,
 .formGroup textarea:hover {
   border-color: var(--primary-color);
+  background-color: var(--background-color);
 }
 
 .formGroup input:focus,
@@ -178,6 +224,7 @@
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px var(--primary-light);
+  background-color: var(--card-background);
 }
 
 .formRow {
@@ -187,28 +234,31 @@
 }
 
 .nextButton {
-  background-color: var(--primary-color);
+  composes: variables;
+  background: linear-gradient(45deg, var(--primary-color), var(--hover-color));
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 120px;
+  min-width: 140px;
   text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .nextButton:hover {
-  background-color: var(--hover-color);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .nextButton:disabled {
-  background-color: #e6e6e6;
+  background: var(--disabled-color);
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .guestDetailsForm {
@@ -318,35 +368,54 @@
 }
 
 .amenityButton {
+  composes: variables;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
   width: 100%;
-  padding: 1rem;
-  border: 2px solid #eee;
-  border-radius: 12px;
-  background: white;
+  padding: 1.25rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--card-background);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.amenityButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, var(--primary-light), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .amenityButton:hover {
-  border-color: #FF385C;
+  border-color: var(--primary-color);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.amenityButton:hover::before {
+  opacity: 0.5;
 }
 
 .amenityButton.selected {
-  border-color: #FF385C;
-  background-color: #FFF8F9;
+  border-color: var(--primary-color);
+  background: linear-gradient(45deg, var(--primary-light), transparent);
 }
 
 .amenityIcon {
-  font-size: 1.5rem;
-  min-width: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 1.75rem;
+  min-width: 28px;
+  position: relative;
+  z-index: 1;
 }
 
 .amenityButton span:last-child {
@@ -386,30 +455,35 @@
 }
 
 .dropZone {
-  border: 2px dashed #ddd;
-  border-radius: 12px;
-  padding: 3rem 2rem;
+  composes: variables;
+  border: 3px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 3.5rem 2.5rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: #f8f8f8;
-  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  background: var(--background-color);
+  margin-bottom: 2.5rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .dropZone:hover,
 .dropZone.dragOver {
-  border-color: #626F47;
-  background: #FFF8F9;
+  border-color: var(--primary-color);
+  background: linear-gradient(45deg, var(--primary-light), transparent);
 }
 
 .uploadIcon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 3.5rem;
+  margin-bottom: 1.25rem;
+  opacity: 0.8;
 }
 
 .dropZone p {
-  color: #666;
-  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  line-height: 1.6;
 }
 
 .dropZone span {
@@ -423,17 +497,24 @@
 
 .photoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2.5rem;
 }
 
 .photoItem {
   position: relative;
   aspect-ratio: 3/2;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   cursor: move;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.photoItem:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .photoItem img {
@@ -555,11 +636,12 @@
 }
 
 .thankYouContainer {
-  background: white;
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+  composes: variables;
+  background: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: var(--shadow-lg);
+  max-width: 800px;
   margin: 0 auto;
 }
 
@@ -577,10 +659,12 @@
 }
 
 .propertyPreview {
-  background: #f7fafc;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin: 2rem 0;
+  composes: variables;
+  background: var(--background-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin: 2.5rem 0;
+  border: 2px solid var(--border-color);
 }
 
 .propertyPreview h3 {
@@ -617,25 +701,23 @@
 }
 
 .submitButton {
-  background: var(--primary-color);
+  composes: variables;
+  background: linear-gradient(45deg, var(--primary-color), var(--hover-color));
   color: white;
+  padding: 1rem 2.5rem;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
   font-weight: 600;
-  padding: 1.25rem 2.5rem;
-  border-radius: 12px;
-  border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  border: none;
   min-width: 180px;
-  box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 .submitButton:hover {
-  background: var(--hover-color);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .submitButton:disabled {
@@ -645,31 +727,16 @@
   box-shadow: none;
 }
 
-.pulsingButton {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
 .loadingSpinner {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .spinner {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   border-top-color: white;
@@ -707,11 +774,12 @@
 }
 
 .priceCard {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 12px rgba(98, 111, 71, 0.08);
-  max-width: 400px;
+  composes: variables;
+  background: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
   margin: 0 auto;
 }
 
@@ -724,20 +792,20 @@
 
 .priceInputWrapper {
   position: relative;
-  display: flex;
-  align-items: center;
+  margin-bottom: 2rem;
 }
 
 .priceInput {
   width: 100%;
-  padding: 0.75rem 4rem 0.75rem 1rem;
-  border: 2px solid #e6e6e6;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  color: #222;
+  padding: 1.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 1.5rem;
+  color: var(--text-primary);
   transition: all 0.3s ease;
-  background-color: white;
-  font-weight: 500;
+  background-color: var(--card-background);
+  font-weight: 600;
+  text-align: center;
 }
 
 /* Remove spinner buttons from number input */
@@ -753,22 +821,24 @@
 
 .priceInput:hover {
   border-color: var(--primary-color);
-  background-color: #fafafa;
+  background-color: var(--background-color);
 }
 
 .priceInput:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(98, 111, 71, 0.1);
-  background-color: white;
+  box-shadow: 0 0 0 4px var(--primary-light);
+  background-color: var(--card-background);
 }
 
 .priceInputWrapper::after {
   content: "RON";
   position: absolute;
-  right: 1rem;
-  color: #626F47;
-  font-size: 1rem;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 1.2rem;
   font-weight: 500;
   pointer-events: none;
 }
@@ -818,78 +888,42 @@
 
 .textarea {
   width: 100%;
-  min-height: 180px;
-  padding: 1.25rem;
-  border: 2px solid #e6e6e6;
-  border-radius: 16px;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #222;
-  background-color: white;
+  min-height: 200px;
+  padding: 1.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background-color: var(--card-background);
   transition: all 0.3s ease;
   resize: vertical;
   font-family: inherit;
-  margin-top: 1rem;
 }
 
 .textarea::placeholder {
-  color: #a0a0a0;
-  font-size: 0.95rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
 }
 
 .textarea:hover {
   border-color: var(--primary-color);
-  background-color: #fafafa;
+  background-color: var(--background-color);
 }
 
 .textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(98, 111, 71, 0.1);
-  background-color: white;
-}
-
-.navigationButtons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 2rem;
-  gap: 1rem;
-  width: 100%;
-}
-
-.backButton {
-  padding: 0.75rem 1.5rem;
-  background: none;
-  border: 2px solid #e6e6e6;
-  border-radius: 12px;
-  color: #484848;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 120px;
-  text-align: center;
-}
-
-.backButton:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  background-color: #fafafa;
-}
-
-.descriptionCard {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 2px 12px rgba(98, 111, 71, 0.08);
+  box-shadow: 0 0 0 4px var(--primary-light);
+  background-color: var(--card-background);
 }
 
 .characterCount {
-  margin-top: 0.75rem;
-  font-size: 0.9rem;
-  color: #666;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
   text-align: right;
+  transition: all 0.3s ease;
 }
 
 .characterCount.valid {
@@ -897,5 +931,93 @@
 }
 
 .characterCount.invalid {
-  color: #dc3545;
+  color: #E53E3E;
+}
+
+.navigationButtons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+  gap: 1.5rem;
+}
+
+.backButton {
+  composes: variables;
+  padding: 1rem 2rem;
+  background: var(--background-color);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 140px;
+  text-align: center;
+}
+
+.backButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.descriptionCard {
+  composes: variables;
+  background: var(--card-background);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .stepContainer {
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .stepTitle {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .propertyTypeGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  .propertyTypeCard {
+    padding: 1.5rem;
+  }
+
+  .propertyIcon {
+    font-size: 2.5rem;
+  }
+
+  .thankYouContainer {
+    padding: 2rem;
+  }
+
+  .thankYouContainer h2 {
+    font-size: 2rem;
+  }
+
+  .previewDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .navigationButtons {
+    flex-direction: column;
+  }
+
+  .backButton,
+  .submitButton {
+    width: 100%;
+  }
 } 
