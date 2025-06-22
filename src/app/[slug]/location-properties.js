@@ -7,7 +7,6 @@ import Image from 'next/image';
 import styles from './location-properties.module.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { useLanguage } from '@/components/LanguageProvider';
 import { LocationPageSkeleton } from '@/components/SkeletonLoader';
 
 export default function LocationProperties() {

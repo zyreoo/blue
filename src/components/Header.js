@@ -7,7 +7,7 @@ import Link from 'next/link';
 import styles from './Header.module.css';
 
 export default function Header({ onTypeChange }) {
-  const { data: session, status, update: updateSession } = useSession();
+  const { data: session, status } = useSession();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -26,11 +26,9 @@ export default function Header({ onTypeChange }) {
       await signOut({ 
         redirect: false,
       });
-      
-      // Force a complete page reload
       window.location.href = '/';
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('Eroare la deconectare:', error);
     }
   };
 
@@ -68,12 +66,11 @@ export default function Header({ onTypeChange }) {
 
       try {
         const response = await fetch(`/api/locations/search?q=${encodeURIComponent(searchQuery)}`);
-        if (!response.ok) throw new Error('Failed to fetch suggestions');
+        if (!response.ok) throw new Error('Eroare la căutarea locațiilor');
         const data = await response.json();
         setSuggestions(data);
         setShowSuggestions(true);
       } catch (error) {
-
         setSuggestions([]);
       }
     };
@@ -91,9 +88,9 @@ export default function Header({ onTypeChange }) {
     setSelectedType(newType);
     
     const typeMap = {
-      'hotel': 'House',
-      'pensiune': 'Villa',
-      'cabana': 'Cabin'
+      'hotel': 'Hotel',
+      'pensiune': 'Pensiune',
+      'cabana': 'Cabană'
     };
     
     onTypeChange?.(newType ? typeMap[newType] : null);
@@ -124,7 +121,7 @@ export default function Header({ onTypeChange }) {
               <button 
                 onClick={() => window.history.back()} 
                 className={styles.backButton}
-                aria-label="Go back"
+                aria-label="Înapoi"
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -142,7 +139,7 @@ export default function Header({ onTypeChange }) {
               </button>
             )}
             <Link href="/" className={styles.homeLink}>
-              Cazari Romania
+              Cazări România
             </Link>
           </div>
           <div className={styles.accommodationTypes}>
@@ -165,14 +162,14 @@ export default function Header({ onTypeChange }) {
               onClick={() => handleTypeClick('cabana')}
             >
               <span className={styles.typeIcon}>🌲</span>
-              <span>Cabana</span>
+              <span>Cabană</span>
             </button>
           </div>
           <div className={styles.profileSection} ref={profileMenuRef}>
             <button 
               onClick={() => setShowProfileMenu(!showProfileMenu)} 
               className={styles.profileButton} 
-              aria-label="Profile menu"
+              aria-label="Meniu profil"
             >
               {status === 'authenticated' && session?.user ? (
                 <div className={styles.userAvatar}>
@@ -204,19 +201,19 @@ export default function Header({ onTypeChange }) {
                       <span className={styles.userEmail}>{session.user.email}</span>
                     </div>
                     <Link href="/profile" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
-                      My Profile
+                      Profilul Meu
                     </Link>
                     <button onClick={handleSignOut} className={`${styles.menuItem} ${styles.signOutButton}`}>
-                      Sign Out
+                      Deconectare
                     </button>
                   </>
                 ) : (
                   <>
                     <Link href="/auth/signin" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
-                      Sign In
+                      Conectare
                     </Link>
                     <Link href="/auth/signup" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
-                      Sign Up
+                      Înregistrare
                     </Link>
                   </>
                 )}
@@ -232,7 +229,7 @@ export default function Header({ onTypeChange }) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="Unde..."
+                placeholder="Caută locații..."
                 className={styles.searchInput}
                 aria-label="Caută locații"
               />
@@ -254,37 +251,16 @@ export default function Header({ onTypeChange }) {
                 </svg>
               </button>
             </div>
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className={styles.suggestions}>
+                {suggestions.map((suggestion, index) => (
+                  <li key={index} onClick={() => handleSuggestionClick(suggestion)}>
+                    {suggestion}
+                  </li>
+                ))}
+              </ul>
+            )}
           </form>
-          {showSuggestions && suggestions.length > 0 && (
-            <ul className={styles.suggestions}>
-              {suggestions.map((location, index) => (
-                <li key={index}>
-                  <button
-                    type="button"
-                    onClick={() => handleSuggestionClick(location)}
-                    className={styles.suggestionButton}
-                  >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="16" 
-                      height="16" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                      className={styles.locationIcon}
-                    >
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    {location}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </div>
     </header>

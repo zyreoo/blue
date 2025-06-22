@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
 import { HomePageSkeleton } from '@/components/SkeletonLoader';
-import { useLanguage } from '@/components/LanguageProvider';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import SearchFilters from '@/components/SearchFilters';
@@ -86,7 +85,7 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         )}
-        <div className={styles.price}>${price}/{t('property.perNight')}</div>
+        <div className={styles.price}>{price}RON per/noapte</div>
       </div>
       <div className={styles.content}>
         <h3>{property.title}</h3>
@@ -97,7 +96,7 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
             : property.location}
         </p>
         <p className={styles.details}>
-          {details.bedrooms} {t('property.bedrooms')} • {details.bathrooms} {t('property.bathrooms')} • {t('property.maxGuests')} {details.maxGuests}
+          {details.bedrooms} dormitoare • {details.bathrooms} băi • Maxim {details.maxGuests} oaspeți
         </p>
       </div>
     </Link>
@@ -106,7 +105,6 @@ const PropertyCard = ({ property, locationUrl, filters, t }) => {
 
 export default function Home() {
   const { properties = [], isLoading: propertiesLoading, isError: propertiesError } = useProperties();
-  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [filters, setFilters] = useState(null);
   const [selectedPropertyType, setSelectedPropertyType] = useState(null);
@@ -132,7 +130,7 @@ export default function Home() {
         }));
       }
     } catch (e) {
-
+      console.error('Eroare la încărcarea filtrelor:', e);
     }
   }, [searchParams]);
 
@@ -213,7 +211,7 @@ export default function Home() {
       try {
         localStorage.setItem('searchFilters', JSON.stringify(newFilters));
       } catch (e) {
-  
+        console.error('Eroare la salvarea filtrelor:', e);
       }
     }
   }, []);
@@ -242,7 +240,7 @@ export default function Home() {
     <div>
       <Header onTypeChange={handleTypeChange} />
       <main className={styles.main}>
-        <h1 className={styles.mainTitle}>{t('home.title')}</h1>
+        <h1 className={styles.mainTitle}>Descoperă locuri minunate de cazare</h1>
         <SearchFilters 
           onFiltersChange={handleFiltersChange} 
           selectedQuickFilter={selectedPropertyType}
@@ -255,7 +253,7 @@ export default function Home() {
               <section key={location} className={styles.locationSection}>
                 <Link href={`/${locationUrl}`} className={styles.locationLink}>
                   <h2 className={styles.locationTitle}>
-                    {t('property.location')} {location}
+                    Cazare în {location}
                   </h2>
                 </Link>
                 <div className={styles.cardsContainer}>
@@ -266,7 +264,6 @@ export default function Home() {
                         property={property}
                         locationUrl={locationUrl}
                         filters={filters}
-                        t={t}
                       />
                     ))}
                   </div>

@@ -2,18 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import './Footer.css';
 import { useRouter } from 'next/navigation';
-import { useLanguage } from './LanguageProvider';
 
 const Footer = () => {
   const [activeSection, setActiveSection] = useState('popular');
   const [prevSection, setPrevSection] = useState('popular');
   const [locations, setLocations] = useState({
-    popular: { title: "Popular", locations: [] },
-    beach: { title: "Beach", locations: [] },
-    mountains: { title: "Mountains", locations: [] }
+    popular: { title: "Populare", locations: [] },
+    beach: { title: "Litoral", locations: [] },
+    mountains: { title: "Munte", locations: [] }
   });
   const router = useRouter();
-  const { language, changeLanguage, t } = useLanguage();
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -28,7 +26,7 @@ const Footer = () => {
               types: new Set()
             };
           }
-          acc[property.location].types.add(property.type || 'House');
+          acc[property.location].types.add(property.type || 'Casă');
           return acc;
         }, {});
 
@@ -44,7 +42,7 @@ const Footer = () => {
         
         const popularLocations = topBookedLocations.map(booking => ({
           name: booking.location,
-          type: locationMap[booking.location]?.types.values().next().value || 'Luxury Stay'
+          type: locationMap[booking.location]?.types.values().next().value || 'Cazare de Lux'
         }));
 
         const remainingLocations = sortedLocations.filter(
@@ -55,20 +53,20 @@ const Footer = () => {
         
         setLocations({
           popular: {
-            title: "Popular",
+            title: "Populare",
             locations: popularLocations
           },
           beach: {
-            title: "Coastal Areas",
+            title: "Litoral",
             locations: remainingLocations.slice(0, midPoint)
           },
           mountains: {
-            title: "Bay Area",
+            title: "Munte",
             locations: remainingLocations.slice(midPoint)
           }
         });
       } catch (error) {
-
+        console.error('Eroare la încărcarea locațiilor:', error);
       }
     };
 
@@ -137,7 +135,7 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="destinations-wrapper">
-        <h2 className="destinations-header">{t('common.footer.inspiration')}</h2>
+        <h2 className="destinations-header">Inspirație pentru viitoarele tale călătorii</h2>
         <div className="categories-nav">
           {Object.entries(locations).map(([key, { title }]) => (
             <button
@@ -165,37 +163,20 @@ const Footer = () => {
 
       <div className="footer-content">
         <div className="footer-section">
-          <h3>{t('common.footer.contact.title')}</h3>
-          <p>{t('common.footer.contact.description')}</p>
+          <h3>Contact</h3>
+          <p>Contactează-ne pentru a-ți planifica călătoria perfectă la aceste destinații uimitoare. Experții noștri în călătorii sunt aici pentru a te ajuta să creezi amintiri de neuitat.</p>
         </div>
         <div className="footer-section">
-          <h3>{t('common.footer.about.title')}</h3>
-          <p>{t('common.footer.about.description')}</p>
+          <h3>Despre Noi</h3>
+          <p>Ne specializăm în prezentarea celor mai bune destinații din România, de la munții Carpați până la litoralul Mării Negre.</p>
         </div>
         <div className="footer-section">
-          <h3>{t('common.footer.quickLinks.title')}</h3>
-          <p>{t('common.footer.quickLinks.description')}</p>
-        </div>
-        <div className="footer-section language-section">
-          <h3>{t('common.footer.language')}</h3>
-          <div className="language-buttons">
-            <button 
-              className={`language-button ${language === 'en' ? 'active' : ''}`}
-              onClick={() => changeLanguage('en')}
-            >
-              English
-            </button>
-            <button 
-              className={`language-button ${language === 'ro' ? 'active' : ''}`}
-              onClick={() => changeLanguage('ro')}
-            >
-              Română
-            </button>
-          </div>
+          <h3>Link-uri Rapide</h3>
+          <p>Descoperă mai multe despre serviciile noastre, ghiduri de călătorie și oferte speciale pentru a face aventura ta în România de neuitat.</p>
         </div>
       </div>
       <div className="footer-bottom">
-        <p>{t('common.footer.copyright')}</p>
+        <p>© 2024 Simone Marton. Toate drepturile rezervate.</p>
       </div>
     </footer>
   );

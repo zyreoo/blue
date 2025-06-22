@@ -1,7 +1,6 @@
 import { Inter } from 'next/font/google';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { LanguageProvider } from '@/components/LanguageProvider';
 import Providers from '@/components/Providers';
 import './globals.css';
 import { headers } from 'next/headers';
@@ -13,11 +12,9 @@ export const metadata = {
   description: 'Discover and book the perfect accommodation for your next trip.',
 };
 
-// Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-// Only revalidate when necessary
-export const revalidate = 3600; // 1 hour
+export const revalidate = 3600;
 
 export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
@@ -26,9 +23,7 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <Providers session={session}>
-          <LanguageProvider>
-            {children}
-          </LanguageProvider>
+          {children}
         </Providers>
       </body>
     </html>
