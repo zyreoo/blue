@@ -1350,13 +1350,29 @@ export default function BecomeHostPage() {
                 </div>
                 {formData.photos.length > 0 && (
                   <div className={styles.previewPhoto}>
-                    <Image
-                      src={formData.photos[0].url}
-                      alt="Property preview"
-                      width={300}
-                      height={200}
-                      objectFit="cover"
-                    />
+                    <div className={`${styles.previewPhotoItem} ${styles.mainPreviewPhoto}`}>
+                      <Image
+                        src={formData.photos.find(p => p.id === formData.primaryPhotoId)?.url || formData.photos[0].url}
+                        alt="Property main photo"
+                        width={600}
+                        height={400}
+                        objectFit="cover"
+                      />
+                    </div>
+                    {formData.photos
+                      .filter(photo => photo.id !== formData.primaryPhotoId)
+                      .slice(0, 5) // Show up to 5 additional photos
+                      .map((photo, index) => (
+                        <div key={photo.id} className={styles.previewPhotoItem}>
+                          <Image
+                            src={photo.url}
+                            alt={`Property photo ${index + 2}`}
+                            width={300}
+                            height={200}
+                            objectFit="cover"
+                          />
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>
