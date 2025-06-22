@@ -18,7 +18,13 @@ const propertySchema = new mongoose.Schema({
   spaceType: {
     type: String,
     required: true,
-    enum: ['entire_place', 'private_room', 'shared_room']
+    enum: [
+      'entire_place',
+      'private_room',
+      'shared_room',
+      'private_cabin',
+      'private_wing'
+    ]
   },
   location: {
     address: {

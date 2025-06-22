@@ -149,7 +149,155 @@ const propertyTypes = [
   { id: 'cycladic', label: t('become_host.property_type.cycladic'), icon: '🏠' },
 ];
 
-const spaceTypes = [
+
+const propertySpaceTypes = {
+  house: [
+    {
+      id: 'entire_place',
+      title: 'Întreaga casă',
+      description: 'Oaspeții au acces la întreaga casă, inclusiv toate camerele și facilitățile.',
+      icon: '🏠'
+    },
+    {
+      id: 'private_room',
+      title: 'Cameră privată',
+      description: 'Oaspeții au propria cameră într-o casă, plus acces la spațiile comune.',
+      icon: '🚪'
+    }
+  ],
+  apartment: [
+    {
+      id: 'entire_place',
+      title: 'Întregul apartament',
+      description: 'Oaspeții au acces la întregul apartament.',
+      icon: '🏢'
+    },
+    {
+      id: 'private_room',
+      title: 'Cameră privată',
+      description: 'Oaspeții au propria cameră într-un apartament, plus acces la spațiile comune.',
+      icon: '🚪'
+    },
+    {
+      id: 'shared_room',
+      title: 'Cameră comună',
+      description: 'Oaspeții împart camera cu alți oaspeți sau cu gazda.',
+      icon: '👥'
+    }
+  ],
+  barn: [
+    {
+      id: 'entire_place',
+      title: 'Întregul hambar',
+      description: 'Oaspeții au acces la întregul hambar renovat.',
+      icon: '🏚'
+    }
+  ],
+  guesthouse: [
+    {
+      id: 'entire_place',
+      title: 'Întreaga casă de oaspeți',
+      description: 'Oaspeții au acces la întreaga casă de oaspeți.',
+      icon: '🏨'
+    },
+    {
+      id: 'private_room',
+      title: 'Cameră privată',
+      description: 'Oaspeții au propria cameră în casa de oaspeți.',
+      icon: '🚪'
+    }
+  ],
+  boat: [
+    {
+      id: 'entire_place',
+      title: 'Întreaga barcă',
+      description: 'Oaspeții au acces la întreaga barcă.',
+      icon: '⛵'
+    },
+    {
+      id: 'private_cabin',
+      title: 'Cabină privată',
+      description: 'Oaspeții au propria cabină pe barcă.',
+      icon: '🛏'
+    }
+  ],
+  cabin: [
+    {
+      id: 'entire_place',
+      title: 'Întreaga cabană',
+      description: 'Oaspeții au acces la întreaga cabană.',
+      icon: '🏡'
+    }
+  ],
+  camper: [
+    {
+      id: 'entire_place',
+      title: 'Întreaga rulotă',
+      description: 'Oaspeții au acces la întreaga rulotă.',
+      icon: '🚐'
+    }
+  ],
+  villa: [
+    {
+      id: 'entire_place',
+      title: 'Întreaga vilă',
+      description: 'Oaspeții au acces la întreaga vilă.',
+      icon: '🏘'
+    }
+  ],
+  castle: [
+    {
+      id: 'entire_place',
+      title: 'Întregul castel',
+      description: 'Oaspeții au acces la întregul castel.',
+      icon: '🏰'
+    },
+    {
+      id: 'private_wing',
+      title: 'Aripă privată',
+      description: 'Oaspeții au acces la o aripă privată a castelului.',
+      icon: '🏰'
+    },
+    {
+      id: 'private_room',
+      title: 'Cameră privată',
+      description: 'Oaspeții au propria cameră în castel.',
+      icon: '🚪'
+    }
+  ],
+  cave: [
+    {
+      id: 'entire_place',
+      title: 'Întreaga peșteră',
+      description: 'Oaspeții au acces la întreaga peșteră amenajată.',
+      icon: '🗿'
+    }
+  ],
+  container: [
+    {
+      id: 'entire_place',
+      title: 'Întregul container',
+      description: 'Oaspeții au acces la întregul container amenajat.',
+      icon: '📦'
+    }
+  ],
+  cycladic: [
+    {
+      id: 'entire_place',
+      title: 'Întreaga casă cicladică',
+      description: 'Oaspeții au acces la întreaga casă cicladică.',
+      icon: '🏠'
+    },
+    {
+      id: 'private_room',
+      title: 'Cameră privată',
+      description: 'Oaspeții au propria cameră într-o casă cicladică.',
+      icon: '🚪'
+    }
+  ]
+};
+
+const defaultSpaceTypes = [
   {
     id: 'entire_place',
     title: t('become_host.space_type.entire_place'),
@@ -161,12 +309,6 @@ const spaceTypes = [
     title: t('become_host.space_type.private_room'),
     description: 'Oaspeții au propria cameră într-o locuință, plus acces la spațiile comune.',
     icon: '🚪'
-  },
-  {
-    id: 'shared_room',
-    title: t('become_host.space_type.shared_room'),
-    description: 'Oaspeții dorm într-o cameră comună dintr-un hostel administrat profesionist, cu personal disponibil nonstop.',
-    icon: '👥'
   }
 ];
 
@@ -176,7 +318,7 @@ const getPropertyTypeLabel = (type) => {
 };
 
 const getSpaceTypeLabel = (type) => {
-  const spaceType = spaceTypes.find(s => s.id === type);
+  const spaceType = propertySpaceTypes[type] || defaultSpaceTypes.find(s => s.id === type);
   return spaceType ? spaceType.title : type;
 };
 
@@ -396,7 +538,7 @@ export default function BecomeHostPage() {
           >
             <h2 className={styles.stepTitle}>{t('become_host.space_type.title')}</h2>
             <div className={styles.spaceTypeGrid}>
-              {spaceTypes.map((type) => (
+              {(propertySpaceTypes[formData.propertyType] || defaultSpaceTypes).map((type) => (
                 <button
                   key={type.id}
                   className={`${styles.spaceTypeCard} ${
@@ -1014,7 +1156,7 @@ export default function BecomeHostPage() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    placeholder="0.00"
+                    placeholder="0"
                     className={styles.priceInput}
                   />
                 </div>

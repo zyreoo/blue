@@ -173,7 +173,7 @@
 }
 
 .becomeHostButton {
-  background-color: #FF385C;
+  background-color: #626F47;
   color: white;
   padding: 12px 24px;
   border: none;
@@ -185,7 +185,7 @@
 }
 
 .becomeHostButton:hover {
-  background-color: #E31C5F;
+  background-color: #626F47;
 }
 
 .adminButton {
