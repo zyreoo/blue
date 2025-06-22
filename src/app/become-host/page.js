@@ -10,8 +10,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import Image from 'next/image';
+import { AmenityIcons } from '@/components/icons/AmenityIcons';
 
-// Dynamically import MapComponent with no SSR
+
 const MapComponent = dynamic(
   () => import('@/components/MapComponent'),
   { ssr: false }
@@ -74,23 +75,72 @@ const translations = {
       essential: "Esențiale",
       features: "Caracteristici",
       safety: "Siguranță",
-      entertainment: "Divertisment",
+      entertainment: "Divertisment & Confort",
+      bathroom: "Baie & Spa",
+      bedroom: "Dormitor",
+      kitchen: "Bucătărie & Dining",
+      outdoor: "Exterior",
+      accessibility: "Accesibilitate",
+      work: "Spațiu de lucru",
+      
+      // Essential amenities
       wifi: "Wi-Fi",
       tv: "TV",
       kitchen: "Bucătărie",
       washer: "Mașină de spălat",
+      workspace: "Spațiu de lucru",
+      dryer: "Uscător",
+      dishwasher: "Mașină de spălat vase",
+
+      // Bathroom amenities
+      hair_dryer: "Uscător de păr",
+      toiletries: "Articole de toaletă",
+      hot_tub: "Cadă cu hidromasaj",
+
+      // Bedroom amenities
+      iron: "Fier de călcat",
+      hangers: "Umerașe",
+      extra_pillows: "Perne suplimentare",
+
+      // Outdoor amenities
       pool: "Piscină",
       parking: "Parcare",
+      balcony: "Balcon",
+      garden: "Grădină",
+      beach_access: "Acces la plajă",
+      bbq: "Grătar",
+      outdoor_dining: "Dining în aer liber",
+
+      // Entertainment & Tech
+      smart_tv: "Smart TV",
+      streaming: "Servicii streaming",
+      games: "Jocuri",
+      board_games: "Jocuri de societate",
+      sound_system: "Sistem audio",
+
+      // Kitchen & Dining
+      coffee_maker: "Espressor",
+      microwave: "Cuptor cu microunde",
+      wine_glasses: "Pahare de vin",
+      dining_table: "Masă de dining",
+
+      // Climate & Safety
       ac: "Aer condiționat",
       heating: "Încălzire",
       smoke_detector: "Detector de fum",
       first_aid: "Trusă de prim ajutor",
       fire_extinguisher: "Stingător",
       security_cameras: "Camere de supraveghere",
-      bbq: "Grătar",
-      gym: "Sală de sport",
-      bikes: "Biciclete",
-      games: "Jocuri"
+
+      // Accessibility
+      elevator: "Lift",
+      ground_floor: "Parter",
+      wide_doorway: "Uși late",
+
+      // Work & Study
+      desk: "Birou",
+      monitor: "Monitor",
+      printer: "Imprimantă"
     },
     photos: {
       title: "Adaugă fotografii ale spațiului tău",
@@ -829,184 +879,189 @@ export default function BecomeHostPage() {
               <div className={styles.amenityCategory}>
                 <h3>{t('become_host.amenities.essential')}</h3>
                 <div className={styles.amenityGrid}>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('wifi') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('wifi')}
-                  >
-                    <span className={styles.amenityIcon}>📶</span>
-                    <span>{t('become_host.amenities.wifi')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('tv') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('tv')}
-                  >
-                    <span className={styles.amenityIcon}>📺</span>
-                    <span>{t('become_host.amenities.tv')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('kitchen') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('kitchen')}
-                  >
-                    <span className={styles.amenityIcon}>🍳</span>
-                    <span>{t('become_host.amenities.kitchen')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('washer') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('washer')}
-                  >
-                    <span className={styles.amenityIcon}>🧺</span>
-                    <span>{t('become_host.amenities.washer')}</span>
-                  </button>
+                  {['wifi', 'kitchen', 'washer', 'dryer', 'dishwasher', 'workspace'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div className={styles.amenityCategory}>
-                <h3>{t('become_host.amenities.features')}</h3>
+                <h3>{t('become_host.amenities.bathroom')}</h3>
                 <div className={styles.amenityGrid}>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('pool') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('pool')}
-                  >
-                    <span className={styles.amenityIcon}>🏊‍♂️</span>
-                    <span>{t('become_host.amenities.pool')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('parking') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('parking')}
-                  >
-                    <span className={styles.amenityIcon}>🅿️</span>
-                    <span>{t('become_host.amenities.parking')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('ac') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('ac')}
-                  >
-                    <span className={styles.amenityIcon}>❄️</span>
-                    <span>{t('become_host.amenities.ac')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('heating') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('heating')}
-                  >
-                    <span className={styles.amenityIcon}>🔥</span>
-                    <span>{t('become_host.amenities.heating')}</span>
-                  </button>
+                  {['hair_dryer', 'toiletries', 'hot_tub'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div className={styles.amenityCategory}>
-                <h3>{t('become_host.amenities.safety')}</h3>
+                <h3>{t('become_host.amenities.bedroom')}</h3>
                 <div className={styles.amenityGrid}>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('smoke_detector') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('smoke_detector')}
-                  >
-                    <span className={styles.amenityIcon}>🚭</span>
-                    <span>{t('become_host.amenities.smoke_detector')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('first_aid') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('first_aid')}
-                  >
-                    <span className={styles.amenityIcon}>🏥</span>
-                    <span>{t('become_host.amenities.first_aid')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('fire_extinguisher') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('fire_extinguisher')}
-                  >
-                    <span className={styles.amenityIcon}>🧯</span>
-                    <span>{t('become_host.amenities.fire_extinguisher')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('security_cameras') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('security_cameras')}
-                  >
-                    <span className={styles.amenityIcon}>📹</span>
-                    <span>{t('become_host.amenities.security_cameras')}</span>
-                  </button>
+                  {['iron', 'hangers', 'extra_pillows'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.amenityCategory}>
+                <h3>{t('become_host.amenities.kitchen')}</h3>
+                <div className={styles.amenityGrid}>
+                  {['microwave', 'coffee_maker', 'wine_glasses', 'dining_table'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.amenityCategory}>
+                <h3>{t('become_host.amenities.outdoor')}</h3>
+                <div className={styles.amenityGrid}>
+                  {['pool', 'parking', 'balcony', 'garden', 'beach_access', 'bbq', 'outdoor_dining'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div className={styles.amenityCategory}>
                 <h3>{t('become_host.amenities.entertainment')}</h3>
                 <div className={styles.amenityGrid}>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('bbq') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('bbq')}
-                  >
-                    <span className={styles.amenityIcon}>🍖</span>
-                    <span>{t('become_host.amenities.bbq')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('gym') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('gym')}
-                  >
-                    <span className={styles.amenityIcon}>💪</span>
-                    <span>{t('become_host.amenities.gym')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('bikes') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('bikes')}
-                  >
-                    <span className={styles.amenityIcon}>🚲</span>
-                    <span>{t('become_host.amenities.bikes')}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.amenityButton} ${
-                      formData.amenities.includes('games') ? styles.selected : ''
-                    }`}
-                    onClick={() => handleAmenitiesChange('games')}
-                  >
-                    <span className={styles.amenityIcon}>🎮</span>
-                    <span>{t('become_host.amenities.games')}</span>
-                  </button>
+                  {['smart_tv', 'streaming', 'games', 'board_games', 'sound_system'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.amenityCategory}>
+                <h3>{t('become_host.amenities.safety')}</h3>
+                <div className={styles.amenityGrid}>
+                  {['smoke_detector', 'first_aid', 'fire_extinguisher', 'security_cameras'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.amenityCategory}>
+                <h3>{t('become_host.amenities.accessibility')}</h3>
+                <div className={styles.amenityGrid}>
+                  {['elevator', 'ground_floor', 'wide_doorway'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.amenityCategory}>
+                <h3>{t('become_host.amenities.work')}</h3>
+                <div className={styles.amenityGrid}>
+                  {['desk', 'monitor', 'printer'].map((amenity) => (
+                    <button
+                      key={amenity}
+                      type="button"
+                      className={`${styles.amenityButton} ${
+                        formData.amenities.includes(amenity) ? styles.selected : ''
+                      }`}
+                      onClick={() => handleAmenitiesChange(amenity)}
+                    >
+                      <span className={styles.amenityIcon}>
+                        {AmenityIcons[amenity]}
+                      </span>
+                      <span>{t(`become_host.amenities.${amenity}`)}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 

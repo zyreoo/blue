@@ -357,26 +357,27 @@
 .amenityCategory h3 {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #222;
+  color: #2D3748;
   margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #E5E9E0;
 }
 
 .amenityGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
 }
 
 .amenityButton {
-  composes: variables;
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
   width: 100%;
   padding: 1.25rem;
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--card-background);
+  border: 2px solid #E5E9E0;
+  border-radius: 12px;
+  background: #FFFFFF;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
@@ -384,62 +385,53 @@
   overflow: hidden;
 }
 
-.amenityButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, var(--primary-light), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
 .amenityButton:hover {
-  border-color: var(--primary-color);
+  border-color: #626F47;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
-}
-
-.amenityButton:hover::before {
-  opacity: 0.5;
+  box-shadow: 0 4px 6px rgba(98, 111, 71, 0.1);
 }
 
 .amenityButton.selected {
-  border-color: var(--primary-color);
-  background: linear-gradient(45deg, var(--primary-light), transparent);
+  border-color: #626F47;
+  background: rgba(98, 111, 71, 0.05);
+}
+
+.amenityButton.selected:hover {
+  background: rgba(98, 111, 71, 0.08);
 }
 
 .amenityIcon {
-  font-size: 1.75rem;
-  min-width: 28px;
-  position: relative;
-  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(98, 111, 71, 0.1);
+  transition: all 0.3s ease;
+}
+
+.amenityButton:hover .amenityIcon {
+  background: rgba(98, 111, 71, 0.15);
+}
+
+.amenityButton.selected .amenityIcon {
+  background: rgba(98, 111, 71, 0.2);
 }
 
 .amenityButton span:last-child {
   font-size: 1rem;
   font-weight: 500;
-  color: #222;
+  color: #2D3748;
+  transition: color 0.3s ease;
 }
 
-@media (max-width: 768px) {
-  .amenityGrid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
+.amenityButton:hover span:last-child {
+  color: #626F47;
+}
 
-  .amenityButton {
-    padding: 0.75rem;
-  }
-
-  .amenityIcon {
-    font-size: 1.25rem;
-  }
-
-  .amenityButton span:last-child {
-    font-size: 0.9rem;
-  }
+.amenityButton.selected span:last-child {
+  color: #626F47;
 }
 
 .stepDescription {
@@ -620,6 +612,23 @@
 
   .dropZone p {
     font-size: 1rem;
+  }
+
+  .amenityGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .amenityButton {
+    padding: 1rem;
+  }
+
+  .amenityIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .amenityButton span:last-child {
+    font-size: 0.9rem;
   }
 }
 
