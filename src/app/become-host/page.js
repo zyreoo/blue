@@ -390,6 +390,7 @@ export default function BecomeHostPage() {
     description: '',
     amenities: [],
     photos: [],
+    primaryPhotoId: null,
     pricePerNight: '',
     maxGuests: '1',
     bedrooms: '1',
@@ -469,17 +470,49 @@ export default function BecomeHostPage() {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = (e) => {
+          const newPhotoId = `photo-${Date.now()}-${formData.photos.length}`;
           setFormData(prev => ({
             ...prev,
             photos: [...prev.photos, {
-              id: `photo-${Date.now()}-${prev.photos.length}`,
+              id: newPhotoId,
               url: e.target.result,
               file: file
-            }]
+            }],
+            primaryPhotoId: prev.primaryPhotoId || newPhotoId // Set as primary if no primary exists
           }));
         };
         reader.readAsDataURL(file);
       }
+    });
+  };
+
+  const handleSetPrimaryPhoto = (photoId) => {
+    if (photoId === formData.primaryPhotoId) {
+      return; // Don't do anything if clicking on current primary photo
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      primaryPhotoId: photoId
+    }));
+  };
+
+  const handleRemovePhoto = (photoId) => {
+    setFormData(prev => {
+      const newPhotos = prev.photos.filter(photo => photo.id !== photoId);
+      let newPrimaryPhotoId = prev.primaryPhotoId;
+      
+
+      if (photoId === prev.primaryPhotoId) {
+
+        newPrimaryPhotoId = newPhotos.length > 0 ? newPhotos[0].id : null;
+      }
+      
+      return {
+        ...prev,
+        photos: newPhotos,
+        primaryPhotoId: newPrimaryPhotoId
+      };
     });
   };
 
@@ -493,13 +526,6 @@ export default function BecomeHostPage() {
     setFormData(prev => ({
       ...prev,
       photos: items
-    }));
-  };
-
-  const handleRemovePhoto = (photoId) => {
-    setFormData(prev => ({
-      ...prev,
-      photos: prev.photos.filter(photo => photo.id !== photoId)
     }));
   };
 
@@ -1143,20 +1169,38 @@ export default function BecomeHostPage() {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className={`${styles.photoItem} ${
-                                  index === 0 ? styles.mainPhoto : ''
+                                  photo.id === formData.primaryPhotoId ? styles.mainPhoto : ''
                                 } ${snapshot.isDragging ? styles.dragging : ''}`}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                }}
                               >
                                 <img src={photo.url} alt={`Property photo ${index + 1}`} />
-                                <button
-                                  type="button"
-                                  className={styles.removePhoto}
-                                  onClick={() => handleRemovePhoto(photo.id)}
-                                >
-                                  ✕
-                                </button>
-                                {index === 0 && (
+                                <div className={styles.photoActions}>
+                                  <button
+                                    type="button"
+                                    className={styles.setPrimary}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleSetPrimaryPhoto(photo.id);
+                                    }}
+                                  >
+                                    {photo.id === formData.primaryPhotoId ? 'Main photo' : 'Set as main'}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={styles.removePhoto}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleRemovePhoto(photo.id);
+                                    }}
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                                {photo.id === formData.primaryPhotoId && (
                                   <div className={styles.mainPhotoLabel}>
-                                    {t('become_host.photos.main_photo')}
+                                    Main photo
                                   </div>
                                 )}
                               </div>

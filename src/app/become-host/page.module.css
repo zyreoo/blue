@@ -489,77 +489,135 @@
 
 .photoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+  padding: 24px 0;
+  min-height: 200px;
 }
 
 .photoItem {
   position: relative;
-  aspect-ratio: 3/2;
+  aspect-ratio: 4/3;
   border-radius: var(--radius-md);
   overflow: hidden;
-  cursor: move;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
-}
-
-.photoItem:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  background: var(--card-background);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .photoItem img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .photoItem:hover img {
   transform: scale(1.05);
 }
 
-.removePhoto {
+/* Clean overlay for hover state */
+.photoItem::before {
+  content: '';
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
+  inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.photoItem:hover::before {
+  opacity: 1;
+}
+
+.photoActions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.photoItem:hover .photoActions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.removePhoto,
+.setPrimary {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
   border: none;
-  cursor: pointer;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  cursor: pointer;
   transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
 }
 
-.removePhoto:hover {
-  background: rgba(0, 0, 0, 0.8);
+.removePhoto {
+  width: 32px;
+  padding: 0;
 }
 
-.mainPhoto {
-  grid-column: span 2;
-  grid-row: span 2;
+.removePhoto:hover,
+.setPrimary:hover {
+  background: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.setPrimary.isPrimary {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Main photo indicator */
 .mainPhotoLabel {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  bottom: 12px;
+  left: 12px;
+  background: white;
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.photoItem:hover .mainPhotoLabel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.photoItem.mainPhoto {
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.photoItem.mainPhoto .mainPhotoLabel {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .dragging {
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 .photoTips {
