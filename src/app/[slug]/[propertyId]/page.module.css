@@ -5,17 +5,20 @@
 }
 
 .loadingContainer {
+  width: 100%;
+  height: 450px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 60vh;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 12px;
 }
 
 .loader {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #626F47;
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -23,6 +26,18 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.noImage {
+  width: 100%;
+  height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #666;
+  font-size: 1.1rem;
+  border-radius: 12px;
 }
 
 .errorContainer {
@@ -67,16 +82,77 @@
 
 .imageGallery {
   width: 100%;
-  height: 500px;
+  margin: 2rem 0;
   border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 32px;
 }
 
-.mainImage {
+.photoGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+  height: 450px;
+}
+
+.mainPhotoContainer {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.mainPhotoContainer:hover {
+  opacity: 0.95;
+}
+
+.mainPhoto {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.smallPhotosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  height: 100%;
+}
+
+.smallPhotoContainer {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.smallPhotoContainer:hover {
+  opacity: 0.95;
+}
+
+.smallPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showAllPhotos {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 1;
+}
+
+.showAllPhotos:hover {
+  background: white;
 }
 
 .contentContainer {

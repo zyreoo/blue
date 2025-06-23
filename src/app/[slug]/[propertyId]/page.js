@@ -9,9 +9,12 @@ import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import { useSession } from 'next-auth/react';
 
-
 const DateRangePicker = dynamic(() => import('@/components/DateRangePicker'), {
   ssr: false,
+});
+
+const PhotoViewer = dynamic(() => import('@/components/PhotoViewer'), {
+  ssr: false
 });
 
 export default function PropertyPage() {
@@ -21,6 +24,8 @@ export default function PropertyPage() {
   const [error, setError] = useState(null);
   const [selectedDates, setSelectedDates] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [showPhotoViewer, setShowPhotoViewer] = useState(false);
+  const [initialPhotoIndex, setInitialPhotoIndex] = useState(0);
   const [bookingForm, setBookingForm] = useState({
     firstName: '',
     lastName: '',
@@ -172,8 +177,6 @@ export default function PropertyPage() {
         return;
       }
 
-
-
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
@@ -202,7 +205,6 @@ export default function PropertyPage() {
       
       alert('Booking recorded successfully! You will receive a confirmation email shortly.');
       
-
       setBookingForm({
         firstName: session?.user?.firstName || '',
         lastName: session?.user?.lastName || '',
@@ -214,7 +216,6 @@ export default function PropertyPage() {
       setEditMode(false);
       
     } catch (error) {
-
       alert('Failed to record booking. Please try again.');
     }
   }; 
@@ -258,19 +259,89 @@ export default function PropertyPage() {
         </div>
         
         <div className={styles.imageGallery}>
-          <Image 
-            src={property.imageUrl} 
-            alt={property.title} 
-            className={styles.mainImage}
-            width={1200}
-            height={800}
-            quality={85}
-            priority={true}
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPjA+OjU/RUVHUFBQUFtbW1tbW1tbW1tbW1v/2wBDARUXFyAeIB4gHR4dICEgW1FRW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1v/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-          />
+          {loading ? (
+            <div className={styles.loadingContainer}>
+              <div className={styles.loader}></div>
+            </div>
+          ) : property?.photos?.length > 0 ? (
+            <div className={styles.photoGrid}>
+              <div 
+                className={styles.mainPhotoContainer}
+                onClick={() => {
+                  setInitialPhotoIndex(0);
+                  setShowPhotoViewer(true);
+                }}
+              >
+                <Image 
+                  src={property.photos.find(photo => photo.isMain)?.url || property.photos[0].url}
+                  alt={`${property.title} - Main`}
+                  className={styles.mainPhoto}
+                  width={1200}
+                  height={800}
+                  quality={85}
+                  priority={true}
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPjA+OjU/RUVHUFBQUFtbW1tbW1tbW1tbW1v/2wBDARUXFyAeIB4gHR4dICEgW1FRW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1v/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                />
+              </div>
+              <div className={styles.smallPhotosGrid}>
+                {property.photos.slice(1, 5).map((photo, index) => (
+                  <div 
+                    key={index} 
+                    className={styles.smallPhotoContainer}
+                    onClick={() => {
+                      setInitialPhotoIndex(index + 1);
+                      setShowPhotoViewer(true);
+                    }}
+                  >
+                    <Image
+                      src={photo.url}
+                      alt={`${property.title} - ${index + 2}`}
+                      className={styles.smallPhoto}
+                      width={600}
+                      height={400}
+                      quality={75}
+                    />
+                  </div>
+                ))}
+                {property.photos.length > 5 && (
+                  <button 
+                    className={styles.showAllPhotos}
+                    onClick={() => {
+                      setInitialPhotoIndex(0);
+                      setShowPhotoViewer(true);
+                    }}
+                  >
+                    +{property.photos.length - 5} more photos
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : property?.imageUrl ? (
+            <Image 
+              src={property.imageUrl}
+              alt={property.title || 'Property Image'}
+              className={styles.mainImage}
+              width={1200}
+              height={800}
+              quality={85}
+              priority={true}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPjA+OjU/RUVHUFBQUFtbW1tbW1tbW1tbW1v/2wBDARUXFyAeIB4gHR4dICEgW1FRW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1v/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            />
+          ) : (
+            <div className={styles.noImage}>No images available</div>
+          )}
         </div>
-        
+
+        {showPhotoViewer && property?.photos && (
+          <PhotoViewer
+            photos={property.photos}
+            onClose={() => setShowPhotoViewer(false)}
+            initialPhotoIndex={initialPhotoIndex}
+          />
+        )}
+
         <div className={styles.contentContainer}>
           <div className={styles.propertyInfo}>
             <div className={styles.detailsGrid}>

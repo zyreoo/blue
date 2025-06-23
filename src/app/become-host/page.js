@@ -487,7 +487,7 @@ export default function BecomeHostPage() {
 
   const handleSetPrimaryPhoto = (photoId) => {
     if (photoId === formData.primaryPhotoId) {
-      return; // Don't do anything if clicking on current primary photo
+      return;
     }
     
     setFormData(prev => ({
@@ -533,7 +533,6 @@ export default function BecomeHostPage() {
     setIsSubmitting(true);
 
     try {
-      // Ensure all required fields are present
       if (!formData.location.city || !formData.location.country || !formData.location.address) {
         throw new Error('Please fill in all location fields');
       }
