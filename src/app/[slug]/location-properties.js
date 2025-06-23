@@ -8,6 +8,7 @@ import styles from './location-properties.module.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { LocationPageSkeleton } from '@/components/SkeletonLoader';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function LocationProperties() {
   const [properties, setProperties] = useState([]);

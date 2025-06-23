@@ -23,6 +23,7 @@
   padding: 2rem;
   min-height: calc(100vh - 160px);
   background-color: var(--background-color);
+  position: relative;
 }
 
 .progressBar {
@@ -1129,4 +1130,59 @@
   .submitButton {
     width: 100%;
   }
+}
+
+.dragHint {
+  text-align: center;
+  color: #666;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.orderButtons {
+  display: flex;
+  gap: 4px;
+}
+
+.orderButton {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.orderButton:hover:not(:disabled) {
+  background: white;
+  transform: scale(1.1);
+}
+
+.orderButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.backArrow {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  background: #F5ECD5;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #626F47;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.backArrow:hover {
+  background: #F0BB78;
+  transform: translateX(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 } 

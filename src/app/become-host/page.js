@@ -4,7 +4,6 @@ import { useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -478,7 +477,7 @@ export default function BecomeHostPage() {
               url: e.target.result,
               file: file
             }],
-            primaryPhotoId: prev.primaryPhotoId || newPhotoId // Set as primary if no primary exists
+            primaryPhotoId: prev.primaryPhotoId || newPhotoId 
           }));
         };
         reader.readAsDataURL(file);
@@ -516,16 +515,16 @@ export default function BecomeHostPage() {
     });
   };
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const items = Array.from(formData.photos);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
+  const movePhoto = (index, direction) => {
+    const newPhotos = [...formData.photos];
+    if (direction === 'up' && index > 0) {
+      [newPhotos[index], newPhotos[index - 1]] = [newPhotos[index - 1], newPhotos[index]];
+    } else if (direction === 'down' && index < newPhotos.length - 1) {
+      [newPhotos[index], newPhotos[index + 1]] = [newPhotos[index + 1], newPhotos[index]];
+    }
     setFormData(prev => ({
       ...prev,
-      photos: items
+      photos: newPhotos
     }));
   };
 
@@ -1115,6 +1114,9 @@ export default function BecomeHostPage() {
             </p>
 
             <div className={styles.photoUploadSection}>
+              {formData.photos.length > 0 && (
+                <p className={styles.dragHint}>Drag photos to reorder them. The first photo will be your main photo.</p>
+              )}
               <div 
                 className={styles.dropZone}
                 onClick={() => fileInputRef.current?.click()}
@@ -1149,69 +1151,57 @@ export default function BecomeHostPage() {
               </div>
 
               {formData.photos.length > 0 && (
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="photos" direction="horizontal">
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className={styles.photoGrid}
-                      >
-                        {formData.photos.map((photo, index) => (
-                          <Draggable
-                            key={photo.id}
-                            draggableId={photo.id}
-                            index={index}
+                <div className={styles.photoGrid}>
+                  {formData.photos.map((photo, index) => (
+                    <div
+                      key={photo.id}
+                      className={`${styles.photoItem} ${
+                        photo.id === formData.primaryPhotoId ? styles.mainPhoto : ''
+                      }`}
+                    >
+                      <img src={photo.url} alt={`Property photo ${index + 1}`} />
+                      <div className={styles.photoActions}>
+                        <button
+                          type="button"
+                          className={styles.setPrimary}
+                          onClick={() => handleSetPrimaryPhoto(photo.id)}
+                        >
+                          {photo.id === formData.primaryPhotoId ? 'Main photo' : 'Set as main'}
+                        </button>
+                        <div className={styles.orderButtons}>
+                          <button
+                            type="button"
+                            className={styles.orderButton}
+                            onClick={() => movePhoto(index, 'up')}
+                            disabled={index === 0}
                           >
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className={`${styles.photoItem} ${
-                                  photo.id === formData.primaryPhotoId ? styles.mainPhoto : ''
-                                } ${snapshot.isDragging ? styles.dragging : ''}`}
-                                style={{
-                                  ...provided.draggableProps.style,
-                                }}
-                              >
-                                <img src={photo.url} alt={`Property photo ${index + 1}`} />
-                                <div className={styles.photoActions}>
-                                  <button
-                                    type="button"
-                                    className={styles.setPrimary}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleSetPrimaryPhoto(photo.id);
-                                    }}
-                                  >
-                                    {photo.id === formData.primaryPhotoId ? 'Main photo' : 'Set as main'}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className={styles.removePhoto}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleRemovePhoto(photo.id);
-                                    }}
-                                  >
-                                    ×
-                                  </button>
-                                </div>
-                                {photo.id === formData.primaryPhotoId && (
-                                  <div className={styles.mainPhotoLabel}>
-                                    Main photo
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.orderButton}
+                            onClick={() => movePhoto(index, 'down')}
+                            disabled={index === formData.photos.length - 1}
+                          >
+                            ↓
+                          </button>
+                        </div>
+                        <button
+                          type="button"
+                          className={styles.removePhoto}
+                          onClick={() => handleRemovePhoto(photo.id)}
+                        >
+                          ×
+                        </button>
                       </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                      {photo.id === formData.primaryPhotoId && (
+                        <div className={styles.mainPhotoLabel}>
+                          Main photo
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
 
@@ -1344,7 +1334,9 @@ export default function BecomeHostPage() {
                   </div>
                   {formData.amenities.length > 0 && (
                     <div>
-                      <strong>Amenities:</strong> {formData.amenities.join(', ')}
+                      <strong>Amenities:</strong> {formData.amenities
+                        .map(amenity => t(`become_host.amenities.${amenity}`))
+                        .join(', ')}
                     </div>
                   )}
                 </div>
@@ -1361,7 +1353,7 @@ export default function BecomeHostPage() {
                     </div>
                     {formData.photos
                       .filter(photo => photo.id !== formData.primaryPhotoId)
-                      .slice(0, 5) // Show up to 5 additional photos
+                      .slice(0, 4)
                       .map((photo, index) => (
                         <div key={photo.id} className={styles.previewPhotoItem}>
                           <Image
@@ -1426,6 +1418,21 @@ export default function BecomeHostPage() {
             style={{ width: `${(steps.indexOf(currentStep) / steps.length) * 100}%` }}
           />
         </div>
+        <button 
+          onClick={prevStep} 
+          className={styles.backArrow}
+          style={{ visibility: steps.indexOf(currentStep) === 0 ? 'hidden' : 'visible' }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path 
+              d="M15 18L9 12L15 6" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
         <AnimatePresence mode="wait">
           {renderStep()}
         </AnimatePresence>

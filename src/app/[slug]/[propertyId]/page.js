@@ -199,8 +199,7 @@ export default function PropertyPage() {
       }
 
       const result = await response.json();
-
-
+      
       alert('Booking recorded successfully! You will receive a confirmation email shortly.');
       
 

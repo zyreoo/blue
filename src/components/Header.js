@@ -27,6 +27,7 @@ export default function Header({ onTypeChange }) {
         redirect: false,
       });
       window.location.href = '/';
+      window.location.reload()
     } catch (error) {
       console.error('Eroare la deconectare:', error);
     }
