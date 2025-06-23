@@ -203,7 +203,7 @@ export default function PropertyPage() {
 
       alert('Booking recorded successfully! You will receive a confirmation email shortly.');
       
-      // Reset form
+
       setBookingForm({
         firstName: session?.user?.firstName || '',
         lastName: session?.user?.lastName || '',
@@ -218,7 +218,7 @@ export default function PropertyPage() {
 
       alert('Failed to record booking. Please try again.');
     }
-  };
+  }; 
 
   if (loading) {
     return (

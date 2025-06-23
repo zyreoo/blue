@@ -1,15 +1,14 @@
 'use client';
 
 import { SessionProvider } from 'next-auth/react';
+import { LanguageProvider } from '@/hooks/useLanguage';
 
-export default function Providers({ children, session }) {
+export default function Providers({ children }) {
   return (
-    <SessionProvider 
-      session={session} 
-      refetchInterval={0}
-      refetchOnWindowFocus={false}
-    >
-      {children}
+    <SessionProvider>
+      <LanguageProvider>
+        {children}
+      </LanguageProvider>
     </SessionProvider>
   );
 } 
