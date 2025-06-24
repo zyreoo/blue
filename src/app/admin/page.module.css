@@ -1,58 +1,127 @@
 .adminPage {
-  --primary-color: #626F47;
-  --primary-hover: #4F5A39;
-  --secondary-color: #A4B494;
-  --accent-color: #E5E9E0;
-  --danger-color: #D64045;
-  --success-color: #4CAF50;
-  --text-primary: #2D3748;
-  --text-secondary: #4A5568;
+  --primary: #626F47;
+  --primary-light: #A4B465;
+  --primary-dark: #4F5A39;
+  --background: #F5ECD5;
+  --text-dark: #2d3748;
+  --text-medium: #4a5568;
   --text-light: #718096;
-  --bg-white: #FFFFFF;
-  --bg-light: #F7FAFC;
-  --border-color: #E2E8F0;
+  --white: #FFFFFF;
+  --danger: #D64045;
+  --success: #4CAF50;
+  --border: #E2E8F0;
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --radius-sm: 8px;
   --radius-md: 12px;
+  --radius-lg: 16px;
 }
-
 
 .main {
   padding: 2rem;
   max-width: 1200px;
   margin: 2rem auto;
   min-height: calc(100vh - 200px);
+  background-color: var(--background);
 }
 
 .adminHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
 }
 
 .adminHeader h1 {
-  color: var(--text-primary);
+  color: var(--primary);
   font-size: 2rem;
   font-weight: 600;
+  margin: 0 0 1.5rem 0;
 }
 
+.adminControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.adminNav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.navButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--white);
+  color: var(--text-medium);
+  border: 1px solid var(--border);
+}
+
+.navButton:hover {
+  background-color: var(--background);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.navButton.active {
+  background-color: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+
+.addButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.addButton:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.addButton:active {
+  transform: translateY(0);
+}
+
+.adminContent {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
 
 .propertiesList {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 2rem;
-  margin-bottom: 3rem;
+  padding: 2rem;
 }
 
 .propertyCard {
-  background: var(--bg-white);
+  background: var(--white);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
 }
 
 .propertyCard:hover {
@@ -62,7 +131,7 @@
 
 .propertyImage {
   width: 100%;
-  height: 220px;
+  height: 200px;
   object-fit: cover;
 }
 
@@ -70,238 +139,188 @@
   padding: 1.5rem;
 }
 
-.propertyInfo h3 {
-  margin: 0 0 0.75rem;
-  color: var(--text-primary);
+.propertyTitle {
+  color: var(--text-dark);
   font-size: 1.25rem;
   font-weight: 600;
+  margin: 0 0 0.75rem 0;
 }
 
-.propertyInfo p {
-  margin: 0.5rem 0;
-  color: var(--text-secondary);
+.propertyDescription {
+  color: var(--text-medium);
+  margin: 0 0 1rem 0;
   line-height: 1.5;
 }
 
 .propertyStats {
   display: flex;
-  gap: 1.25rem;
-  margin: 1rem 0;
+  gap: 1rem;
   color: var(--text-light);
   font-size: 0.9rem;
+  margin-bottom: 1.5rem;
 }
 
 .propertyActions {
   display: flex;
   gap: 0.75rem;
-  margin-top: 1.5rem;
 }
 
-
-.form {
-  background: var(--bg-white);
-  padding: 2rem;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-  margin-top: 2rem;
-}
-
-.form h2 {
-  margin: 0 0 2rem;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.formGroup {
-  margin-bottom: 1.5rem;
-}
-
-.formRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.formGroup label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.formGroup input,
-.formGroup select,
-.formGroup textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  font-size: 1rem;
-  color: var(--text-primary);
-  background: var(--bg-white);
-  transition: all 0.2s ease;
-}
-
-.formGroup input:focus,
-.formGroup select:focus,
-.formGroup textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(98, 111, 71, 0.1);
-}
-
-.formGroup textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-.checkboxGroup {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.checkboxGroup input[type="checkbox"] {
-  width: auto;
-  accent-color: var(--primary-color);
-}
-
-.formActions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2.5rem;
-}
-
-/* Buttons */
-.addPropertyButton,
-.submitButton,
-.cancelButton,
 .editButton,
-.deleteButton,
-.previewButton {
-  padding: 0.75rem 1.5rem;
-  border: none;
+.deleteButton {
+  padding: 0.75rem 1.25rem;
   border-radius: var(--radius-sm);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.addPropertyButton,
-.submitButton,
 .editButton {
-  background-color: var(--primary-color);
-  color: white;
+  background-color: var(--primary-light);
+  color: var(--white);
+  border: none;
 }
 
-.addPropertyButton:hover,
-.submitButton:hover,
 .editButton:hover {
-  background-color: var(--primary-hover);
-}
-
-.submitButton:disabled {
-  background-color: var(--text-light);
-  cursor: not-allowed;
-}
-
-.cancelButton {
-  background-color: var(--bg-light);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-}
-
-.cancelButton:hover {
-  background-color: var(--accent-color);
+  background-color: var(--primary);
 }
 
 .deleteButton {
-  background-color: white;
-  color: var(--danger-color);
-  border: 1px solid var(--danger-color);
+  background-color: var(--white);
+  color: var(--danger);
+  border: 1px solid var(--danger);
 }
 
 .deleteButton:hover {
-  background-color: var(--danger-color);
-  color: white;
+  background-color: var(--danger);
+  color: var(--white);
 }
 
-.previewButton {
-  background-color: var(--secondary-color);
-  color: white;
-}
-
-.previewButton:hover {
-  background-color: #8FA07E;
-}
-
-/* Status Messages */
-.error,
-.success {
-  padding: 1rem 1.5rem;
-  border-radius: var(--radius-sm);
-  margin-bottom: 1.5rem;
+.loadingContainer {
   display: flex;
+  justify-content: center;
   align-items: center;
-  font-weight: 500;
+  min-height: 400px;
 }
 
-.error {
-  background-color: rgba(214, 64, 69, 0.1);
-  color: var(--danger-color);
-  border: 1px solid var(--danger-color);
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--background);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 1s linear infinite;
 }
 
-.success {
-  background-color: rgba(76, 175, 80, 0.1);
-  color: var(--success-color);
-  border: 1px solid var(--success-color);
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.loading,
-.noProperties {
+.unauthorizedContainer {
   text-align: center;
-  padding: 3rem;
-  color: var(--text-light);
-  background: var(--bg-light);
-  border-radius: var(--radius-md);
+  padding: 4rem 2rem;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.unauthorizedContainer h1 {
+  color: var(--primary);
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.unauthorizedContainer p {
+  color: var(--text-medium);
   font-size: 1.1rem;
 }
 
-@media (max-width: 640px) {
+.statusSelect {
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.statusSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(98, 111, 71, 0.1);
+}
+
+.statusSelect.draft {
+  background-color: var(--background);
+  color: var(--text-medium);
+}
+
+.statusSelect.pending {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.statusSelect.active {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.statusSelect.inactive {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+@media (max-width: 768px) {
   .main {
-    margin: 80px auto 20px;
-    padding: 0 16px;
+    padding: 1rem;
+    margin: 1rem auto;
   }
 
   .adminHeader {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .form {
     padding: 1.5rem;
   }
 
-  .formRow {
-    grid-template-columns: 1fr;
+  .adminControls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .adminNav {
+    width: 100%;
+  }
+
+  .navButton {
+    flex: 1;
+    text-align: center;
   }
 
   .propertiesList {
-    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
   }
+}
 
-  .formActions {
-    flex-direction: column;
+@media (max-width: 480px) {
+  .propertyCard {
+    grid-column: 1 / -1;
   }
 
   .propertyActions {
     flex-direction: column;
-    gap: 0.5rem;
+  }
+
+  .editButton,
+  .deleteButton {
+    width: 100%;
+    text-align: center;
   }
 } 

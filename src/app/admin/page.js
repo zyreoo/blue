@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import styles from './admin.module.css';
+import styles from './page.module.css';
 import PropertyList from '@/components/admin/PropertyList';
 import BookingsList from '@/components/admin/BookingsList';
 import AddPropertyForm from '@/components/admin/AddPropertyForm';
@@ -14,6 +14,27 @@ export default function AdminPage() {
   const [activeSection, setActiveSection] = useState('properties');
   const [showAddProperty, setShowAddProperty] = useState(false);
   const [properties, setProperties] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProperties = async () => {
+      if (session?.user?.email) {
+        try {
+          const response = await fetch(`/api/users/properties?email=${session.user.email}`);
+          if (response.ok) {
+            const data = await response.json();
+            setProperties(data.properties || []);
+          }
+        } catch (error) {
+          console.error('Error fetching properties:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchUserProperties();
+  }, [session]);
 
   const handlePropertyAdded = (newProperty) => {
     setProperties(prev => [...prev, newProperty]);
