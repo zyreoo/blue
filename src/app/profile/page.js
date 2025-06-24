@@ -160,6 +160,9 @@ export default function ProfilePage() {
             )}
           </div>
           <div className={styles.actions}>
+            <button onClick={() => router.push('/profile/edit')} className={styles.editProfileButton}>
+              Edit Profile
+            </button>
             {userData?.isHost ? (
               <button onClick={handleGoToAdmin} className={styles.adminButton}>
                 Admin Dashboard
