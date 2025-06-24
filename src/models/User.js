@@ -30,6 +30,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
   },
+  isHost: {
+    type: Boolean,
+    default: false
+  },
+  properties: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Property'
+  }],
+  hostingSince: {
+    type: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now,

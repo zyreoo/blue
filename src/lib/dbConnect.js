@@ -40,6 +40,3 @@ async function dbConnect() {
 }
 
 export default dbConnect;
-
-
-// i am gay

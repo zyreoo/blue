@@ -7,7 +7,7 @@ export default function MapComponent({ onLocationSelect, initialLocation }) {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const containerRef = useRef(null);
-  const defaultPosition = initialLocation || [44.4268, 26.1025]; // Default to Bucharest
+  const defaultPosition = initialLocation || [44.4268, 26.1025];
 
   useEffect(() => {
     if (typeof window === 'undefined' || !containerRef.current) return;
@@ -15,24 +15,19 @@ export default function MapComponent({ onLocationSelect, initialLocation }) {
     let L;
     async function initializeMap() {
       try {
-        // Import Leaflet only once
         const leaflet = await import('leaflet');
         await import('leaflet/dist/leaflet.css');
         L = leaflet.default;
 
-        // If map is already initialized, return
         if (mapRef.current) return;
 
-        // Create map instance
         const map = L.map(containerRef.current).setView(defaultPosition, 13);
         mapRef.current = map;
 
-        // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Create marker
         const icon = L.icon({
           iconUrl: '/marker-icon.png',
           iconRetinaUrl: '/marker-icon-2x.png',
@@ -46,7 +41,6 @@ export default function MapComponent({ onLocationSelect, initialLocation }) {
         const marker = L.marker(defaultPosition, { icon }).addTo(map);
         markerRef.current = marker;
 
-        // Add click handler to map
         map.on('click', async (e) => {
           const { lat, lng } = e.latlng;
           marker.setLatLng([lat, lng]);
@@ -77,7 +71,6 @@ export default function MapComponent({ onLocationSelect, initialLocation }) {
 
     initializeMap();
 
-    // Cleanup function
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
@@ -102,7 +95,6 @@ export default function MapComponent({ onLocationSelect, initialLocation }) {
         markerRef.current.setLatLng(newLatLng);
         mapRef.current.setView(newLatLng, 13);
         
-        // Trigger the reverse geocoding
         const reverseResponse = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`
         );

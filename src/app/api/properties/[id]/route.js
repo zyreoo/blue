@@ -3,11 +3,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/dbConnect';
 import Property from '@/models/Property';
+import User from '@/models/User';
+import fs from 'fs/promises';
+import path from 'path';
 
-// Update a property
 export async function PUT(request, { params }) {
   try {
-    // Get the user's session
     const session = await getServerSession(authOptions);
     
     if (!session) {
@@ -19,7 +20,6 @@ export async function PUT(request, { params }) {
 
     await dbConnect();
 
-    // Find the property
     const property = await Property.findById(params.id);
 
     if (!property) {
@@ -29,7 +29,6 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Check if the user owns the property
     if (property.owner.toString() !== session.user.id) {
       return NextResponse.json(
         { error: 'Not authorized to update this property' },
@@ -37,10 +36,8 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Get the updated data
     const updates = await request.json();
 
-    // Update the property
     const updatedProperty = await Property.findByIdAndUpdate(
       params.id,
       updates,
@@ -57,24 +54,19 @@ export async function PUT(request, { params }) {
   }
 }
 
-// Delete a property
-export async function DELETE(request, { params }) {
+export async function DELETE(req, { params }) {
   try {
-    // Get the user's session
     const session = await getServerSession(authOptions);
-    
     if (!session) {
       return NextResponse.json(
-        { error: 'Authentication required' },
+        { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
     await dbConnect();
 
-    // Find the property
     const property = await Property.findById(params.id);
-
     if (!property) {
       return NextResponse.json(
         { error: 'Property not found' },
@@ -82,20 +74,42 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Check if the user owns the property
-    if (property.owner.toString() !== session.user.id) {
+    if (property.hostEmail !== session.user.email) {
       return NextResponse.json(
         { error: 'Not authorized to delete this property' },
         { status: 403 }
       );
     }
 
-    // Delete the property
+    const propertyDir = path.join(process.cwd(), 'public', 'properties', property._id.toString());
+    try {
+      await fs.rm(propertyDir, { recursive: true, force: true });
+    } catch (error) {
+      console.error('Error deleting property photos:', error);
+    }
+
+    await User.findOneAndUpdate(
+      { email: session.user.email },
+      { $pull: { properties: property._id } }
+    );
+
+    const user = await User.findOne({ email: session.user.email });
+    if (user.properties.length === 0) {
+      await User.findOneAndUpdate(
+        { email: session.user.email },
+        { $set: { isHost: false } }
+      );
+    }
+
     await Property.findByIdAndDelete(params.id);
 
-    return NextResponse.json({ message: 'Property deleted successfully' });
-  } catch (error) {
+    return NextResponse.json({
+      success: true,
+      message: 'Property deleted successfully'
+    });
 
+  } catch (error) {
+    console.error('Error deleting property:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to delete property' },
       { status: 500 }
@@ -115,7 +129,6 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     }
 
-    // Update the property
     Object.assign(property, updates);
     await property.save();
 

@@ -188,20 +188,32 @@
   background-color: #626F47;
 }
 
+.additionalInfo {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.additionalInfo p {
+  margin: 0.5rem 0;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
 .adminButton {
-  background-color: #626F47;
+  background-color: #2c3e50;
   color: white;
-  padding: 12px 24px;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s;
 }
 
 .adminButton:hover {
-  background-color: #4F5A39;
+  background-color: #34495e;
 }
 
 .signOutButton {

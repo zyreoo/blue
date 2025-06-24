@@ -14,6 +14,7 @@ export default function ProfilePage() {
   const [userProperties, setUserProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -29,6 +30,15 @@ export default function ProfilePage() {
       const fetchData = async () => {
         try {
           setLoading(true);
+          // Fetch user data
+          const userResponse = await fetch('/api/user/profile');
+          if (!userResponse.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+          const userData = await userResponse.json();
+          setUserData(userData);
+
+          // Fetch bookings
           const bookingsResponse = await fetch('/api/bookings?role=guest');
           if (!bookingsResponse.ok) {
             throw new Error('Failed to fetch bookings');
@@ -36,12 +46,15 @@ export default function ProfilePage() {
           const bookingsData = await bookingsResponse.json();
           setBookings(bookingsData);
 
-          const propertiesResponse = await fetch('/api/properties?admin=true');
-          if (!propertiesResponse.ok) {
-            throw new Error('Failed to fetch properties');
+          // Fetch properties if user is a host
+          if (userData.isHost) {
+            const propertiesResponse = await fetch('/api/properties?admin=true');
+            if (!propertiesResponse.ok) {
+              throw new Error('Failed to fetch properties');
+            }
+            const propertiesData = await propertiesResponse.json();
+            setUserProperties(propertiesData);
           }
-          const propertiesData = await propertiesResponse.json();
-          setUserProperties(propertiesData);
         } catch (err) {
           setError(err.message);
         } finally {
@@ -135,13 +148,21 @@ export default function ProfilePage() {
       <main className={styles.container}>
         <div className={styles.profileHeader}>
           <div className={styles.userInfo}>
-            <h1>Welcome, {session.user.name || session.user.email}!</h1>
-            <p className={styles.email}>{session.user.email}</p>
+            <h1>Welcome, {userData?.fullName || session.user.name || session.user.email}!</h1>
+            <p className={styles.email}>{userData?.email || session.user.email}</p>
+            {userData && (
+              <div className={styles.additionalInfo}>
+                <p>Phone: {userData.phoneNumber}</p>
+                {userData.isHost && (
+                  <p>Hosting since: {new Date(userData.hostingSince).toLocaleDateString()}</p>
+                )}
+              </div>
+            )}
           </div>
           <div className={styles.actions}>
-            {userProperties.length > 0 ? (
+            {userData?.isHost ? (
               <button onClick={handleGoToAdmin} className={styles.adminButton}>
-                Manage Properties
+                Admin Dashboard
               </button>
             ) : (
               <button onClick={handleBecomeHost} className={styles.becomeHostButton}>

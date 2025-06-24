@@ -2,17 +2,14 @@ import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request) {
-  // Get the pathname of the request (e.g. /, /protected)
   const path = request.nextUrl.pathname;
 
-  // If it's the profile page or any protected route
   if (path.startsWith('/profile')) {
     const session = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
     });
 
-    // If not authenticated, redirect to sign-in page
     if (!session) {
       return NextResponse.redirect(new URL('/auth/signin', request.url));
     }

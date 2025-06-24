@@ -6,7 +6,6 @@ import Property from '@/models/Property';
 
 export async function GET() {
   try {
-    // Get the user's session
     const session = await getServerSession(authOptions);
     
     if (!session) {
@@ -16,12 +15,10 @@ export async function GET() {
       );
     }
 
-    // Connect to the database
     await dbConnect();
 
-    // Fetch properties owned by the user
     const properties = await Property.find({ owner: session.user.id })
-      .sort({ createdAt: -1 }); // Sort by newest first
+      .sort({ createdAt: -1 });
 
     return NextResponse.json(properties);
   } catch (error) {

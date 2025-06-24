@@ -155,13 +155,11 @@ const propertySchema = new mongoose.Schema({
   }
 });
 
-// Update timestamps on save
 propertySchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();
 });
 
-// Add indexes for common queries
 propertySchema.index({ 'location.city': 1 });
 propertySchema.index({ 'location.country': 1 });
 propertySchema.index({ propertyType: 1 });

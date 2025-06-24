@@ -38,7 +38,6 @@ export default function PropertyPage() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // First try to get dates from URL parameters
     const checkIn = searchParams.get('checkIn');
     const checkOut = searchParams.get('checkOut');
     const adults = parseInt(searchParams.get('adults') || '0');
@@ -58,7 +57,6 @@ export default function PropertyPage() {
         rooms
       };
       setSelectedDates(dates);
-      // Save to localStorage
       localStorage.setItem('searchFilters', JSON.stringify({
         checkIn: dates.startDate,
         checkOut: dates.endDate,
@@ -66,7 +64,6 @@ export default function PropertyPage() {
         rooms: dates.rooms
       }));
     } else {
-      // If no URL parameters, try to get from localStorage
       const savedFilters = localStorage.getItem('searchFilters');
       if (savedFilters) {
         const parsedFilters = JSON.parse(savedFilters);
@@ -84,7 +81,6 @@ export default function PropertyPage() {
 
   const handleDateChange = (ranges) => {
     setSelectedDates(ranges);
-    // Save to localStorage
     localStorage.setItem('searchFilters', JSON.stringify({
       checkIn: ranges.startDate,
       checkOut: ranges.endDate,
@@ -107,7 +103,6 @@ export default function PropertyPage() {
           throw new Error('Property not found');
         }
 
-        // Format the location if it's an object
         if (foundProperty.location && typeof foundProperty.location === 'object') {
           foundProperty.formattedLocation = `${foundProperty.location.city}, ${foundProperty.location.country}`;
         }
@@ -123,7 +118,6 @@ export default function PropertyPage() {
     fetchProperty();
   }, [params.propertyId]);
 
-  // Pre-fill form with user data when session is available
   useEffect(() => {
     if (session?.user) {
       setBookingForm(prev => ({
@@ -148,19 +142,17 @@ export default function PropertyPage() {
   const toggleEditMode = () => {
     setEditMode(!editMode);
     if (!editMode) {
-      // When enabling edit mode, keep current values
       setBookingForm(prev => ({
         ...prev
       }));
     } else {
-      // When disabling edit mode, reset to user's info
       setBookingForm({
         firstName: session?.user?.firstName || '',
         lastName: session?.user?.lastName || '',
         guestEmail: session?.user?.email || '',
         guestPhone: session?.user?.phoneNumber || '',
         idNumber: session?.user?.idNumber || '',
-        specialRequests: bookingForm.specialRequests // Keep special requests
+        specialRequests: bookingForm.specialRequests
       });
     }
   };

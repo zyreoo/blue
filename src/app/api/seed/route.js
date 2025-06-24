@@ -109,24 +109,18 @@ const sampleProperties = [
 
 export async function GET() {
   try {
-    // Get the base connection URI from environment
     const baseUri = process.env.MONGODB_URI;
     if (!baseUri) {
       throw new Error('MONGODB_URI not found in environment variables');
     }
 
-    // Create connection string for 'blue' database
     const uri = baseUri.replace(/\/[^/]*(\?|$)/, '/blue$1');
     
-    // Connect to the 'blue' database
     const conn = await mongoose.createConnection(uri).asPromise();
-    // Delete all existing properties
     const deleteResult = await conn.collection('properties').deleteMany({});
 
-    // Insert new properties
     const insertResult = await conn.collection('properties').insertMany(sampleProperties);
 
-    // Close connection
     await conn.close();
 
     return NextResponse.json({

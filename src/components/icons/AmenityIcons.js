@@ -1,5 +1,4 @@
 export const AmenityIcons = {
-  // Essential amenities
   wifi: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M12 21l-1.2-1.2c-.4-.4-.4-1 0-1.4.4-.4 1-.4 1.4 0l.8.8.8-.8c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4L12 21zM4.4 14.2c-.4-.4-.4-1 0-1.4C7.3 9.9 9.6 9 12 9s4.7.9 7.6 3.8c.4.4.4 1 0 1.4-.4.4-1 .4-1.4 0C15.8 11.8 14 11 12 11s-3.8.8-6.2 2.2c-.4.4-1 .4-1.4 0zm3.8 3.8c-.4-.4-.4-1 0-1.4 2-2 3.8-2.7 5.8-2.7s3.8.7 5.8 2.7c.4.4.4 1 0 1.4-.4.4-1 .4-1.4 0-1.6-1.6-2.9-2.1-4.4-2.1s-2.8.5-4.4 2.1c-.4.4-1 .4-1.4 0z"/>
@@ -34,7 +33,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Features
   pool: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M22 21c-1.1 0-2.7-1.1-4.2-2.1-1.3-.9-2.5-1.7-3.8-1.7s-2.5.8-3.8 1.7c-1.5 1-3.1 2.1-4.2 2.1s-2.7-1.1-4.2-2.1l1.4-1.4c1.3.9 2.5 1.7 3.8 1.7s2.5-.8 3.8-1.7c1.5-1 3.1-2.1 4.2-2.1s2.7 1.1 4.2 2.1l-1.4 1.4c-1.3-.9-2.5-1.7-3.8-1.7s-2.5.8-3.8 1.7c-1.5 1-3.1 2.1-4.2 2.1z"/>
@@ -56,7 +54,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Safety
   smoke_detector: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/>
@@ -73,7 +70,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Entertainment & Comfort
   tv: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/>
@@ -100,7 +96,6 @@ export const AmenityIcons = {
     </svg>
   ),
   
-  // Additional amenities
   coffee_maker: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/>
@@ -122,7 +117,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Bathroom amenities
   hair_dryer: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M22 9a4.32 4.32 0 01-2.22-.58A4.32 4.32 0 0117.56 8a4.32 4.32 0 00-2.22-.58A4.32 4.32 0 0013.12 8a4.32 4.32 0 01-2.22.58A4.32 4.32 0 018.68 8a4.32 4.32 0 00-2.22-.58A4.32 4.32 0 014.24 8 4.32 4.32 0 012 8.42v2.16A4.32 4.32 0 004.22 11a4.32 4.32 0 002.22-.58 4.32 4.32 0 012.22-.58 4.32 4.32 0 002.22.58 4.32 4.32 0 002.22-.58 4.32 4.32 0 012.22-.58 4.32 4.32 0 002.22.58 4.32 4.32 0 002.22-.58A4.32 4.32 0 0022 11V9z"/>
@@ -141,7 +135,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Bedroom amenities
   iron: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M21 6c-1.66 0-3 1.34-3 3v4c0 .55-.45 1-1 1v-2c0-1.66-1.34-3-3-3h-4c-1.66 0-3 1.34-3 3v2c-.55 0-1-.45-1-1V9c0-1.66-1.34-3-3-3S2 7.34 2 9v5c0 1.66 1.34 3 3 3h14c1.66 0 3-1.34 3-3V9c0-1.66-1.34-3-3-3z"/>
@@ -158,7 +151,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Outdoor amenities
   balcony: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M21 14v1c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2v-1h18zM3 11v1h18v-1c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm11-3V5c0-1.1-.9-2-2-2s-2 .9-2 2v3h4z"/>
@@ -175,7 +167,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Entertainment & Tech
   smart_tv: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/>
@@ -194,7 +185,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Kitchen & Dining
   microwave: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M4 20h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2zM4 6h16v12H4V6zm13 7h2v3h-2zM7 9h8v2H7zm0 4h8v2H7z"/>
@@ -211,7 +201,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Accessibility
   elevator: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M7 2l2 3h6l2-3v20H7z"/>
@@ -228,7 +217,6 @@ export const AmenityIcons = {
     </svg>
   ),
 
-  // Work & Study
   desk: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
       <path d="M2 6v12h20V6H2zm18 10H4V8h16v8z"/>
