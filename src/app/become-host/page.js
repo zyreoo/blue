@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -376,6 +376,8 @@ export default function BecomeHostPage() {
   const router = useRouter();
   const fileInputRef = useRef(null);
   const [currentStep, setCurrentStep] = useState('property_type');
+  const isExistingHost = router.searchParams?.get('isExistingHost') === 'true';
+  
   const [formData, setFormData] = useState({
     propertyType: '',
     spaceType: '',
@@ -537,6 +539,7 @@ export default function BecomeHostPage() {
         throw new Error('Please fill in all location fields');
       }
 
+      // For existing hosts, we'll update their user document
       const response = await fetch('/api/hosts', {
         method: 'POST',
         headers: {
@@ -555,13 +558,20 @@ export default function BecomeHostPage() {
           amenities: formData.amenities,
           photos: formData.photos,
           pricePerNight: parseFloat(formData.pricePerNight),
-          description: formData.description || `Beautiful ${formData.propertyType} in ${formData.location.city}`
+          description: formData.description || `Beautiful ${formData.propertyType} in ${formData.location.city}`,
+          // Include user email for existing hosts
+          userEmail: isExistingHost ? session?.user?.email : undefined
         }),
       });
 
       if (response.ok) {
         const result = await response.json();
-        router.push('/profile?success=true&propertyId=' + result.property._id);
+        // Redirect back to admin for existing hosts
+        if (isExistingHost) {
+          router.push('/admin?success=true&propertyId=' + result.property._id);
+        } else {
+          router.push('/profile?success=true&propertyId=' + result.property._id);
+        }
       } else {
         const error = await response.json();
         throw new Error(error.message || 'Failed to create property');

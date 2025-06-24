@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import PropertyList from '@/components/admin/PropertyList';
 import BookingsList from '@/components/admin/BookingsList';
-import AddPropertyForm from '@/components/admin/AddPropertyForm';
 
 export default function AdminPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState('properties');
-  const [showAddProperty, setShowAddProperty] = useState(false);
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,11 +35,6 @@ export default function AdminPage() {
 
     fetchUserProperties();
   }, [session]);
-
-  const handlePropertyAdded = (newProperty) => {
-    setProperties(prev => [...prev, newProperty]);
-    setShowAddProperty(false);
-  };
 
   if (status === 'loading') {
     return (
@@ -76,7 +71,7 @@ export default function AdminPage() {
             {activeSection === 'properties' && (
               <button
                 className={styles.addButton}
-                onClick={() => setShowAddProperty(true)}
+                onClick={() => router.push('/become-host?isExistingHost=true')}
               >
                 Add New Property
               </button>
@@ -107,13 +102,6 @@ export default function AdminPage() {
         </div>
       </main>
       <Footer />
-
-      {showAddProperty && (
-        <AddPropertyForm
-          onClose={() => setShowAddProperty(false)}
-          onPropertyAdded={handlePropertyAdded}
-        />
-      )}
     </div>
   );
 } 
