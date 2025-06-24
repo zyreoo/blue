@@ -2,6 +2,7 @@
   max-width: 1200px;
   margin: 80px auto 40px;
   padding: 0 20px;
+  background-color: #FFFFFF;
 }
 
 .loadingContainer {
@@ -12,9 +13,9 @@
 }
 
 .loader {
-  border: 3px solid #f3f3f3;
+  border: 3px solid #E8E9E4;
   border-radius: 50%;
-  border-top: 3px solid #3b82f6;
+  border-top: 3px solid #626F47;
   width: 24px;
   height: 24px;
   animation: spin 1s linear infinite;
@@ -28,10 +29,12 @@
 .profileHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
+  padding: 2rem;
+  background-color: #F5F6F1;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(98, 111, 71, 0.1);
 }
 
 .userInfo {
@@ -39,41 +42,64 @@
 }
 
 .userInfo h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 2rem;
-  color: #2d3748;
+  margin: 0 0 0.75rem 0;
+  font-size: 2.25rem;
+  color: #626F47;
+  font-weight: 600;
 }
 
 .email {
-  color: #718096;
+  color: #8B9B6A;
   margin: 0;
+  font-size: 1.1rem;
+}
+
+.additionalInfo {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #E8E9E4;
+}
+
+.additionalInfo p {
+  margin: 0.75rem 0;
+  color: #626F47;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .bookingsSection {
-  margin-top: 2rem;
+  margin-top: 3rem;
 }
 
 .bookingsSection h2 {
-  margin: 0 0 24px 0;
+  margin: 0 0 1.5rem 0;
   font-size: 1.8rem;
-  color: #2d3748;
+  color: #626F47;
+  font-weight: 600;
 }
 
 .noBookings {
   text-align: center;
   padding: 3rem;
-  background-color: #f7fafc;
-  border-radius: 8px;
+  background-color: #F5F6F1;
+  border-radius: 12px;
+  border: 1px solid #E8E9E4;
 }
 
 .noBookings h3 {
   margin: 0 0 1rem;
-  color: #2d3748;
+  color: #626F47;
+  font-size: 1.4rem;
 }
 
 .noBookings p {
-  color: #718096;
+  color: #8B9B6A;
   margin: 0;
+  font-size: 1.1rem;
 }
 
 .bookingsList {
@@ -83,10 +109,17 @@
 }
 
 .bookingCard {
-  background-color: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 10px rgba(98, 111, 71, 0.1);
+  border: 1px solid #E8E9E4;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bookingCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(98, 111, 71, 0.15);
 }
 
 .bookingHeader {
@@ -99,53 +132,62 @@
 .propertyInfo {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .propertyImage {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
   object-fit: cover;
 }
 
 .propertyInfo h3 {
-  margin: 0 0 0.25rem;
-  color: #2d3748;
+  margin: 0 0 0.5rem;
+  color: #626F47;
+  font-size: 1.3rem;
+  font-weight: 600;
 }
 
 .propertyInfo p {
   margin: 0;
-  color: #718096;
+  color: #8B9B6A;
+  font-size: 1rem;
 }
 
 .status {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 24px;
+  font-size: 0.95rem;
   font-weight: 500;
+  text-transform: capitalize;
 }
 
 .bookingDetails {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background-color: #F5F6F1;
+  border-radius: 12px;
 }
 
 .detail {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.4rem;
 }
 
 .detail span {
-  font-size: 0.875rem;
-  color: #718096;
+  font-size: 0.95rem;
+  color: #8B9B6A;
+  font-weight: 500;
 }
 
 .detail strong {
-  color: #2d3748;
+  color: #626F47;
+  font-size: 1.1rem;
 }
 
 .specialRequests {
@@ -172,80 +214,71 @@
   align-items: center;
 }
 
-.becomeHostButton {
+.becomeHostButton, .adminButton {
   background-color: #626F47;
-  color: white;
-  padding: 12px 24px;
+  color: #FFFFFF;
+  padding: 0.9rem 1.8rem;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 12px;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  text-transform: none;
+  letter-spacing: 0.3px;
 }
 
-.becomeHostButton:hover {
-  background-color: #626F47;
+.becomeHostButton:hover, .adminButton:hover {
+  background-color: #4F5A39;
+  transform: translateY(-1px);
 }
 
-.additionalInfo {
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-}
-
-.additionalInfo p {
-  margin: 0.5rem 0;
-  color: #495057;
-  font-size: 0.95rem;
-}
-
-.adminButton {
-  background-color: #2c3e50;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.adminButton:hover {
-  background-color: #34495e;
+.becomeHostButton:active, .adminButton:active {
+  transform: translateY(0);
 }
 
 .signOutButton {
-  padding: 0.75rem 1.5rem;
-  background-color: #EF4444;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
+  background-color: transparent;
+  color: #626F47;
+  padding: 0.9rem 1.8rem;
+  border: 2px solid #626F47;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .signOutButton:hover {
-  background-color: #DC2626;
-}
-
-.signOutButton:focus {
-  outline: none;
-  ring: 2px;
-  ring-offset: 2px;
-  ring-color: #EF4444;
+  background-color: #F5F6F1;
+  color: #4F5A39;
+  border-color: #4F5A39;
 }
 
 @media (max-width: 768px) {
   .container {
     margin: 60px auto 30px;
+    padding: 0 15px;
+  }
+
+  .profileHeader {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .becomeHostButton, .adminButton, .signOutButton {
+    width: 100%;
+    text-align: center;
   }
 
   .bookingHeader {
     flex-direction: column;
-    align-items: flex-start;
     gap: 1rem;
   }
 
@@ -255,5 +288,11 @@
 
   .bookingDetails {
     grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .propertyImage {
+    width: 80px;
+    height: 80px;
   }
 } 
