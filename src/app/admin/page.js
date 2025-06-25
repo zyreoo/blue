@@ -32,6 +32,7 @@ export default function AdminPage() {
         }
       }
     };
+  
 
     fetchUserProperties();
   }, [session]);
@@ -60,7 +61,7 @@ export default function AdminPage() {
       </div>
     );
   }
-
+  
   return (
     <div>
       <Header />

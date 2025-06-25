@@ -101,7 +101,7 @@ const translations = {
       hangers: "Umerașe",
       extra_pillows: "Perne suplimentare",
 
-      // Outdoor amenities
+
       pool: "Piscină",
       parking: "Parcare",
       balcony: "Balcon",
@@ -110,14 +110,14 @@ const translations = {
       bbq: "Grătar",
       outdoor_dining: "Dining în aer liber",
 
-      // Entertainment & Tech
+
       smart_tv: "Smart TV",
       streaming: "Servicii streaming",
       games: "Jocuri",
       board_games: "Jocuri de societate",
       sound_system: "Sistem audio",
 
-      // Kitchen & Dining
+
       coffee_maker: "Espressor",
       microwave: "Cuptor cu microunde",
       wine_glasses: "Pahare de vin",
@@ -467,20 +467,29 @@ export default function BecomeHostPage() {
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     
-    files.forEach(file => {
+    files.forEach((file, index) => {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          const newPhotoId = `photo-${Date.now()}-${formData.photos.length}`;
-          setFormData(prev => ({
-            ...prev,
-            photos: [...prev.photos, {
-              id: newPhotoId,
-              url: e.target.result,
-              file: file
-            }],
-            primaryPhotoId: prev.primaryPhotoId || newPhotoId 
-          }));
+          // Use both timestamp and a random number to ensure uniqueness
+          const newPhotoId = `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          setFormData(prev => {
+            // Check if this photo ID already exists
+            if (prev.photos.some(photo => photo.id === newPhotoId)) {
+              console.warn('Duplicate photo ID detected, skipping...');
+              return prev;
+            }
+            
+            return {
+              ...prev,
+              photos: [...prev.photos, {
+                id: newPhotoId,
+                url: e.target.result,
+                file: file
+              }],
+              primaryPhotoId: prev.primaryPhotoId || newPhotoId
+            };
+          });
         };
         reader.readAsDataURL(file);
       }
@@ -492,6 +501,12 @@ export default function BecomeHostPage() {
       return;
     }
     
+    // Verify the photo exists before setting it as primary
+    if (!formData.photos.some(photo => photo.id === photoId)) {
+      console.error('Attempted to set non-existent photo as primary');
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       primaryPhotoId: photoId
@@ -500,12 +515,18 @@ export default function BecomeHostPage() {
 
   const handleRemovePhoto = (photoId) => {
     setFormData(prev => {
+      // Find the photo to be removed
+      const photoToRemove = prev.photos.find(photo => photo.id === photoId);
+      if (!photoToRemove) {
+        console.error('Attempted to remove non-existent photo');
+        return prev;
+      }
+
       const newPhotos = prev.photos.filter(photo => photo.id !== photoId);
       let newPrimaryPhotoId = prev.primaryPhotoId;
-      
 
+      // If we're removing the primary photo, set the first remaining photo as primary
       if (photoId === prev.primaryPhotoId) {
-
         newPrimaryPhotoId = newPhotos.length > 0 ? newPhotos[0].id : null;
       }
       
@@ -518,16 +539,23 @@ export default function BecomeHostPage() {
   };
 
   const movePhoto = (index, direction) => {
-    const newPhotos = [...formData.photos];
-    if (direction === 'up' && index > 0) {
-      [newPhotos[index], newPhotos[index - 1]] = [newPhotos[index - 1], newPhotos[index]];
-    } else if (direction === 'down' && index < newPhotos.length - 1) {
-      [newPhotos[index], newPhotos[index + 1]] = [newPhotos[index + 1], newPhotos[index]];
+    if (index < 0 || index >= formData.photos.length) {
+      console.error('Invalid photo index for moving');
+      return;
     }
-    setFormData(prev => ({
-      ...prev,
-      photos: newPhotos
-    }));
+
+    setFormData(prev => {
+      const newPhotos = [...prev.photos];
+      if (direction === 'up' && index > 0) {
+        [newPhotos[index], newPhotos[index - 1]] = [newPhotos[index - 1], newPhotos[index]];
+      } else if (direction === 'down' && index < newPhotos.length - 1) {
+        [newPhotos[index], newPhotos[index + 1]] = [newPhotos[index + 1], newPhotos[index]];
+      }
+      return {
+        ...prev,
+        photos: newPhotos
+      };
+    });
   };
 
   const handleSubmit = async (e) => {
