@@ -81,29 +81,27 @@
 }
 
 .imageGallery {
+  position: relative;
   width: 100%;
-  margin: 2rem 0;
+  max-width: 1200px;
+  margin: 0 auto;
   border-radius: 12px;
   overflow: hidden;
 }
 
 .photoGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 8px;
   height: 450px;
+  cursor: pointer;
 }
 
 .mainPhotoContainer {
+  grid-column: span 2;
+  grid-row: span 2;
   position: relative;
   height: 100%;
-  overflow: hidden;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.mainPhotoContainer:hover {
-  opacity: 0.95;
 }
 
 .mainPhoto {
@@ -113,22 +111,15 @@
 }
 
 .smallPhotosGrid {
+  grid-column: span 2;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 8px;
-  height: 100%;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 8px;
 }
 
 .smallPhotoContainer {
   position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.smallPhotoContainer:hover {
-  opacity: 0.95;
+  height: 220px;
 }
 
 .smallPhoto {
@@ -137,22 +128,26 @@
   object-fit: cover;
 }
 
-.showAllPhotos {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  z-index: 1;
+.lastPhotoContainer {
+  position: relative;
 }
 
-.showAllPhotos:hover {
-  background: white;
+.remainingPhotos {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  margin: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mainPhoto:hover,
+.smallPhoto:hover {
+  opacity: 0.95;
 }
 
 .contentContainer {
@@ -530,6 +525,18 @@
     grid-template-columns: 1fr;
     gap: 12px;
   }
+
+  .photoGrid {
+    height: 300px;
+  }
+
+  .smallPhotoContainer {
+    height: 145px;
+  }
+
+  .noImage {
+    height: 300px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -616,5 +623,31 @@
   .nameGroup {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .photoGrid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .mainPhotoContainer,
+  .smallPhotosGrid {
+    grid-column: span 1;
+  }
+
+  .mainPhotoContainer {
+    height: 300px;
+  }
+
+  .smallPhotosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .smallPhotoContainer {
+    height: 200px;
+  }
+
+  .noImage {
+    height: 300px;
   }
 } 
