@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Property from '@/models/Property';
+import User from '@/models/User';
 import dbConnect from '@/lib/dbConnect';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -80,13 +81,26 @@ export async function POST(request) {
 
     const property = await Property.create(propertyData);
 
-    // Now move the photos to the property-specific folder
+    // Update the user's isHost status and add property to their properties array
+    await User.findByIdAndUpdate(
+      session.user.id,
+      {
+        $set: { 
+          isHost: true,
+          hostingSince: new Date()
+        },
+        $push: { properties: property._id }
+      }
+    );
     const updatedPhotos = await Promise.all(body.photos.map(async (photo) => {
       if (photo.url.includes('/temp/')) {
-        // Extract the public_id from the URL
-        const publicId = photo.public_id;
+
+
+        const urlParts = photo.url.split('/upload/');
+        const afterUpload = urlParts[1];
+        const publicId = afterUpload.split('.')[0].substring(afterUpload.indexOf('/') + 1);
         
-        // Create new public ID with property ID
+
         const newPublicId = `properties/${property._id}/${publicId.split('/').pop()}`;
         
         try {
@@ -105,7 +119,7 @@ export async function POST(request) {
       return photo;
     }));
 
-    // Update the property with the new photo URLs
+
     property.photos = updatedPhotos;
     await property.save();
 
