@@ -7,6 +7,7 @@ const nextConfig = {
       'plus.unsplash.com',
       'source.unsplash.com',
       'iso.500px.com',
+      'res.cloudinary.com'
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60 * 60 * 24,
@@ -18,6 +19,11 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   generateEtags: true,
+  env: {
+    CLOUDINARY_CLOUD_NAME: 'dizwqfgrr',
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
+  }
 };
 
 module.exports = nextConfig; 

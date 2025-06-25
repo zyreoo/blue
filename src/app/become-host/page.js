@@ -464,15 +464,29 @@ export default function BecomeHostPage() {
     }));
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
     
-    files.forEach((file, index) => {
+    for (const file of files) {
       if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error('Upload failed');
+          }
+
+          const result = await response.json();
+          
           // Use both timestamp and a random number to ensure uniqueness
           const newPhotoId = `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          
           setFormData(prev => {
             // Check if this photo ID already exists
             if (prev.photos.some(photo => photo.id === newPhotoId)) {
@@ -484,16 +498,18 @@ export default function BecomeHostPage() {
               ...prev,
               photos: [...prev.photos, {
                 id: newPhotoId,
-                url: e.target.result,
-                file: file
+                url: result.url,
+                public_id: result.public_id // Store Cloudinary public_id for future reference
               }],
               primaryPhotoId: prev.primaryPhotoId || newPhotoId
             };
           });
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+          console.error('Error uploading file:', error);
+          alert('Failed to upload image. Please try again.');
+        }
       }
-    });
+    }
   };
 
   const handleSetPrimaryPhoto = (photoId) => {
@@ -567,39 +583,46 @@ export default function BecomeHostPage() {
         throw new Error('Please fill in all location fields');
       }
 
-      // For existing hosts, we'll update their user document
-      const response = await fetch('/api/hosts', {
+      const propertyData = {
+        propertyType: formData.propertyType,
+        spaceType: formData.spaceType,
+        location: {
+          address: formData.location.address,
+          city: formData.location.city,
+          country: formData.location.country,
+          coordinates: formData.location.coordinates || null
+        },
+        details: {
+          maxGuests: parseInt(formData.maxGuests),
+          bedrooms: parseInt(formData.bedrooms),
+          beds: parseInt(formData.beds),
+          bathrooms: parseInt(formData.bathrooms)
+        },
+        amenities: formData.amenities,
+        photos: formData.photos.map((photo, index) => ({
+          url: photo.url,
+          isMain: photo.id === formData.primaryPhotoId
+        })),
+        pricing: {
+          basePrice: parseFloat(formData.pricePerNight),
+          cleaningFee: 0, // Can be added later in property settings
+          serviceFee: 0 // Can be calculated automatically
+        },
+        description: formData.description || `Beautiful ${formData.propertyType} in ${formData.location.city}`,
+        status: 'pending' // New properties start as pending
+      };
+
+      const response = await fetch('/api/properties', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          propertyType: formData.propertyType,
-          spaceType: formData.spaceType,
-          address: formData.location.address,
-          city: formData.location.city,
-          country: formData.location.country,
-          maxGuests: parseInt(formData.maxGuests),
-          bedrooms: parseInt(formData.bedrooms),
-          beds: parseInt(formData.beds),
-          bathrooms: parseInt(formData.bathrooms),
-          amenities: formData.amenities,
-          photos: formData.photos,
-          pricePerNight: parseFloat(formData.pricePerNight),
-          description: formData.description || `Beautiful ${formData.propertyType} in ${formData.location.city}`,
-          // Include user email for existing hosts
-          userEmail: isExistingHost ? session?.user?.email : undefined
-        }),
+        body: JSON.stringify(propertyData),
       });
 
       if (response.ok) {
         const result = await response.json();
-        // Redirect back to admin for existing hosts
-        if (isExistingHost) {
-          router.push('/admin?success=true&propertyId=' + result.property._id);
-        } else {
-          router.push('/profile?success=true&propertyId=' + result.property._id);
-        }
+        router.push('/profile?success=true&propertyId=' + result._id);
       } else {
         const error = await response.json();
         throw new Error(error.message || 'Failed to create property');
