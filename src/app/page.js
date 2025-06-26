@@ -114,7 +114,7 @@ const LocationSection = ({ location, filters }) => {
     <section className={styles.locationSection}>
       <Link href={`/${location.slug}`} className={styles.locationLink}>
         <h2 className={styles.locationTitle}>
-          Cazare în {location.city}
+          Cazare în {location.city}, {location.country}
         </h2>
       </Link>
       <div className={styles.cardsContainer}>
