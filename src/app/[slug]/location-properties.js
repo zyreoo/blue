@@ -14,36 +14,26 @@ export default function LocationProperties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [locationData, setLocationData] = useState(null);
   const params = useParams();
   const locationSlug = params.slug;
   const { t } = useLanguage();
 
-  const formatSlugToLocation = (slug) => {
-    return slug
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
-
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch('/api/properties');
+        const response = await fetch(`/api/locations/${locationSlug}/properties`);
         if (!response.ok) {
           throw new Error('Failed to fetch properties');
         }
         const data = await response.json();
         
-        const locationName = formatSlugToLocation(locationSlug);
-        const filteredProperties = data.filter(
-          property => property.location === locationName
-        );
-        
-        if (filteredProperties.length === 0) {
-          throw new Error(`No properties found in ${locationName}`);
+        if (!data.properties || data.properties.length === 0) {
+          throw new Error(`No properties found in ${data.location.city}`);
         }
         
-        setProperties(filteredProperties);
+        setProperties(data.properties);
+        setLocationData(data.location);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -70,13 +60,11 @@ export default function LocationProperties() {
     </div>
   );
 
-  const locationName = formatSlugToLocation(locationSlug);
-
   return (
     <div>
       <Header />
       <main className={styles.main}>
-        <h1 className={styles.title}>{t('property.location')} {locationName}</h1>
+        <h1 className={styles.title}>{t('property.location')} {locationData?.city}</h1>
         <div className={styles.contentContainer}>
           <div className={styles.grid}>
             {properties.map((property) => (
@@ -87,7 +75,7 @@ export default function LocationProperties() {
               >
                 <div className={styles.imageContainer}>
                   <Image 
-                    src={property.imageUrl} 
+                    src={property.photos[0]?.url || '/placeholder.jpg'} 
                     alt={property.title}
                     className={styles.image}
                     width={400}
@@ -97,12 +85,12 @@ export default function LocationProperties() {
                     placeholder="blur"
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LS0yMi4qLjgyPjA+OjU/RUVHUFBQUFtbW1tbW1tbW1tbW1v/2wBDARUXFyAeIB4gHR4dICEgW1FRW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1tbW1v/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                   />
-                  <div className={styles.price}>${property.price}/{t('property.perNight')}</div>
+                  <div className={styles.price}>${property.pricing.basePrice}/{t('property.perNight')}</div>
                 </div>
                 <div className={styles.content}>
                   <h3>{property.title}</h3>
                   <p className={styles.description}>{property.description}</p>
-                </div>
+                </div>  
               </Link>
             ))}
           </div>

@@ -1,14 +1,16 @@
 import useSWR from 'swr';
+import { useState, useEffect } from 'react';
 
 const fetcher = async (url) => {
-  const res = await fetch(url, {
-    headers: {
-      'Cache-Control': 'public, max-age=31536000, immutable',
-    }
-  });
-  if (!res.ok) throw new Error('Failed to fetch data');
-  const data = await res.json();
-  return Array.isArray(data) ? data : [];
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Failed to fetch data');
+  }
+  const data = await response.json();
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  return data;
 };
 
 export function useProperties() {
@@ -38,5 +40,36 @@ export function useBookings() {
     bookings: data || [],
     isLoading: !error && !data,
     isError: error
+  };
+}
+
+export function useLocations() {
+  const { data, error, isLoading } = useSWR('/api/locations', fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60000, // Cache for 1 minute
+  });
+  
+  return {
+    locations: Array.isArray(data) ? data : [],
+    isLoading,
+    error: error?.message
+  };
+}
+
+export function useLocationProperties(slug) {
+  const { data, error, isLoading } = useSWR(
+    slug ? `/api/locations/${slug}/properties` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000, // Cache for 1 minute
+    }
+  );
+  
+  return {
+    properties: data?.properties || [],
+    location: data?.location,
+    isLoading,
+    error: error?.message
   };
 } 

@@ -30,7 +30,7 @@ export default function ProfilePage() {
       const fetchData = async () => {
         try {
           setLoading(true);
-          // Fetch user data
+
           const userResponse = await fetch('/api/user/profile');
           if (!userResponse.ok) {
             throw new Error('Failed to fetch user data');
@@ -38,7 +38,7 @@ export default function ProfilePage() {
           const userData = await userResponse.json();
           setUserData(userData);
 
-          // Fetch bookings
+
           const bookingsResponse = await fetch('/api/bookings?role=guest');
           if (!bookingsResponse.ok) {
             throw new Error('Failed to fetch bookings');

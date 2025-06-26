@@ -1,11 +1,8 @@
-import { Inter } from 'next/font/google';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Providers from '@/components/Providers';
 import './globals.css';
 import { headers } from 'next/headers';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'Blue - Find Your Perfect Stay',
@@ -21,7 +18,7 @@ export default async function RootLayout({ children }) {
   
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <Providers session={session}>
           {children}
         </Providers>

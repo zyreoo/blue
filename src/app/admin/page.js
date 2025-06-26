@@ -20,10 +20,12 @@ export default function AdminPage() {
     const fetchUserProperties = async () => {
       if (session?.user?.email) {
         try {
-          const response = await fetch(`/api/users/properties?email=${session.user.email}`);
+          const response = await fetch(`/api/user/properties`);
           if (response.ok) {
             const data = await response.json();
             setProperties(data.properties || []);
+          } else {
+            console.error('Failed to fetch properties:', await response.text());
           }
         } catch (error) {
           console.error('Error fetching properties:', error);
@@ -32,7 +34,6 @@ export default function AdminPage() {
         }
       }
     };
-  
 
     fetchUserProperties();
   }, [session]);

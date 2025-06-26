@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/dbConnect';
 import Property from '@/models/Property';
 import User from '@/models/User';
@@ -117,25 +117,35 @@ export async function DELETE(req, { params }) {
   }
 }
 
-export async function PATCH(req, { params }) {
+export async function PATCH(request, { params }) {
   try {
     await dbConnect();
-
+    
     const { id } = params;
-    const updates = await req.json();
-
+    const body = await request.json();
+    
     const property = await Property.findById(id);
+    
     if (!property) {
-      return NextResponse.json({ error: 'Property not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Property not found' },
+        { status: 404 }
+      );
     }
 
-    Object.assign(property, updates);
+    if (body.pricing?.basePrice !== undefined) {
+      property.pricing.basePrice = body.pricing.basePrice;
+    }
+
     await property.save();
 
     return NextResponse.json(property);
   } catch (error) {
     console.error('Error updating property:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Failed to update property' },
+      { status: 500 }
+    );
   }
 }
 

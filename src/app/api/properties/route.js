@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Property from '@/models/Property';
 import User from '@/models/User';
+import Location from '@/models/Location';
 import dbConnect from '@/lib/dbConnect';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { v2 as cloudinary } from 'cloudinary';
 import { Types } from 'mongoose';
 
@@ -69,11 +70,38 @@ export async function POST(request) {
 
     const body = await request.json();
     
-    // Create the property with host information
+
+    const { city, country } = body.location;
+    
+    const generateSlug = (city, country) => {
+      return `${city}-${country}`.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+    };
+
+    const locationSlug = generateSlug(city, country);
+    
+    let location = await Location.findOne({ 
+      city: { $regex: new RegExp(`^${city}$`, 'i') },
+      country: { $regex: new RegExp(`^${country}$`, 'i') }
+    });
+
+    if (!location) {
+      location = await Location.create({
+        city,
+        country,
+        slug: locationSlug
+      });
+    }
+    
+
     const propertyData = {
       ...body,
-      host: session.user.id || new Types.ObjectId(), // Use the user's ID from session or create a new one
-      hostEmail: session.user.email, // Use the email from the session
+      host: session.user.id || new Types.ObjectId(),
+      hostEmail: session.user.email,
       adminEmail: session.user.email
     };
 
@@ -81,7 +109,11 @@ export async function POST(request) {
 
     const property = await Property.create(propertyData);
 
-    // Update the user's isHost status and add property to their properties array
+
+    location.properties.push(property._id);
+    await location.save();
+
+
     await User.findByIdAndUpdate(
       session.user.id,
       {
@@ -92,19 +124,16 @@ export async function POST(request) {
         $push: { properties: property._id }
       }
     );
+
     const updatedPhotos = await Promise.all(body.photos.map(async (photo) => {
       if (photo.url.includes('/temp/')) {
-
-
         const urlParts = photo.url.split('/upload/');
         const afterUpload = urlParts[1];
         const publicId = afterUpload.split('.')[0].substring(afterUpload.indexOf('/') + 1);
         
-
         const newPublicId = `properties/${property._id}/${publicId.split('/').pop()}`;
         
         try {
-          // Move the image to the new folder
           const result = await cloudinary.uploader.rename(publicId, newPublicId);
           return {
             ...photo,
@@ -113,12 +142,11 @@ export async function POST(request) {
           };
         } catch (error) {
           console.error('Error moving image:', error);
-          return photo; // Keep original if move fails
+          return photo; 
         }
       }
       return photo;
     }));
-
 
     property.photos = updatedPhotos;
     await property.save();
