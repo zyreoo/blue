@@ -32,10 +32,20 @@
   font-size: 0.95rem;
 }
 
+.success {
+  background-color: #DEF7EC;
+  color: #28a745;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
 .form {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-bottom: 1.5rem;
 }
 
 .formGroup {
@@ -55,12 +65,14 @@
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   font-size: 1rem;
-  transition: border-color 0.2s ease;
+  width: 100%;
+  transition: all 0.2s ease;
 }
 
 .input:focus {
   outline: none;
   border-color: #626F47;
+  box-shadow: 0 0 0 2px rgba(98, 111, 71, 0.2);
 }
 
 .button {
@@ -74,6 +86,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   margin-top: 8px;
+  width: 100%;
 }
 
 .button:hover {
@@ -96,9 +109,11 @@
   color: #626F47;
   text-decoration: none;
   font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .switchText a:hover {
+  color: #4a5438;
   text-decoration: underline;
 }
 
@@ -106,6 +121,34 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  color: #2d3748;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.googleButton:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.googleIcon {
+  width: 24px;
+  height: 24px;
+  color: #4285f4;
 }
 
 @media (max-width: 640px) {
@@ -126,7 +169,8 @@
     gap: 12px;
   }
 
-  .button {
+  .button,
+  .googleButton {
     padding: 10px;
   }
 
