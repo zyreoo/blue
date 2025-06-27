@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { LocationPageSkeleton } from '@/components/SkeletonLoader';
 import { useLanguage } from '@/hooks/useLanguage';
+import { getFontDefinitionFromNetwork } from 'next/dist/server/font-utils';
 
 export default function LocationProperties() {
   const [properties, setProperties] = useState([]);
@@ -99,4 +100,4 @@ export default function LocationProperties() {
       <Footer />
     </div>
   );
-} 
+}

@@ -91,22 +91,47 @@ export default function EditPropertyPage({ params }) {
         const response = await fetch(`/api/properties/${params.id}`);
         if (response.ok) {
           const data = await response.json();
-          setProperty(data);
+          
+          // Update all states with the fetched data
+          setProperty({
+            name: data.name || '',
+            description: data.description || '',
+            price: data.price || '',
+            type: data.type || 'house',
+            amenities: data.amenities || [],
+            photos: data.photos || [],
+            address: data.address || '',
+            city: data.city || '',
+            country: data.country || ''
+          });
           setSelectedAmenities(data.amenities || []);
           setPhotos(data.photos || []);
-          if (data.location) {
+          
+          // Safely handle location data
+          if (data.location && Array.isArray(data.location.coordinates) && data.location.coordinates.length >= 2) {
             setLocation({
               lat: data.location.coordinates[1],
               lng: data.location.coordinates[0],
-              address: data.address,
-              city: data.city,
-              country: data.country
+              address: data.address || '',
+              city: data.city || '',
+              country: data.country || ''
+            });
+          } else {
+            // Set default location or empty values
+            setLocation({
+              lat: 0,
+              lng: 0,
+              address: data.address || '',
+              city: data.city || '',
+              country: data.country || ''
             });
           }
         } else {
+          setError('Failed to fetch property');
           console.error('Failed to fetch property');
         }
       } catch (error) {
+        setError(error.message);
         console.error('Error:', error);
       } finally {
         setLoading(false);
@@ -119,10 +144,18 @@ export default function EditPropertyPage({ params }) {
   }, [session, params.id]);
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value, type, checked } = e.target;
+    
+    // Handle different input types
+    const newValue = type === 'number' 
+      ? (value === '' ? '' : Number(value))
+      : type === 'checkbox' 
+        ? checked 
+        : value;
+
     setProperty(prev => ({
       ...prev,
-      [name]: type === 'number' ? (value === '' ? '' : Number(value)) : value
+      [name]: newValue
     }));
   };
 
@@ -235,16 +268,17 @@ export default function EditPropertyPage({ params }) {
       const updatedProperty = {
         name: property.name,
         description: property.description,
-        price: property.price,
+        price: parseFloat(property.price),
         type: property.type,
         amenities: selectedAmenities,
-        location: location ? {
+        photos: photos,
+        location: location && location.lat && location.lng ? {
           type: 'Point',
           coordinates: [location.lng, location.lat]
         } : undefined,
-        address: location?.address,
-        city: location?.city,
-        country: location?.country
+        address: location?.address || '',
+        city: location?.city || '',
+        country: location?.country || ''
       };
 
       const response = await fetch(`/api/properties/${params.id}`, {
@@ -253,9 +287,16 @@ export default function EditPropertyPage({ params }) {
         body: JSON.stringify(updatedProperty)
       });
 
-      if (!response.ok) throw new Error('Failed to update property');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update property');
+      }
+
+      const updatedData = await response.json();
+      setProperty(updatedData);
       router.push('/admin');
     } catch (error) {
+      setError(error.message);
       console.error('Error updating property:', error);
       alert('Failed to update property. Please try again.');
     } finally {
@@ -367,7 +408,8 @@ export default function EditPropertyPage({ params }) {
                 type="text"
                 id="name"
                 name="name"
-                defaultValue={property.name}
+                value={property.name}
+                onChange={handleChange}
                 required
                 placeholder="Give your property a catchy name"
               />
@@ -378,7 +420,8 @@ export default function EditPropertyPage({ params }) {
               <textarea
                 id="description"
                 name="description"
-                defaultValue={property.description}
+                value={property.description}
+                onChange={handleChange}
                 required
                 placeholder="Describe what makes your place special"
               />
@@ -390,7 +433,8 @@ export default function EditPropertyPage({ params }) {
                 type="number"
                 id="price"
                 name="price"
-                defaultValue={property.price}
+                value={property.price}
+                onChange={handleChange}
                 required
                 min="0"
                 step="0.01"
@@ -414,7 +458,8 @@ export default function EditPropertyPage({ params }) {
                     type="radio"
                     name="type"
                     value={type.id}
-                    defaultChecked={property.type === type.id}
+                    checked={property.type === type.id}
+                    onChange={handleChange}
                   />
                   <span className={styles.propertyTypeIcon}>{type.icon}</span>
                   <span className={styles.propertyTypeLabel}>{type.label}</span>
@@ -441,7 +486,8 @@ export default function EditPropertyPage({ params }) {
                   type="text"
                   id="address"
                   name="address"
-                  defaultValue={location?.address}
+                  value={location?.address || ''}
+                  onChange={(e) => setLocation(prev => ({ ...prev, address: e.target.value }))}
                   required
                   placeholder="Enter the full street address"
                 />
@@ -453,7 +499,8 @@ export default function EditPropertyPage({ params }) {
                     type="text"
                     id="city"
                     name="city"
-                    defaultValue={location?.city}
+                    value={location?.city || ''}
+                    onChange={(e) => setLocation(prev => ({ ...prev, city: e.target.value }))}
                     required
                     placeholder="Enter the city"
                   />
@@ -464,7 +511,8 @@ export default function EditPropertyPage({ params }) {
                     type="text"
                     id="country"
                     name="country"
-                    defaultValue={location?.country}
+                    value={location?.country || ''}
+                    onChange={(e) => setLocation(prev => ({ ...prev, country: e.target.value }))}
                     required
                     placeholder="Enter the country"
                   />
