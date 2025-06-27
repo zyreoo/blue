@@ -1,114 +1,137 @@
 .pageContainer {
   min-height: 100vh;
-  background-color: #f8f9fa;
-  padding: 2rem 0;
+  background-color: var(--background-warm);
+  padding: 3rem 0;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 2rem;
 }
 
 .pageTitle {
-  font-size: 2.5rem;
-  color: #2d3748;
-  margin-bottom: 2rem;
-  font-weight: 600;
+  font-size: 2.25rem;
+  color: var(--primary-dark);
+  margin-bottom: 2.5rem;
+  font-weight: 500;
+  letter-spacing: -0.5px;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 .formSection {
   background: white;
-  border-radius: 1rem;
-  padding: 2.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 1.5rem;
+  padding: 3rem;
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1);
+  border: 1px solid rgba(98, 111, 71, 0.08);
+  transition: all 0.3s ease;
+}
+
+.formSection:hover {
+  box-shadow: 0 12px 28px rgba(149, 157, 165, 0.15);
+  transform: translateY(-2px);
 }
 
 .formSection h2 {
-  font-size: 1.5rem;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-size: 1.75rem;
+  color: var(--primary-dark);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  letter-spacing: -0.3px;
 }
 
 .sectionDescription {
-  color: #718096;
-  margin-bottom: 2rem;
-  font-size: 1rem;
-  line-height: 1.5;
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 0.875rem;
+  margin-bottom: 2rem;
 }
 
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .formGroup label {
   font-weight: 500;
-  color: #4a5568;
-  font-size: 1rem;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
 }
 
 .formGroup input[type="text"],
 .formGroup input[type="number"],
 .formGroup textarea {
-  padding: 0.875rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 1rem;
-  transition: all 0.2s;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: 1rem;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
   background-color: #fff;
+}
+
+.formGroup input[type="text"]:hover,
+.formGroup input[type="number"]:hover,
+.formGroup textarea:hover {
+  border-color: var(--primary-light);
 }
 
 .formGroup input[type="text"]:focus,
 .formGroup input[type="number"]:focus,
 .formGroup textarea:focus {
   outline: none;
-  border-color: #626F47;
-  box-shadow: 0 0 0 3px rgba(98, 111, 71, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(98, 111, 71, 0.08);
 }
 
 .formGroup textarea {
-  min-height: 150px;
+  min-height: 180px;
   resize: vertical;
+  line-height: 1.6;
 }
 
 .photoSection {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 .currentPhotos {
-  border-radius: 1rem;
+  border-radius: 1.5rem;
   overflow: hidden;
-  background-color: #f7fafc;
+  background-color: rgba(245, 236, 213, 0.3);
+  padding: 1rem;
 }
 
 .uploadSection {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding: 3rem;
-  border: 2px dashed #e2e8f0;
-  border-radius: 1rem;
+  gap: 1.5rem;
+  padding: 4rem;
+  border: 2px dashed var(--primary-light);
+  border-radius: 1.5rem;
   text-align: center;
-  background-color: #f7fafc;
+  background-color: rgba(245, 236, 213, 0.3);
+  transition: all 0.3s ease;
+}
+
+.uploadSection:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(245, 236, 213, 0.5);
 }
 
 .fileInput {
@@ -116,52 +139,56 @@
 }
 
 .uploadButton {
-  padding: 0.875rem 2rem;
-  background-color: #626F47;
+  padding: 1rem 2.5rem;
+  background-color: var(--primary-color);
   color: white;
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  border: none;
 }
 
 .uploadButton:hover {
-  background-color: #4e5939;
-  transform: translateY(-1px);
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(98, 111, 71, 0.15);
 }
 
 .uploadInfo {
-  color: #718096;
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
 }
 
 .propertyTypes {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .propertyType {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.5rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 1rem;
+  padding: 2rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
   background-color: white;
 }
 
 .propertyType:hover {
-  border-color: #626F47;
-  transform: translateY(-2px);
+  border-color: var(--primary-light);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1);
 }
 
 .propertyType.selected {
-  border-color: #626F47;
-  background-color: rgba(98, 111, 71, 0.05);
+  border-color: var(--primary-color);
+  background-color: rgba(164, 180, 101, 0.08);
 }
 
 .propertyType input[type="radio"] {
@@ -200,21 +227,21 @@
 }
 
 .amenityGroups {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2.5rem;
 }
 
 .amenityGroup h3 {
-  font-size: 1.1rem;
-  color: #2d3748;
+  font-size: 1.25rem;
+  color: var(--primary-dark);
   margin-bottom: 1.5rem;
   font-weight: 500;
 }
 
 .amenities {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 1rem;
 }
 
@@ -222,22 +249,22 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: 1rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   background-color: white;
 }
 
 .amenity:hover {
-  border-color: #626F47;
-  background-color: rgba(98, 111, 71, 0.02);
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
 }
 
 .amenity.selected {
-  border-color: #626F47;
-  background-color: rgba(98, 111, 71, 0.05);
+  border-color: var(--primary-color);
+  background-color: rgba(164, 180, 101, 0.08);
 }
 
 .amenity input[type="checkbox"] {
@@ -265,47 +292,52 @@
 
 .formActions {
   display: flex;
-  gap: 1rem;
-  margin-top: 3rem;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1);
 }
 
 .cancelButton,
 .saveButton {
-  padding: 1rem 2rem;
-  border-radius: 0.75rem;
-  font-size: 1rem;
+  padding: 1rem 2.5rem;
+  border-radius: 1rem;
+  font-size: 1.1rem;
   font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
 .cancelButton {
-  background-color: #f7fafc;
-  color: #4a5568;
-  border: 1px solid #e2e8f0;
+  background-color: #f3f4f6;
+  color: var(--text-secondary);
 }
 
 .cancelButton:hover {
-  background-color: #edf2f7;
-  transform: translateY(-1px);
+  background-color: #e5e7eb;
+  transform: translateY(-2px);
 }
 
 .saveButton {
-  background-color: #626F47;
+  background-color: var(--primary-color);
   color: white;
-  border: none;
-  flex: 1;
 }
 
 .saveButton:hover {
-  background-color: #4e5939;
-  transform: translateY(-1px);
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(98, 111, 71, 0.15);
 }
 
 .saveButton:disabled {
-  background-color: #A8B2A8;
+  background-color: var(--disabled-color);
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .loading {

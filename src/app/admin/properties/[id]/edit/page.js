@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { AmenityIcons } from '@/components/icons/AmenityIcons';
+import ErrorMessage from '@/components/ErrorMessage';
 
 const PhotoViewer = dynamic(() => import('@/components/PhotoViewer'), {
   ssr: false
@@ -79,7 +80,7 @@ export default function EditPropertyPage({ params }) {
   const [showPhotoViewer, setShowPhotoViewer] = useState(false);
   const [initialPhotoIndex, setInitialPhotoIndex] = useState(0);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [location, setLocation] = useState(null);
 
@@ -132,11 +133,11 @@ export default function EditPropertyPage({ params }) {
             });
           }
         } else {
-          setError('Failed to fetch property');
+          setErrorMessage('Failed to fetch property');
           console.error('Failed to fetch property');
         }
       } catch (error) {
-        setError(error.message);
+        setErrorMessage(error.message);
         console.error('Error:', error);
       } finally {
         setLoading(false);
@@ -178,6 +179,7 @@ export default function EditPropertyPage({ params }) {
 
     setUploadingPhotos(true);
     const formData = new FormData();
+    
     files.forEach(file => {
       formData.append('photos', file);
     });
@@ -188,14 +190,17 @@ export default function EditPropertyPage({ params }) {
         body: formData
       });
 
-      if (!response.ok) throw new Error('Failed to upload photos');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload photos');
+      }
 
       const { urls } = await response.json();
+      
       const newPhotos = urls.map(url => ({
         id: `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         url,
-        isMain: false,
-        caption: ''
+        isMain: false
       }));
 
       const updatedPhotos = [...(property.photos || []), ...newPhotos];
@@ -210,7 +215,10 @@ export default function EditPropertyPage({ params }) {
         }),
       });
 
-      if (!updateResponse.ok) throw new Error('Failed to update property photos');
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json();
+        throw new Error(errorData.error || 'Failed to update property photos');
+      }
 
       const updatedProperty = await updateResponse.json();
       setProperty(prev => ({
@@ -219,20 +227,21 @@ export default function EditPropertyPage({ params }) {
       }));
     } catch (error) {
       console.error('Error uploading photos:', error);
-      alert('Failed to upload photos. Please try again.');
+      setErrorMessage(error.message || 'Failed to upload photos. Please try again.');
     } finally {
       setUploadingPhotos(false);
+      e.target.value = '';
     }
   };
 
   const handleSetMainPhoto = async (photoId) => {
-    // First, verify we have the photo and its ID
+
     if (!property.photos || !photoId) {
       console.error('Invalid photo data');
       return;
     }
 
-    // Create a new array with all photos marked as not main except the selected one
+
     const updatedPhotos = property.photos.map(photo => ({
       ...photo,
       isMain: photo.id === photoId ? true : false,
@@ -254,7 +263,7 @@ export default function EditPropertyPage({ params }) {
 
       const updatedProperty = await response.json();
       
-      // Update the local state with the new photos array
+
       setProperty(prev => ({
         ...prev,
         photos: updatedProperty.photos.map(photo => ({
@@ -377,7 +386,7 @@ export default function EditPropertyPage({ params }) {
       setProperty(updatedData);
       router.push('/admin');
     } catch (error) {
-      setError(error.message);
+      setErrorMessage(error.message);
       console.error('Error updating property:', error);
       alert('Failed to update property. Please try again.');
     } finally {
@@ -414,7 +423,7 @@ export default function EditPropertyPage({ params }) {
     );
   }
 
-  if (error) return <div>Error: {error}</div>;
+  if (errorMessage) return <ErrorMessage message={errorMessage} onClose={() => setErrorMessage(null)} />;
   if (!property) return <div>Property not found</div>;
 
   return (

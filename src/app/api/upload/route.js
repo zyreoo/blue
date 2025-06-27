@@ -25,48 +25,51 @@ export async function POST(request) {
     });
 
     const data = await request.formData();
-    const file = data.get('file');
+    const files = data.getAll('photos');
 
-    if (!file) {
+    if (!files || files.length === 0) {
       return NextResponse.json(
-        { error: 'No file provided' },
+        { error: 'No files provided' },
         { status: 400 }
       );
     }
 
-    // Convert the file to a buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Upload all files to Cloudinary
+    const uploadPromises = files.map(async (file) => {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
 
-    // Upload to Cloudinary in a temporary session folder
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'auto',
-          folder: `properties/temp/${uploadSessionId}`,
-          tags: ['temp', uploadSessionId], // Add tags for easier management
-        },
-        (error, result) => {
-          if (error) {
-            console.error('Cloudinary upload error:', error);
-            reject(error);
-          } else {
-            console.log('Cloudinary upload success:', result.secure_url);
-            resolve(result);
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          {
+            resource_type: 'auto',
+            folder: `properties/temp/${uploadSessionId}`,
+            tags: ['temp', uploadSessionId],
+          },
+          (error, result) => {
+            if (error) {
+              console.error('Cloudinary upload error:', error);
+              reject(error);
+            } else {
+              console.log('Cloudinary upload success:', result.secure_url);
+              resolve(result);
+            }
           }
-        }
-      ).end(buffer);
+        ).end(buffer);
+      });
     });
 
+    const results = await Promise.all(uploadPromises);
+    const urls = results.map(result => result.secure_url);
+
     return NextResponse.json({
-      url: result.secure_url,
-      public_id: result.public_id,
-      uploadSessionId: uploadSessionId
+      urls,
+      uploadSessionId
     });
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: 'Upload failed' },
+      { error: 'Upload failed: ' + error.message },
       { status: 500 }
     );
   }
