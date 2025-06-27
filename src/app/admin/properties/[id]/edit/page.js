@@ -92,44 +92,44 @@ export default function EditPropertyPage({ params }) {
         if (response.ok) {
           const data = await response.json();
           
-          // Ensure each photo has an ID and isMain flag
+
           const photosWithIds = (data.photos || []).map((photo, index) => ({
             ...photo,
             id: photo.id || `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            isMain: photo.isMain || index === 0 // First photo is main if none is marked
+            isMain: photo.isMain || index === 0
           }));
           
-          // Update all states with the fetched data
+
           setProperty({
             ...data,
             photos: photosWithIds,
             name: data.name || '',
             description: data.description || '',
-            price: data.price || '',
-            type: data.type || 'house',
+            price: data.pricing?.basePrice || '',
+            type: data.propertyType || 'house',
             amenities: data.amenities || [],
-            address: data.address || '',
-            city: data.city || '',
-            country: data.country || ''
+            address: data.location?.address || '',
+            city: data.location?.city || '',
+            country: data.location?.country || ''
           });
           setSelectedAmenities(data.amenities || []);
           
           // Safely handle location data
-          if (data.location && Array.isArray(data.location.coordinates) && data.location.coordinates.length >= 2) {
+          if (data.location?.coordinates?.lat && data.location?.coordinates?.lng) {
             setLocation({
-              lat: data.location.coordinates[1],
-              lng: data.location.coordinates[0],
-              address: data.address || '',
-              city: data.city || '',
-              country: data.country || ''
+              lat: data.location.coordinates.lat,
+              lng: data.location.coordinates.lng,
+              address: data.location.address || '',
+              city: data.location.city || '',
+              country: data.location.country || ''
             });
           } else {
             setLocation({
               lat: 0,
               lng: 0,
-              address: data.address || '',
-              city: data.city || '',
-              country: data.country || ''
+              address: data.location?.address || '',
+              city: data.location?.city || '',
+              country: data.location?.country || ''
             });
           }
         } else {
@@ -358,17 +358,23 @@ export default function EditPropertyPage({ params }) {
       const updatedProperty = {
         name: property.name,
         description: property.description,
-        price: parseFloat(property.price),
-        type: property.type,
+        propertyType: property.type,
         amenities: selectedAmenities,
         photos: property.photos,
-        location: location && location.lat && location.lng ? {
-          type: 'Point',
-          coordinates: [location.lng, location.lat]
-        } : undefined,
-        address: location?.address || '',
-        city: location?.city || '',
-        country: location?.country || ''
+        pricing: {
+          basePrice: parseFloat(property.price),
+          cleaningFee: property.pricing?.cleaningFee || 0,
+          serviceFee: property.pricing?.serviceFee || 0
+        },
+        location: {
+          address: location?.address || '',
+          city: location?.city || '',
+          country: location?.country || '',
+          coordinates: location && location.lat && location.lng ? {
+            lat: location.lat,
+            lng: location.lng
+          } : undefined
+        }
       };
 
       const response = await fetch(`/api/properties/${params.id}`, {
