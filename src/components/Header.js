@@ -65,12 +65,20 @@ export default function Header({ onTypeChange }) {
       }
 
       try {
-        const response = await fetch(`/api/locations/search?q=${encodeURIComponent(searchQuery)}`);
-        if (!response.ok) throw new Error('Eroare la căutarea locațiilor');
+        const response = await fetch('/api/locations');
+        if (!response.ok) throw new Error('Failed to fetch locations');
         const data = await response.json();
-        setSuggestions(data);
+        
+        // Filter locations based on search query
+        const filteredLocations = data.filter(location => 
+          location.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          location.country.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        setSuggestions(filteredLocations);
         setShowSuggestions(true);
       } catch (error) {
+        console.error('Error fetching locations:', error);
         setSuggestions([]);
       }
     };
@@ -99,16 +107,27 @@ export default function Header({ onTypeChange }) {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      const formattedLocation = searchQuery.toLowerCase().replace(/\s+/g, '-');
-      router.push(`/${formattedLocation}`);
+      const selectedLocation = suggestions.find(loc => 
+        `${loc.city}, ${loc.country}`.toLowerCase() === searchQuery.toLowerCase()
+      );
+      
+      if (selectedLocation) {
+        router.push(`/${selectedLocation.slug}`);
+      } else {
+        // If no exact match, use the first suggestion if available
+        const firstSuggestion = suggestions[0];
+        if (firstSuggestion) {
+          router.push(`/${firstSuggestion.slug}`);
+          setSearchQuery(`${firstSuggestion.city}, ${firstSuggestion.country}`);
+        }
+      }
       setShowSuggestions(false);
     }
   };
 
   const handleSuggestionClick = (location) => {
-    const formattedLocation = location.toLowerCase().replace(/\s+/g, '-');
-    router.push(`/${formattedLocation}`);
-    setSearchQuery(location);
+    router.push(`/${location.slug}`);
+    setSearchQuery(`${location.city}, ${location.country}`);
     setShowSuggestions(false);
   };
 
@@ -253,9 +272,29 @@ export default function Header({ onTypeChange }) {
             </div>
             {showSuggestions && suggestions.length > 0 && (
               <ul className={styles.suggestions}>
-                {suggestions.map((suggestion, index) => (
-                  <li key={index} onClick={() => handleSuggestionClick(suggestion)}>
-                    {suggestion}
+                {suggestions.map((location, index) => (
+                  <li key={location.slug}>
+                    <button 
+                      className={styles.suggestionButton}
+                      onClick={() => handleSuggestionClick(location)}
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        className={styles.locationIcon}
+                      >
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                      {location.city}, {location.country}
+                    </button>
                   </li>
                 ))}
               </ul>

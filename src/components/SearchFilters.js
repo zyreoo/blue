@@ -15,8 +15,9 @@ const defaultFilters = {
   rooms: 1,
   priceRange: [0, 1000],
   propertyType: 'all',
-  amenities: []
-};
+  amenities: [],
+  location: null
+}; 
 
 const debounce = (func, wait) => {
   let timeout;
@@ -35,6 +36,33 @@ export default function SearchFilters({ onFiltersChange }) {
   const [filters, setFilters] = useState(defaultFilters);
   const [isOpen, setIsOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
+  const [locations, setLocations] = useState([]);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(false);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        setIsLoadingLocations(true);
+        const response = await fetch('/api/locations');
+        if (!response.ok) throw new Error('Failed to fetch locations');
+        const data = await response.json();
+        setLocations(data);
+      } catch (error) {
+        console.error('Error fetching locations:', error);
+      } finally {
+        setIsLoadingLocations(false);
+      }
+    };
+
+    fetchLocations();
+  }, []);
+
+  const handleLocationChange = useCallback((location) => {
+    setFilters(prev => ({
+      ...prev,
+      location
+    }));
+  }, []);
 
   const handleDateChange = useCallback(({ startDate, endDate, persons, rooms }) => {
     setFilters(prev => ({
@@ -172,7 +200,7 @@ export default function SearchFilters({ onFiltersChange }) {
         }}
       />
 
-      <div 
+      <div
         className={styles.filtersContainer}
         data-visible={isOpen}
       >
@@ -190,6 +218,18 @@ export default function SearchFilters({ onFiltersChange }) {
         </div>
 
         <div className={styles.filtersRow}>
+          <button 
+            className={`${styles.filterButton} ${activeModal === 'location' ? styles.active : ''}`}
+            onClick={() => setActiveModal(activeModal === 'location' ? null : 'location')}
+          >
+            <span>Location</span>
+            {filters.location && (
+              <span className={styles.filterValue}>
+                {filters.location.city}, {filters.location.country}
+              </span>
+            )}
+          </button>
+
           <button 
             className={`${styles.filterButton} ${activeModal === 'dates' ? styles.active : ''}`}
             onClick={() => setActiveModal(activeModal === 'dates' ? null : 'dates')}
@@ -256,6 +296,29 @@ export default function SearchFilters({ onFiltersChange }) {
             </button>
           )}
         </div>
+
+        {activeModal === 'location' && (
+          <div className={styles.modal} data-visible={true}>
+            <div className={styles.modalContent}>
+              <h3>Select Location</h3>
+              {isLoadingLocations ? (
+                <div className={styles.loading}>Loading locations...</div>
+              ) : (
+                <div className={styles.locationList}>
+                  {locations.map((location) => (
+                    <button
+                      key={location.slug}
+                      className={`${styles.locationButton} ${filters.location?.slug === location.slug ? styles.active : ''}`}
+                      onClick={() => handleLocationChange(location)}
+                    >
+                      {location.city}, {location.country}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {activeModal === 'dates' && (
           <div className={styles.modal} data-visible={true}>
