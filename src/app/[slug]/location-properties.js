@@ -77,7 +77,7 @@ export default function LocationProperties() {
                 <div className={styles.imageContainer}>
                   <Image 
                     src={property.photos[0]?.url || '/placeholder.jpg'} 
-                    alt={property.title}
+                    alt={property.name}
                     className={styles.image}
                     width={400}
                     height={300}
@@ -89,7 +89,7 @@ export default function LocationProperties() {
                   <div className={styles.price}>${property.pricing.basePrice}/{t('property.perNight')}</div>
                 </div>
                 <div className={styles.content}>
-                  <h3>{property.title}</h3>
+                  <h3>{property.name}</h3>
                   <p className={styles.description}>{property.description}</p>
                 </div>  
               </Link>

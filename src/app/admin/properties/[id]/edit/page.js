@@ -195,35 +195,17 @@ export default function EditPropertyPage({ params }) {
         throw new Error(errorData.error || 'Failed to upload photos');
       }
 
-      const { urls } = await response.json();
+      const { url } = await response.json();
       
-      const newPhotos = urls.map(url => ({
-        id: `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      const newPhotos = [{
         url,
-        isMain: false
-      }));
+        id: `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        isMain: property.photos.length === 0
+      }];
 
-      const updatedPhotos = [...(property.photos || []), ...newPhotos];
-      
-      const updateResponse = await fetch(`/api/properties/${params.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          photos: updatedPhotos
-        }),
-      });
-
-      if (!updateResponse.ok) {
-        const errorData = await updateResponse.json();
-        throw new Error(errorData.error || 'Failed to update property photos');
-      }
-
-      const updatedProperty = await updateResponse.json();
       setProperty(prev => ({
         ...prev,
-        photos: updatedProperty.photos
+        photos: [...prev.photos, ...newPhotos]
       }));
     } catch (error) {
       console.error('Error uploading photos:', error);

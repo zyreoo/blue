@@ -8,6 +8,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import { useSession } from 'next-auth/react';
+import { AmenityIcons } from '@/components/icons/AmenityIcons';
 
 const DateRangePicker = dynamic(() => import('@/components/DateRangePicker'), {
   ssr: false,
@@ -338,7 +339,11 @@ export default function PropertyPage() {
           <div className={styles.propertyInfo}>
             <div className={styles.detailsGrid}>
               <div className={styles.detailCard}>
-                <span className={styles.detailIcon}>🛏️</span>
+                <span className={styles.detailIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
+                    <path d="M20 9.557V3h-2v2H6V3H4v6.557C2.81 10.25 2 11.525 2 13v8h2v-2h16v2h2v-8c0-1.475-.811-2.75-2-3.443zM18 7v2h-5V7h5zm-7 0v2H6V7h5zm-7 6v-2h16v2H4z"/>
+                  </svg>
+                </span>
                 <div>
                   <h3>{property.details?.bedrooms || property.bedrooms} Bedroom{(property.details?.bedrooms || property.bedrooms) !== 1 ? 's' : ''}</h3>
                   <p>Perfect for your stay</p>
@@ -346,7 +351,11 @@ export default function PropertyPage() {
               </div>
 
               <div className={styles.detailCard}>
-                <span className={styles.detailIcon}>🚿</span>
+                <span className={styles.detailIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
+                    <path d="M21 13v7h-2v-2H5v2H3v-7c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2zM7 19h10v-6H7v6zm3-9c0-2.76-2.24-5-5-5v2c1.66 0 3 1.34 3 3h2zm4 0c0-2.76-2.24-5-5-5v2c1.66 0 3 1.34 3 3h2z"/>
+                  </svg>
+                </span>
                 <div>
                   <h3>{property.details?.bathrooms || property.bathrooms} Bathroom{(property.details?.bathrooms || property.bathrooms) !== 1 ? 's' : ''}</h3>
                   <p>Fresh and clean</p>
@@ -354,7 +363,11 @@ export default function PropertyPage() {
               </div>
 
               <div className={styles.detailCard}>
-                <span className={styles.detailIcon}>👥</span>
+                <span className={styles.detailIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                  </svg>
+                </span>
                 <div>
                   <h3>Up to {property.details?.maxGuests || property.maxGuests} Guests</h3>
                   <p>Spacious accommodation</p>
@@ -362,7 +375,11 @@ export default function PropertyPage() {
               </div>
 
               <div className={styles.detailCard}>
-                <span className={styles.detailIcon}>🏠</span>
+                <span className={styles.detailIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#626F47">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 13h-2v-2h2v2z"/>
+                  </svg>
+                </span>
                 <div>
                   <h3>{property.propertyType || property.type || 'House'}</h3>
                   <p>Property type</p>
@@ -382,17 +399,7 @@ export default function PropertyPage() {
                   {property.amenities.map((amenity, index) => (
                     <div key={index} className={styles.amenityItem}>
                       <span className={styles.amenityIcon}>
-                        {amenity === 'wifi' && '📶'}
-                        {amenity === 'tv' && '📺'}
-                        {amenity === 'kitchen' && '🍳'}
-                        {amenity === 'washer' && '🧺'}
-                        {amenity === 'pool' && '🏊‍♂️'}
-                        {amenity === 'parking' && '🅿️'}
-                        {amenity === 'ac' && '❄️'}
-                        {amenity === 'heating' && '🔥'}
-                        {amenity === 'workspace' && '💻'}
-                        {amenity === 'gym' && '💪'}
-                        {!['wifi', 'tv', 'kitchen', 'washer', 'pool', 'parking', 'ac', 'heating', 'workspace', 'gym'].includes(amenity) && '✨'}
+                        {AmenityIcons[amenity.toLowerCase()] || '✨'}
                       </span>
                       <span className={styles.amenityLabel}>
                         {amenity.charAt(0).toUpperCase() + amenity.slice(1).replace(/_/g, ' ')}

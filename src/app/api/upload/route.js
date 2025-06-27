@@ -32,7 +32,7 @@ export async function POST(request) {
     });
 
     const data = await request.formData();
-    const files = data.getAll('file');
+    const files = data.getAll('photos');
 
     if (!files || files.length === 0) {
       console.error('No files provided in request');
