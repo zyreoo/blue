@@ -149,28 +149,10 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    // Update all editable fields
-    if (body.description !== undefined) {
-      property.description = body.description;
-    }
-    if (body.propertyType !== undefined) {
-      property.propertyType = body.propertyType;
-    }
-    if (body.details?.bedrooms !== undefined) {
-      property.details.bedrooms = body.details.bedrooms;
-    }
-    if (body.details?.bathrooms !== undefined) {
-      property.details.bathrooms = body.details.bathrooms;
-    }
-    if (body.pricing?.basePrice !== undefined) {
-      property.pricing.basePrice = body.pricing.basePrice;
-    }
-    if (body.location?.city !== undefined) {
-      property.location.city = body.location.city;
-    }
-    if (body.location?.country !== undefined) {
-      property.location.country = body.location.country;
-    }
+    // Update all fields from the request body
+    Object.keys(body).forEach(key => {
+      property[key] = body[key];
+    });
 
     await property.save();
 

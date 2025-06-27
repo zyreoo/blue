@@ -82,7 +82,6 @@ export default function EditPropertyPage({ params }) {
   const [error, setError] = useState(null);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [location, setLocation] = useState(null);
-  const [photos, setPhotos] = useState([]);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -92,20 +91,27 @@ export default function EditPropertyPage({ params }) {
         if (response.ok) {
           const data = await response.json();
           
+          // Ensure each photo has an ID and isMain flag
+          const photosWithIds = (data.photos || []).map((photo, index) => ({
+            ...photo,
+            id: photo.id || `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            isMain: photo.isMain || index === 0 // First photo is main if none is marked
+          }));
+          
           // Update all states with the fetched data
           setProperty({
+            ...data,
+            photos: photosWithIds,
             name: data.name || '',
             description: data.description || '',
             price: data.price || '',
             type: data.type || 'house',
             amenities: data.amenities || [],
-            photos: data.photos || [],
             address: data.address || '',
             city: data.city || '',
             country: data.country || ''
           });
           setSelectedAmenities(data.amenities || []);
-          setPhotos(data.photos || []);
           
           // Safely handle location data
           if (data.location && Array.isArray(data.location.coordinates) && data.location.coordinates.length >= 2) {
@@ -117,7 +123,6 @@ export default function EditPropertyPage({ params }) {
               country: data.country || ''
             });
           } else {
-            // Set default location or empty values
             setLocation({
               lat: 0,
               lng: 0,
@@ -186,23 +191,32 @@ export default function EditPropertyPage({ params }) {
       if (!response.ok) throw new Error('Failed to upload photos');
 
       const { urls } = await response.json();
-      const newPhotos = urls.map(url => ({ url, caption: '' }));
+      const newPhotos = urls.map(url => ({
+        id: `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        url,
+        isMain: false,
+        caption: ''
+      }));
 
-      // Update property photos
+      const updatedPhotos = [...(property.photos || []), ...newPhotos];
+      
       const updateResponse = await fetch(`/api/properties/${params.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          photos: [...(property.photos || []), ...newPhotos]
+          photos: updatedPhotos
         }),
       });
 
       if (!updateResponse.ok) throw new Error('Failed to update property photos');
 
       const updatedProperty = await updateResponse.json();
-      setProperty(updatedProperty);
+      setProperty(prev => ({
+        ...prev,
+        photos: updatedProperty.photos
+      }));
     } catch (error) {
       console.error('Error uploading photos:', error);
       alert('Failed to upload photos. Please try again.');
@@ -211,11 +225,54 @@ export default function EditPropertyPage({ params }) {
     }
   };
 
-  const handlePhotoDelete = async (photoIndex) => {
+  const handleSetMainPhoto = async (photoId) => {
+    // First, verify we have the photo and its ID
+    if (!property.photos || !photoId) {
+      console.error('Invalid photo data');
+      return;
+    }
+
+    // Create a new array with all photos marked as not main except the selected one
+    const updatedPhotos = property.photos.map(photo => ({
+      ...photo,
+      isMain: photo.id === photoId ? true : false,
+      id: photo.id // Preserve existing IDs
+    }));
+
+    try {
+      const response = await fetch(`/api/properties/${params.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          photos: updatedPhotos
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to set main photo');
+
+      const updatedProperty = await response.json();
+      
+      // Update the local state with the new photos array
+      setProperty(prev => ({
+        ...prev,
+        photos: updatedProperty.photos.map(photo => ({
+          ...photo,
+          id: photo.id || `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        }))
+      }));
+    } catch (error) {
+      console.error('Error setting main photo:', error);
+      alert('Failed to set main photo. Please try again.');
+    }
+  };
+
+  const handlePhotoDelete = async (photoId) => {
     if (!confirm('Are you sure you want to delete this photo?')) return;
 
     try {
-      const updatedPhotos = property.photos.filter((_, index) => index !== photoIndex);
+      const updatedPhotos = property.photos.filter(photo => photo.id !== photoId);
       const response = await fetch(`/api/properties/${params.id}`, {
         method: 'PATCH',
         headers: {
@@ -229,17 +286,38 @@ export default function EditPropertyPage({ params }) {
       if (!response.ok) throw new Error('Failed to update property photos');
 
       const updatedProperty = await response.json();
-      setProperty(updatedProperty);
+      setProperty(prev => ({
+        ...prev,
+        photos: updatedProperty.photos
+      }));
     } catch (error) {
       console.error('Error deleting photo:', error);
       alert('Failed to delete photo. Please try again.');
     }
   };
 
-  const handlePhotoReorder = async (oldIndex, newIndex) => {
-    const photos = [...property.photos];
-    const [movedPhoto] = photos.splice(oldIndex, 1);
-    photos.splice(newIndex, 0, movedPhoto);
+  const movePhoto = async (fromIndex, toIndexOrDirection) => {
+    if (!property.photos || fromIndex < 0 || fromIndex >= property.photos.length) {
+      console.error('Invalid photo index for moving');
+      return;
+    }
+
+    const newPhotos = [...property.photos];
+    
+    if (toIndexOrDirection === 'up' && fromIndex > 0) {
+      // Move up
+      [newPhotos[fromIndex], newPhotos[fromIndex - 1]] = [newPhotos[fromIndex - 1], newPhotos[fromIndex]];
+    } else if (toIndexOrDirection === 'down' && fromIndex < newPhotos.length - 1) {
+      // Move down
+      [newPhotos[fromIndex], newPhotos[fromIndex + 1]] = [newPhotos[fromIndex + 1], newPhotos[fromIndex]];
+    } else if (typeof toIndexOrDirection === 'number') {
+      // Move to specific position (used for setting main photo)
+      const photoToMove = newPhotos[fromIndex];
+      newPhotos.splice(fromIndex, 1); // Remove from current position
+      newPhotos.splice(toIndexOrDirection, 0, photoToMove); // Insert at new position
+    } else {
+      return; // Invalid move
+    }
 
     try {
       const response = await fetch(`/api/properties/${params.id}`, {
@@ -247,13 +325,16 @@ export default function EditPropertyPage({ params }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ photos }),
+        body: JSON.stringify({ photos: newPhotos }),
       });
 
       if (!response.ok) throw new Error('Failed to reorder photos');
 
       const updatedProperty = await response.json();
-      setProperty(updatedProperty);
+      setProperty(prev => ({
+        ...prev,
+        photos: updatedProperty.photos
+      }));
     } catch (error) {
       console.error('Error reordering photos:', error);
       alert('Failed to reorder photos. Please try again.');
@@ -271,7 +352,7 @@ export default function EditPropertyPage({ params }) {
         price: parseFloat(property.price),
         type: property.type,
         amenities: selectedAmenities,
-        photos: photos,
+        photos: property.photos,
         location: location && location.lat && location.lng ? {
           type: 'Point',
           coordinates: [location.lng, location.lat]
@@ -348,12 +429,14 @@ export default function EditPropertyPage({ params }) {
             </p>
             <div className={styles.photoSection}>
               <div className={styles.currentPhotos}>
-                {photos.length > 0 && (
+                {property.photos && property.photos.length > 0 && (
                   <div className={styles.photoGrid}>
-                    {photos.map((photo, index) => (
+                    {property.photos.map((photo, index) => (
                       <div
-                        key={index}
-                        className={styles.photoContainer}
+                        key={photo.id || index}
+                        className={`${styles.photoItem} ${
+                          index === 0 ? styles.mainPhoto : ''
+                        }`}
                         onClick={() => {
                           setInitialPhotoIndex(index);
                           setShowPhotoViewer(true);
@@ -366,6 +449,57 @@ export default function EditPropertyPage({ params }) {
                           style={{ objectFit: 'cover' }}
                           className={styles.photo}
                         />
+                        <div className={styles.photoActions}>
+                          <button
+                            type="button"
+                            className={`${styles.setPrimary} ${index === 0 ? styles.isPrimary : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              movePhoto(index, 0); // Move to first position instead of setting isMain
+                            }}
+                          >
+                            {index === 0 ? 'Main photo' : 'Set as main'}
+                          </button>
+                          <div className={styles.orderButtons}>
+                            <button
+                              type="button"
+                              className={styles.orderButton}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                movePhoto(index, 'up');
+                              }}
+                              disabled={index === 0}
+                            >
+                              ↑
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.orderButton}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                movePhoto(index, 'down');
+                              }}
+                              disabled={index === property.photos.length - 1}
+                            >
+                              ↓
+                            </button>
+                          </div>
+                          <button
+                            type="button"
+                            className={styles.removePhoto}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePhotoDelete(photo.id);
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                        {index === 0 && (
+                          <div className={styles.mainPhotoLabel}>
+                            Main photo
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -373,7 +507,7 @@ export default function EditPropertyPage({ params }) {
               </div>
               {typeof window !== 'undefined' && showPhotoViewer && (
                 <PhotoViewer
-                  photos={photos}
+                  photos={property.photos}
                   onClose={() => setShowPhotoViewer(false)}
                   initialPhotoIndex={initialPhotoIndex}
                 />

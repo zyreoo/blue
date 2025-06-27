@@ -326,57 +326,154 @@
 
 .photoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+  padding: 24px 0;
+  min-height: 200px;
 }
 
-.photoContainer {
+.photoItem {
   position: relative;
-  aspect-ratio: 1;
-  border-radius: 8px;
+  aspect-ratio: 4/3;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  background: var(--card-background);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.photoContainer:hover {
-  transform: scale(1.02);
-}
-
-.photo {
+.photoItem img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.photoControls {
+.photoItem:hover img {
+  transform: scale(1.05);
+}
+
+/* Clean overlay for hover state */
+.photoItem::before {
+  content: '';
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  display: flex;
-  gap: 0.5rem;
+  inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0)
+  );
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s ease;
+  z-index: 1;
 }
 
-.photoContainer:hover .photoControls {
+.photoItem:hover::before {
   opacity: 1;
 }
 
-.photoButton {
-  padding: 0.5rem;
-  border: none;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.9);
-  cursor: pointer;
-  transition: all 0.2s;
-  backdrop-filter: blur(4px);
+.photoActions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.photoButton:hover {
+.photoItem:hover .photoActions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.removePhoto,
+.setPrimary {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
+  border: none;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.removePhoto {
+  width: 32px;
+  padding: 0;
+}
+
+.removePhoto:hover,
+.setPrimary:hover {
+  background: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.setPrimary.isPrimary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.mainPhotoLabel {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: white;
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.photoItem:hover .mainPhotoLabel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.photoItem.mainPhoto {
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.photoItem.mainPhoto .mainPhotoLabel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.orderButtons {
+  display: flex;
+  gap: 4px;
+}
+
+.orderButton {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.orderButton:hover:not(:disabled) {
   background: white;
   transform: scale(1.1);
+}
+
+.orderButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .addPhotoButton {
