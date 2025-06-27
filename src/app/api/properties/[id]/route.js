@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/dbConnect';
 import Property from '@/models/Property';
 import User from '@/models/User';
+import Location from '@/models/Location';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -81,6 +82,29 @@ export async function DELETE(req, { params }) {
       );
     }
 
+
+    const locationUpdateResult = await Location.updateOne(
+      {
+        city: { $regex: new RegExp(`^${property.location.city}$`, 'i') },
+        country: { $regex: new RegExp(`^${property.location.country}$`, 'i') }
+      },
+      {
+        $pull: { properties: property._id }
+      }
+    );
+
+
+    const location = await Location.findOne({
+      city: { $regex: new RegExp(`^${property.location.city}$`, 'i') },
+      country: { $regex: new RegExp(`^${property.location.country}$`, 'i') }
+    });
+
+    if (location && location.properties.length === 0) {
+
+      await Location.findByIdAndDelete(location._id);
+    }
+
+
     const propertyDir = path.join(process.cwd(), 'public', 'properties', property._id.toString());
     try {
       await fs.rm(propertyDir, { recursive: true, force: true });
@@ -88,10 +112,12 @@ export async function DELETE(req, { params }) {
       console.error('Error deleting property photos:', error);
     }
 
+
     await User.findOneAndUpdate(
       { email: session.user.email },
       { $pull: { properties: property._id } }
     );
+
 
     const user = await User.findOne({ email: session.user.email });
     if (user.properties.length === 0) {
@@ -105,7 +131,8 @@ export async function DELETE(req, { params }) {
 
     return NextResponse.json({
       success: true,
-      message: 'Property deleted successfully'
+      message: 'Property and associated data deleted successfully',
+      locationUpdated: locationUpdateResult.modifiedCount > 0
     });
 
   } catch (error) {
@@ -141,7 +168,7 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    // Check if the user is authorized to update this property
+
     if (property.hostEmail !== session.user.email) {
       return NextResponse.json(
         { error: 'Not authorized to update this property' },
@@ -149,7 +176,7 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    // Update all fields from the request body
+
     Object.keys(body).forEach(key => {
       property[key] = body[key];
     });

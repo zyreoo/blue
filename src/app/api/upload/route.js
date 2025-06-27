@@ -32,55 +32,46 @@ export async function POST(request) {
     });
 
     const data = await request.formData();
-    const files = data.getAll('photos');
+    const file = data.get('photos');
 
-    if (!files || files.length === 0) {
-      console.error('No files provided in request');
+    if (!file) {
+      console.error('No file provided in request');
       return NextResponse.json(
-        { error: 'No files provided' },
+        { error: 'No file provided' },
         { status: 400 }
       );
     }
 
-    console.log(`Processing ${files.length} files for upload...`);
+    console.log('Processing file:', file.name || 'unnamed file');
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-    const uploadPromises = files.map(async (file, index) => {
-      try {
-        console.log(`Processing file ${index + 1}:`, file.name || 'unnamed file');
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: 'auto',
+          folder: `properties/temp/${uploadSessionId}`,
+          tags: ['temp', uploadSessionId],
+        },
+        (error, result) => {
+          if (error) {
+            console.error('Error uploading file:', error);
+            resolve(NextResponse.json(
+              { error: 'Upload failed: ' + error.message },
+              { status: 500 }
+            ));
+          } else {
+            console.log('Successfully uploaded file:', result.secure_url);
+            resolve(NextResponse.json({
+              url: result.secure_url,
+              public_id: result.public_id,
+              uploadSessionId
+            }));
+          }
+        }
+      );
 
-        return new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              resource_type: 'auto',
-              folder: `properties/temp/${uploadSessionId}`,
-              tags: ['temp', uploadSessionId],
-            },
-            (error, result) => {
-              if (error) {
-                console.error(`Error uploading file ${index + 1}:`, error);
-                reject(error);
-              } else {
-                console.log(`Successfully uploaded file ${index + 1}:`, result.secure_url);
-                resolve(result);
-              }
-            }
-          );
-
-          uploadStream.end(buffer);
-        });
-      } catch (error) {
-        console.error(`Error processing file ${index + 1}:`, error);
-        throw error;
-      }
-    });
-
-    const results = await Promise.all(uploadPromises);
-    console.log('All files uploaded successfully');
-    return NextResponse.json({
-      url: results[0].secure_url,
-      public_id: results[0].public_id
+      uploadStream.end(buffer);
     });
   } catch (error) {
     console.error('Upload error:', error);

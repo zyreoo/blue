@@ -9,15 +9,15 @@ export async function PATCH(request, { params }) {
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
+    
     const { id } = params;
     const { status } = await request.json();
-
+    
     console.log(`Attempting to update property ${id} status to: ${status}`);
 
     await dbConnect();
 
-    // Find the property and verify ownership
+
     const property = await Property.findById(id);
     if (!property) {
       console.log(`Property ${id} not found`);
@@ -29,14 +29,14 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // Log the old status
+
     console.log(`Current status: ${property.status}`);
 
-    // Update the status
+
     property.status = status;
     await property.save();
 
-    // Log the successful update
+
     console.log(`Successfully updated property ${id} status from ${property.status} to ${status}`);
 
     return NextResponse.json({ success: true, property });

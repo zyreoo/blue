@@ -476,10 +476,12 @@ export default function BecomeHostPage() {
     const files = Array.from(e.target.files);
     
     for (const file of files) {
-      if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+      // Accept more image formats
+      if (file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/gif') {
         try {
           const formData = new FormData();
-          formData.append('file', file);
+          // Change 'file' to 'photos' to match the server expectation
+          formData.append('photos', file);
 
           const response = await fetch('/api/upload', {
             method: 'POST',
@@ -487,17 +489,16 @@ export default function BecomeHostPage() {
           });
 
           if (!response.ok) {
-            throw new Error('Upload failed');
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Upload failed');
           }
 
           const result = await response.json();
-          console.log('Upload response:', result); // Add logging
+          console.log('Upload response:', result);
           
-          // Use both timestamp and a random number to ensure uniqueness
           const newPhotoId = `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
           
           setFormData(prev => {
-            // Check if this photo ID already exists
             if (prev.photos.some(photo => photo.id === newPhotoId)) {
               console.warn('Duplicate photo ID detected, skipping...');
               return prev;
@@ -507,7 +508,7 @@ export default function BecomeHostPage() {
               ...prev,
               photos: [...prev.photos, {
                 id: newPhotoId,
-                url: result.url, // Using the direct URL from the response
+                url: result.url,
                 public_id: result.uploadSessionId
               }],
               primaryPhotoId: prev.primaryPhotoId || newPhotoId
@@ -515,10 +516,10 @@ export default function BecomeHostPage() {
           });
         } catch (error) {
           console.error('Error uploading file:', error);
-          alert('Failed to upload image. Please try again.');
+          alert('Failed to upload image: ' + (error.message || 'Please try again.'));
         }
       } else {
-        alert(t('become_host.photos.error_format'));
+        alert('Please upload images in JPG, PNG, WebP, or GIF format');
       }
     }
   };
@@ -1245,7 +1246,13 @@ export default function BecomeHostPage() {
                   e.preventDefault();
                   e.currentTarget.classList.remove(styles.dragOver);
                   const files = Array.from(e.dataTransfer.files);
-                  const imageFiles = files.filter(file => file.type === 'image/jpeg' || file.type === 'image/jpg');
+                  const imageFiles = files.filter(file => 
+                    file.type === 'image/jpeg' || 
+                    file.type === 'image/jpg' || 
+                    file.type === 'image/png' || 
+                    file.type === 'image/webp' || 
+                    file.type === 'image/gif'
+                  );
                   if (imageFiles.length > 0) {
                     handleFileUpload({ target: { files: imageFiles } });
                   }
@@ -1257,7 +1264,7 @@ export default function BecomeHostPage() {
                   type="file"
                   ref={fileInputRef}
                   className={styles.fileInput}
-                  accept=".jpg,.jpeg"
+                  accept=".jpg,.jpeg,.png,.webp,.gif"
                   multiple
                   onChange={handleFileUpload}
                 />
