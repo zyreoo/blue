@@ -242,7 +242,7 @@ export default function PropertyPage() {
       <Header />
       <main className={styles.main}>
         <div className={styles.titleSection}>
-          <h1>{property.title}</h1>
+          <h1>{property.name}</h1>
           <p className={styles.location}>
             {property.formattedLocation || (typeof property.location === 'object' 
               ? `${property.location.city}, ${property.location.country}`

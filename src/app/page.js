@@ -35,7 +35,7 @@ const PropertyCard = ({ property, locationSlug, filters }) => {
         {inView && (
           <Image 
             src={mainPhotoUrl}
-            alt={property.title}
+            alt={property.name}
             className={styles.image}
             width={300}
             height={200}
@@ -48,7 +48,7 @@ const PropertyCard = ({ property, locationSlug, filters }) => {
         <div className={styles.price}>{price} RON/noapte</div>
       </div>
       <div className={styles.content}>
-        <h3>{property.title}</h3>
+        <h3>{property.name}</h3>
         <p className={styles.description}>{property.description}</p>
         <div className={styles.details}>
           {bedrooms} dormitoare • {bathrooms} băi • Maxim {maxGuests} oaspeți

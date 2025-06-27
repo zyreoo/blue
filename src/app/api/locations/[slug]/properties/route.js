@@ -11,7 +11,7 @@ export async function GET(request, { params }) {
     const location = await Location.findOne({ slug })
       .populate({
         path: 'properties',
-        select: 'title description photos pricing location'
+        select: 'name description photos pricing location'
       });
     
     if (!location) {
