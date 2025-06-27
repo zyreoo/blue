@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
 
 export default function SignInForm() {
   const router = useRouter();
-  const { update } = useSession();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     email: '',
@@ -34,24 +33,16 @@ export default function SignInForm() {
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: '/profile'
       });
-
-      if (result?.error) {
-        setError('Invalid email or password');
-      } else {
-        // Force a complete page reload to get fresh session
-        window.location.href = '/profile';
-      }
     } catch (err) {
       setError('An error occurred. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
 
   const showSuccessMessage = searchParams.get('registered') === 'true';
-  
   const showErrorMessage = searchParams.get('error') === 'true';
 
   return (

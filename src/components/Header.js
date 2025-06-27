@@ -7,6 +7,7 @@ import Link from 'next/link';
 import styles from './Header.module.css';
 
 export default function Header({ onTypeChange }) {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -17,17 +18,15 @@ export default function Header({ onTypeChange }) {
   const suggestionsRef = useRef(null);
   const profileMenuRef = useRef(null);
   const pathname = usePathname();
-  const router = useRouter();
   const isLocationPage = pathname !== '/';
 
   const handleSignOut = async () => {
     try {
       setShowProfileMenu(false);
       await signOut({ 
-        redirect: false,
+        redirect: true,
+        callbackUrl: '/'
       });
-      window.location.href = '/';
-      window.location.reload()
     } catch (error) {
       console.error('Eroare la deconectare:', error);
     }
@@ -267,4 +266,3 @@ export default function Header({ onTypeChange }) {
     </header>
   );
 }
-

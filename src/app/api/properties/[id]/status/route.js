@@ -9,10 +9,10 @@ export async function PATCH(request, { params }) {
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     const { id } = params;
     const { status } = await request.json();
-    
+
     console.log(`Attempting to update property ${id} status to: ${status}`);
 
     await dbConnect();

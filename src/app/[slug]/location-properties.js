@@ -91,7 +91,8 @@ export default function LocationProperties() {
                 <div className={styles.content}>
                   <h3>{property.name}</h3>
                   <p className={styles.description}>{property.description}</p>
-                </div>  
+
+                </div>
               </Link>
             ))}
           </div>

@@ -24,8 +24,13 @@ export async function middleware(request) {
     response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
   }
 
-  if (path.startsWith('/api/')) {
-    response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+  if (path.startsWith('/api/auth/') || path.includes('auth')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+  }
+  else if (path.startsWith('/api/')) {
+    response.headers.set('Cache-Control', 'no-cache, must-revalidate, proxy-revalidate');
   }
 
   return response;
