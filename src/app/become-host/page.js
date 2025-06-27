@@ -62,6 +62,12 @@ const translations = {
       country: "Țară",
       country_placeholder: "Introduceți țara"
     },
+    property_name: {
+      title: "Cum se numește proprietatea ta?",
+      label: "Numele proprietății",
+      placeholder: "Introduceți un nume atractiv pentru proprietatea dvs.",
+      required: "Numele proprietății este obligatoriu"
+    },
     details: {
       title: "Câți oaspeți pot fi găzduiți?",
       guests: "Număr maxim de oaspeți",
@@ -147,10 +153,11 @@ const translations = {
       drop_zone_text: "Trage fotografiile aici sau",
       main_photo: "Fotografie principală",
       tips_title: "Sfaturi pentru fotografii grozave:",
-      tip1: "Folosește fotografii de înaltă calitate, minim 1024x683 pixeli",
-      tip2: "Adaugă o varietate de fotografii: camere, exterior, facilități speciale",
+      tip1: "Folosește fotografii clare și de calitate bună",
+      tip2: "Adaugă fotografii diverse: camere, exterior, facilități speciale",
       tip3: "Fotografiază în timpul zilei cu multă lumină naturală",
-      tip4: "Arată spațiul exact așa cum îl vor găsi oaspeții"
+      tip4: "Arată spațiul exact așa cum îl vor găsi oaspeții",
+      error_format: "Te rugăm să încarci doar fotografii în format JPG"
     },
     pricing: {
       title: "Setează prețul pe noapte",
@@ -405,6 +412,7 @@ export default function BecomeHostPage() {
     'property_type',
     'space_type',
     'location',
+    'property_name',
     'details',
     'amenities',
     'photos',
@@ -468,7 +476,7 @@ export default function BecomeHostPage() {
     const files = Array.from(e.target.files);
     
     for (const file of files) {
-      if (file.type.startsWith('image/')) {
+      if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
         try {
           const formData = new FormData();
           formData.append('file', file);
@@ -483,6 +491,7 @@ export default function BecomeHostPage() {
           }
 
           const result = await response.json();
+          console.log('Upload response:', result); // Add logging
           
           // Use both timestamp and a random number to ensure uniqueness
           const newPhotoId = `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -498,8 +507,8 @@ export default function BecomeHostPage() {
               ...prev,
               photos: [...prev.photos, {
                 id: newPhotoId,
-                url: result.url,
-                public_id: result.public_id // Store Cloudinary public_id for future reference
+                url: result.url, // Using the direct URL from the response
+                public_id: result.uploadSessionId
               }],
               primaryPhotoId: prev.primaryPhotoId || newPhotoId
             };
@@ -508,6 +517,8 @@ export default function BecomeHostPage() {
           console.error('Error uploading file:', error);
           alert('Failed to upload image. Please try again.');
         }
+      } else {
+        alert(t('become_host.photos.error_format'));
       }
     }
   };
@@ -517,7 +528,7 @@ export default function BecomeHostPage() {
       return;
     }
     
-    // Verify the photo exists before setting it as primary
+
     if (!formData.photos.some(photo => photo.id === photoId)) {
       console.error('Attempted to set non-existent photo as primary');
       return;
@@ -579,11 +590,18 @@ export default function BecomeHostPage() {
     setIsSubmitting(true);
 
     try {
+      if (!formData.name) {
+        throw new Error(t('become_host.property_name.required') || 'Please enter a property name');
+      }
+
       if (!formData.location.city || !formData.location.country || !formData.location.address) {
         throw new Error('Please fill in all location fields');
       }
 
       const propertyData = {
+        host: session.user.id,
+        hostEmail: session.user.email,
+        name: formData.name,
         propertyType: formData.propertyType,
         spaceType: formData.spaceType,
         location: {
@@ -605,11 +623,11 @@ export default function BecomeHostPage() {
         })),
         pricing: {
           basePrice: parseFloat(formData.pricePerNight),
-          cleaningFee: 0, // Can be added later in property settings
-          serviceFee: 0 // Can be calculated automatically
+          cleaningFee: 0, 
+          serviceFee: 0 
         },
         description: formData.description || `Beautiful ${formData.propertyType} in ${formData.location.city}`,
-        status: 'pending' // New properties start as pending
+        status: 'pending' 
       };
 
       const response = await fetch('/api/properties', {
@@ -762,8 +780,44 @@ export default function BecomeHostPage() {
               </div>
               <button
                 className={styles.nextButton}
-                onClick={() => setCurrentStep('details')}
+                onClick={() => setCurrentStep('property_name')}
                 disabled={!formData.location.address || !formData.location.city || !formData.location.country}
+              >
+                {t('common.next')}
+              </button>
+            </div>
+          </motion.div>
+        );
+
+      case 'property_name':
+        return (
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            className={styles.stepContainer}
+          >
+            <h2 className={styles.stepTitle}>{t('become_host.property_name.title')}</h2>
+            <div className={styles.propertyNameForm}>
+              <div className={styles.formGroup}>
+                <label htmlFor="name">{t('become_host.property_name.label')}</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name || ''}
+                  onChange={handleChange}
+                  placeholder={t('become_host.property_name.placeholder')}
+                  required
+                  className={styles.input}
+                  minLength={3}
+                  maxLength={100}
+                />
+              </div>
+              <button
+                className={styles.nextButton}
+                onClick={() => setCurrentStep('details')}
+                disabled={!formData.name || formData.name.trim().length < 3}
               >
                 {t('common.next')}
               </button>
@@ -1128,7 +1182,6 @@ export default function BecomeHostPage() {
                   ))}
                 </div>
               </div>
-
               <div className={styles.amenityCategory}>
                 <h3>{t('become_host.amenities.work')}</h3>
                 <div className={styles.amenityGrid}>
@@ -1192,7 +1245,7 @@ export default function BecomeHostPage() {
                   e.preventDefault();
                   e.currentTarget.classList.remove(styles.dragOver);
                   const files = Array.from(e.dataTransfer.files);
-                  const imageFiles = files.filter(file => file.type.startsWith('image/'));
+                  const imageFiles = files.filter(file => file.type === 'image/jpeg' || file.type === 'image/jpg');
                   if (imageFiles.length > 0) {
                     handleFileUpload({ target: { files: imageFiles } });
                   }
@@ -1204,7 +1257,7 @@ export default function BecomeHostPage() {
                   type="file"
                   ref={fileInputRef}
                   className={styles.fileInput}
-                  accept="image/*"
+                  accept=".jpg,.jpeg"
                   multiple
                   onChange={handleFileUpload}
                 />

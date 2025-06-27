@@ -490,65 +490,52 @@
 
 .photoGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 24px;
-  padding: 24px 0;
-  min-height: 200px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
 }
 
 .photoItem {
   position: relative;
   aspect-ratio: 4/3;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   overflow: hidden;
-  background: var(--card-background);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
 }
 
 .photoItem img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.photoItem:hover {
+  transform: translateY(-4px);
 }
 
 .photoItem:hover img {
   transform: scale(1.05);
 }
 
-/* Clean overlay for hover state */
-.photoItem::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom,
-    rgba(0, 0, 0, 0.1),
-    rgba(0, 0, 0, 0)
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 1;
-}
-
-.photoItem:hover::before {
-  opacity: 1;
-}
-
 .photoActions {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
   display: flex;
-  gap: 8px;
-  z-index: 2;
+  justify-content: space-between;
+  align-items: center;
   opacity: 0;
-  transform: translateY(-4px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.2s ease;
 }
 
 .photoItem:hover .photoActions {
   opacity: 1;
-  transform: translateY(0);
 }
 
 .removePhoto,

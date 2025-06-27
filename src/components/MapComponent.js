@@ -16,7 +16,6 @@ export default function MapComponent({ onLocationSelect, initialLocation }) {
     async function initializeMap() {
       try {
         const leaflet = await import('leaflet');
-        await import('leaflet/dist/leaflet.css');
         L = leaflet.default;
 
         if (mapRef.current) return;
