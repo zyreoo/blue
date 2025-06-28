@@ -335,7 +335,38 @@ export default function Header({ onTypeChange }) {
                     onClick={() => handleSuggestionClick(item)}
                   >
                     <span className={styles.suggestionIcon}>
-                      {item.type === 'location' ? '📍' : '🏠'}
+                      {item.type === 'location' ? (
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="1.75" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <path d="M12 22s-8-6-8-12a8 8 0 1 1 16 0c0 6-8 12-8 12z" />
+                          <circle cx="12" cy="10" r="2.5" />
+                        </svg>
+                      ) : (
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="1.75" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <path d="M12 3L4 9v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-8-6z" />
+                          <path d="M9 14h6" />
+                          <path d="M12 22V14" />
+                        </svg>
+                      )}
                     </span>
                     <div className={styles.suggestionInfo}>
                       <div>{item.displayName}</div>
@@ -379,29 +410,6 @@ export default function Header({ onTypeChange }) {
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
-          </button>
-        </div>
-        <div className={styles.mobileAccommodationTypes}>
-          <button 
-            className={`${styles.mobileTypeButton} ${selectedType === 'hotel' ? styles.selected : ''}`}
-            onClick={() => handleTypeClick('hotel')}
-          >
-            <span className={styles.typeIcon}>🏨</span>
-            <span>Hotel</span>
-          </button>
-          <button 
-            className={`${styles.mobileTypeButton} ${selectedType === 'pensiune' ? styles.selected : ''}`}
-            onClick={() => handleTypeClick('pensiune')}
-          >
-            <span className={styles.typeIcon}>🏡</span>
-            <span>Pensiune</span>
-          </button>
-          <button 
-            className={`${styles.mobileTypeButton} ${selectedType === 'cabana' ? styles.selected : ''}`}
-            onClick={() => handleTypeClick('cabana')}
-          >
-            <span className={styles.typeIcon}>🌲</span>
-            <span>Cabană</span>
           </button>
         </div>
       </div>
