@@ -15,8 +15,10 @@ export default function Header({ onTypeChange }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const suggestionsRef = useRef(null);
   const profileMenuRef = useRef(null);
+  const mobileMenuRef = useRef(null);
   const pathname = usePathname();
   const isLocationPage = pathname !== '/';
 
@@ -51,6 +53,9 @@ export default function Header({ onTypeChange }) {
       if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
         setShowSuggestions(false);
       }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        setIsMobileMenuOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -69,7 +74,7 @@ export default function Header({ onTypeChange }) {
         if (!response.ok) throw new Error('Failed to fetch locations');
         const data = await response.json();
         
-        // Filter locations based on search query
+        
         const filteredLocations = data.filter(location => 
           location.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
           location.country.toLowerCase().includes(searchQuery.toLowerCase())
@@ -102,6 +107,7 @@ export default function Header({ onTypeChange }) {
     };
     
     onTypeChange?.(newType ? typeMap[newType] : null);
+    setIsMobileMenuOpen(false);
   };
 
   const handleSearch = (e) => {
@@ -114,7 +120,7 @@ export default function Header({ onTypeChange }) {
       if (selectedLocation) {
         router.push(`/${selectedLocation.slug}`);
       } else {
-        // If no exact match, use the first suggestion if available
+       
         const firstSuggestion = suggestions[0];
         if (firstSuggestion) {
           router.push(`/${firstSuggestion.slug}`);
@@ -135,6 +141,27 @@ export default function Header({ onTypeChange }) {
     <header className={`${styles.header} ${isScrolled && !isLocationPage ? styles.scrolled : ''} ${isLocationPage ? styles.static : ''}`}>
       <div className={styles.container}>
         <div className={styles.headerTop}>
+          <button 
+            className={styles.hamburgerButton}
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-label="Deschide meniul"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
           <div className={styles.navigation}>
             {isLocationPage && (
               <button 
@@ -160,29 +187,6 @@ export default function Header({ onTypeChange }) {
             <Link href="/" className={styles.homeLink}>
               Cazări România
             </Link>
-          </div>
-          <div className={styles.accommodationTypes}>
-            <button 
-              className={`${styles.typeButton} ${selectedType === 'hotel' ? styles.selected : ''}`}
-              onClick={() => handleTypeClick('hotel')}
-            >
-              <span className={styles.typeIcon}>🏨</span>
-              <span>Hotel</span>
-            </button>
-            <button 
-              className={`${styles.typeButton} ${selectedType === 'pensiune' ? styles.selected : ''}`}
-              onClick={() => handleTypeClick('pensiune')}
-            >
-              <span className={styles.typeIcon}>🏡</span>
-              <span>Pensiune</span>
-            </button>
-            <button 
-              className={`${styles.typeButton} ${selectedType === 'cabana' ? styles.selected : ''}`}
-              onClick={() => handleTypeClick('cabana')}
-            >
-              <span className={styles.typeIcon}>🌲</span>
-              <span>Cabană</span>
-            </button>
           </div>
           <div className={styles.profileSection} ref={profileMenuRef}>
             <button 
@@ -272,7 +276,7 @@ export default function Header({ onTypeChange }) {
             </div>
             {showSuggestions && suggestions.length > 0 && (
               <ul className={styles.suggestions}>
-                {suggestions.map((location, index) => (
+                {suggestions.map((location) => (
                   <li key={location.slug}>
                     <button 
                       className={styles.suggestionButton}
@@ -300,6 +304,61 @@ export default function Header({ onTypeChange }) {
               </ul>
             )}
           </form>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div 
+        ref={mobileMenuRef}
+        className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.open : ''}`}
+      >
+        <div className={styles.mobileMenuHeader}>
+          <Link href="/" className={styles.homeLink} onClick={() => setIsMobileMenuOpen(false)}>
+            Cazări România
+          </Link>
+          <button 
+            className={styles.closeMenuButton}
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Închide meniul"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div className={styles.mobileAccommodationTypes}>
+          <button 
+            className={`${styles.mobileTypeButton} ${selectedType === 'hotel' ? styles.selected : ''}`}
+            onClick={() => handleTypeClick('hotel')}
+          >
+            <span className={styles.typeIcon}>🏨</span>
+            <span>Hotel</span>
+          </button>
+          <button 
+            className={`${styles.mobileTypeButton} ${selectedType === 'pensiune' ? styles.selected : ''}`}
+            onClick={() => handleTypeClick('pensiune')}
+          >
+            <span className={styles.typeIcon}>🏡</span>
+            <span>Pensiune</span>
+          </button>
+          <button 
+            className={`${styles.mobileTypeButton} ${selectedType === 'cabana' ? styles.selected : ''}`}
+            onClick={() => handleTypeClick('cabana')}
+          >
+            <span className={styles.typeIcon}>🌲</span>
+            <span>Cabană</span>
+          </button>
         </div>
       </div>
     </header>
