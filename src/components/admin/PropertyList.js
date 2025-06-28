@@ -20,7 +20,6 @@ export default function PropertyList({ properties, setProperties }) {
       
       if (!response.ok) throw new Error('Failed to delete property');
       
-      // Remove the property from the list
       setProperties(properties.filter(p => p._id !== propertyId));
     } catch (err) {
       alert('Error deleting property: ' + err.message);

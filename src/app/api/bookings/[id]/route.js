@@ -8,7 +8,6 @@ export async function PATCH(request, { params }) {
   try {
     await connectDB();
     
-    // Get the authenticated user session
     const session = await getServerSession(authOptions);
     if (!session) {
 
@@ -20,20 +19,19 @@ export async function PATCH(request, { params }) {
     
 
 
-    // Find the booking
+    
     const booking = await Booking.findById(id);
     if (!booking) {
 
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    // Check if the user is authorized to update this booking
     if (booking.adminEmail !== session.user.email) {
 
       return NextResponse.json({ error: 'Not authorized to update this booking' }, { status: 403 });
     }
 
-    // Validate the status update
+
     if (updates.status && !['pending', 'confirmed', 'cancelled', 'completed'].includes(updates.status)) {
 
       return NextResponse.json({ 
@@ -41,7 +39,7 @@ export async function PATCH(request, { params }) {
       }, { status: 400 });
     }
 
-    // Update the booking
+
     const updatedBooking = await Booking.findByIdAndUpdate(
       id,
       { ...updates, updatedAt: new Date() },

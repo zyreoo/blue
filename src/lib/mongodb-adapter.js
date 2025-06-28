@@ -5,7 +5,9 @@ if (!process.env.MONGODB_URI) {
 }
 
 const uri = process.env.MONGODB_URI;
-const options = {};
+const options = {
+  dbName: 'blue'  // Explicitly set the database name
+};
 
 let client;
 let clientPromise;

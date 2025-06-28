@@ -5,7 +5,7 @@ import User from '@/models/User';
 
 export async function POST(request) {
   try {
-    // Parse request body
+
     const body = await request.json().catch(e => {
       console.error('Failed to parse request body:', e);
       return null;
@@ -20,7 +20,7 @@ export async function POST(request) {
 
     const { firstName, lastName, email, phoneNumber, idNumber, password } = body;
 
-    // Validate required fields
+
     if (!firstName || !lastName || !email || !phoneNumber || !idNumber || !password) {
       return NextResponse.json(
         { error: 'All fields are required', 
@@ -90,7 +90,6 @@ export async function POST(request) {
       );
     }
 
-    // Hash password
     let hashedPassword;
     try {
       const salt = await bcrypt.genSalt(10);
@@ -103,7 +102,6 @@ export async function POST(request) {
       );
     }
 
-    // Create user
     try {
       const user = await User.create({
         firstName,
@@ -122,8 +120,7 @@ export async function POST(request) {
       });
     } catch (error) {
       console.error('User creation failed:', error);
-      
-      // Check for specific MongoDB errors
+
       if (error.code === 11000) {
         const field = Object.keys(error.keyPattern)[0];
         return NextResponse.json(

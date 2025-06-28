@@ -45,14 +45,12 @@ export default function BookingsList() {
         throw new Error(data.error || 'Failed to update booking status');
       }
       
-      // Update booking in the list
       setBookings(bookings.map(booking => 
         booking._id === bookingId 
           ? { ...booking, status: newStatus }
           : booking
       ));
 
-      // Show success message
       alert('Booking status updated successfully');
     } catch (err) {
 

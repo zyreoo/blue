@@ -89,7 +89,7 @@
 .imageContainer {
   position: relative;
   width: 100%;
-  padding-top: 66.67%; /* 3:2 aspect ratio */
+  padding-top: 66.67%;
   overflow: hidden;
 }
 

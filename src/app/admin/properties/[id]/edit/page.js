@@ -114,7 +114,6 @@ export default function EditPropertyPage({ params }) {
           });
           setSelectedAmenities(data.amenities || []);
           
-          // Safely handle location data
           if (data.location?.coordinates?.lat && data.location?.coordinates?.lng) {
             setLocation({
               lat: data.location.coordinates.lat,
@@ -152,7 +151,6 @@ export default function EditPropertyPage({ params }) {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    // Handle different input types
     const newValue = type === 'number' 
       ? (value === '' ? '' : Number(value))
       : type === 'checkbox' 
@@ -227,7 +225,7 @@ export default function EditPropertyPage({ params }) {
     const updatedPhotos = property.photos.map(photo => ({
       ...photo,
       isMain: photo.id === photoId ? true : false,
-      id: photo.id // Preserve existing IDs
+      id: photo.id
     }));
 
     try {
@@ -296,18 +294,16 @@ export default function EditPropertyPage({ params }) {
     const newPhotos = [...property.photos];
     
     if (toIndexOrDirection === 'up' && fromIndex > 0) {
-      // Move up
       [newPhotos[fromIndex], newPhotos[fromIndex - 1]] = [newPhotos[fromIndex - 1], newPhotos[fromIndex]];
     } else if (toIndexOrDirection === 'down' && fromIndex < newPhotos.length - 1) {
-      // Move down
+
       [newPhotos[fromIndex], newPhotos[fromIndex + 1]] = [newPhotos[fromIndex + 1], newPhotos[fromIndex]];
     } else if (typeof toIndexOrDirection === 'number') {
-      // Move to specific position (used for setting main photo)
       const photoToMove = newPhotos[fromIndex];
-      newPhotos.splice(fromIndex, 1); // Remove from current position
-      newPhotos.splice(toIndexOrDirection, 0, photoToMove); // Insert at new position
+      newPhotos.splice(fromIndex, 1); 
+      newPhotos.splice(toIndexOrDirection, 0, photoToMove);
     } else {
-      return; // Invalid move
+      return;
     }
 
     try {
@@ -452,7 +448,7 @@ export default function EditPropertyPage({ params }) {
                             className={`${styles.setPrimary} ${index === 0 ? styles.isPrimary : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              movePhoto(index, 0); // Move to first position instead of setting isMain
+                              movePhoto(index, 0); 
                             }}
                           >
                             {index === 0 ? 'Main photo' : 'Set as main'}

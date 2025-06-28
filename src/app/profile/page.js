@@ -46,7 +46,7 @@ export default function ProfilePage() {
           const bookingsData = await bookingsResponse.json();
           setBookings(bookingsData);
 
-          // Fetch properties if user is a host
+
           if (userData.isHost) {
             const propertiesResponse = await fetch('/api/properties?admin=true');
             if (!propertiesResponse.ok) {

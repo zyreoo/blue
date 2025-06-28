@@ -2,7 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 
-// Add debug logging
+
 console.log('Attempting to configure Cloudinary...');
 
 cloudinary.config({
@@ -16,7 +16,6 @@ export async function POST(request) {
     const headersList = headers();
     const uploadSessionId = headersList.get('x-upload-session') || `session-${Date.now()}`;
 
-    // Verify Cloudinary configuration
     if (!cloudinary.config().api_secret) {
       console.error('Cloudinary API secret is missing');
       return NextResponse.json(

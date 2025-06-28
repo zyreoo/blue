@@ -384,7 +384,7 @@
   transform: scale(1.05);
 }
 
-/* Clean overlay for hover state */
+
 .photoItem::before {
   content: '';
   position: absolute;

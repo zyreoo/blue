@@ -39,7 +39,7 @@ export default function EditProfile() {
         }
         const userData = await response.json();
         
-        // Split fullName into firstName and lastName
+
         const [firstName = '', lastName = ''] = (userData.fullName || '').split(' ');
         
         setFormData({
@@ -72,7 +72,7 @@ export default function EditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Combine firstName and lastName into fullName
+
       const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim();
       
       const response = await fetch('/api/user/profile', {
@@ -83,7 +83,6 @@ export default function EditProfile() {
         body: JSON.stringify({
           ...formData,
           fullName,
-          // Remove firstName and lastName as they're not stored in DB
           firstName: undefined,
           lastName: undefined
         }),
