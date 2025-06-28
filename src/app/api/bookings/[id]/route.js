@@ -45,9 +45,6 @@ export async function PATCH(request, { params }) {
       { ...updates, updatedAt: new Date() },
       { new: true, runValidators: true }
     );
-
-
-
     return NextResponse.json(updatedBooking);
   } catch (error) {
 
