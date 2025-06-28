@@ -61,7 +61,7 @@ export default function SignUp() {
         throw new Error(data.error || 'Failed to create account');
       }
 
-      // Redirect to sign in page on success
+
       router.push('/auth/signin');
     } catch (error) {
       setError(error.message);

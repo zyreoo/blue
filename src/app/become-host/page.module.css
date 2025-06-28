@@ -686,18 +686,20 @@
 }
 
 .finalStep {
-  text-align: center;
-  padding: 3rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+  padding-top: 60px;
 }
 
 .thankYouContainer {
-  composes: variables;
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
   background: var(--card-background);
   border-radius: var(--radius-lg);
-  padding: 3rem;
-  box-shadow: var(--shadow-lg);
-  max-width: 800px;
-  margin: 0 auto;
+  box-shadow: var(--shadow-md);
 }
 
 .thankYouContainer h2 {
@@ -714,12 +716,11 @@
 }
 
 .propertyPreview {
-  composes: variables;
-  background: var(--background-color);
+  background: var(--card-background);
   border-radius: var(--radius-lg);
   padding: 2rem;
-  margin: 2.5rem 0;
-  border: 2px solid var(--border-color);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
 }
 
 .propertyPreview h3 {
@@ -729,23 +730,21 @@
 }
 
 .previewDetails {
-  margin: 24px 0;
-  padding: 24px;
-  background: var(--background-color);
-  border-radius: var(--radius-md);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
 }
 
 .previewDetails div {
-  margin: 12px 0;
-  color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .previewDetails strong {
+  font-size: 1.1rem;
   color: var(--text-primary);
-  font-weight: 600;
-  margin-right: 8px;
 }
 
 .previewPhoto {
@@ -1076,46 +1075,106 @@
 
   .stepContainer {
     padding: 1.5rem;
-    margin-top: 2rem;
+    margin-top: 60px;
+    border-radius: var(--radius-md);
   }
 
   .stepTitle {
-    font-size: 1.75rem;
-    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
-  .propertyTypeGrid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
-  }
-
-  .propertyTypeCard {
-    padding: 1.5rem;
-  }
-
-  .propertyIcon {
-    font-size: 2.5rem;
+  .finalStep {
+    padding: 1rem;
   }
 
   .thankYouContainer {
-    padding: 2rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .thankYouContainer h2 {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .propertyPreview {
+    padding: 1rem;
+    border-radius: var(--radius-md);
   }
 
   .previewDetails {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .previewDetails div {
+    padding: 1rem;
+    background: var(--background-color);
+    border-radius: var(--radius-sm);
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .previewDetails strong {
+    font-size: 1rem;
   }
 
   .navigationButtons {
     flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
   }
 
   .backButton,
   .submitButton {
     width: 100%;
+    padding: 1rem;
+  }
+
+  .backArrow {
+    top: 80px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .stepContainer {
+    padding: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .finalStep {
+    padding: 0.5rem;
+  }
+
+  .thankYouContainer {
+    padding: 1rem;
+  }
+
+  .propertyPreview {
+    padding: 0.75rem;
+  }
+
+  .previewDetails div {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .previewDetails strong {
+    font-size: 0.95rem;
+  }
+
+  .navigationButtons {
+    padding: 0.75rem;
   }
 }
 
@@ -1151,25 +1210,38 @@
 }
 
 .backArrow {
-  position: absolute;
+  position: fixed;
+  top: 100px;
   left: 20px;
-  top: 20px;
-  background: #F5ECD5;
-  border: none;
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #626F47;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  z-index: 10;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 .backArrow:hover {
-  background: #F0BB78;
-  transform: translateX(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--background-color);
+  transform: translateX(-2px);
+}
+
+@media (max-width: 768px) {
+  .backArrow {
+    top: 80px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .stepContainer {
+    margin-top: 60px;
+  }
 } 

@@ -88,7 +88,6 @@ const translations = {
       accessibility: "Accesibilitate",
       work: "Spațiu de lucru",
       
-      // Essential amenities
       wifi: "Wi-Fi",
       tv: "TV",
       kitchen: "Bucătărie",
@@ -97,12 +96,11 @@ const translations = {
       dryer: "Uscător",
       dishwasher: "Mașină de spălat vase",
 
-      // Bathroom amenities
       hair_dryer: "Uscător de păr",
       toiletries: "Articole de toaletă",
       hot_tub: "Cadă cu hidromasaj",
 
-      // Bedroom amenities
+      
       iron: "Fier de călcat",
       hangers: "Umerașe",
       extra_pillows: "Perne suplimentare",
@@ -129,7 +127,6 @@ const translations = {
       wine_glasses: "Pahare de vin",
       dining_table: "Masă de dining",
 
-      // Climate & Safety
       ac: "Aer condiționat",
       heating: "Încălzire",
       smoke_detector: "Detector de fum",
@@ -137,15 +134,13 @@ const translations = {
       fire_extinguisher: "Stingător",
       security_cameras: "Camere de supraveghere",
 
-      // Accessibility
       elevator: "Lift",
       ground_floor: "Parter",
       wide_doorway: "Uși late",
-
-      // Work & Study
       desk: "Birou",
       monitor: "Monitor",
       printer: "Imprimantă"
+
     },
     photos: {
       title: "Adaugă fotografii ale spațiului tău",
@@ -408,6 +403,15 @@ export default function BecomeHostPage() {
   const [draggedPhoto, setDraggedPhoto] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      // Cleanup file input ref on unmount
+      if (fileInputRef.current) {
+        fileInputRef.current = null;
+      }
+    };
+  }, []);
+
   const steps = [
     'property_type',
     'space_type',
@@ -476,11 +480,10 @@ export default function BecomeHostPage() {
     const files = Array.from(e.target.files);
     
     for (const file of files) {
-      // Accept more image formats
       if (file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/gif') {
         try {
           const formData = new FormData();
-          // Change 'file' to 'photos' to match the server expectation
+
           formData.append('photos', file);
 
           const response = await fetch('/api/upload', {
@@ -543,7 +546,7 @@ export default function BecomeHostPage() {
 
   const handleRemovePhoto = (photoId) => {
     setFormData(prev => {
-      // Find the photo to be removed
+
       const photoToRemove = prev.photos.find(photo => photo.id === photoId);
       if (!photoToRemove) {
         console.error('Attempted to remove non-existent photo');
@@ -552,8 +555,7 @@ export default function BecomeHostPage() {
 
       const newPhotos = prev.photos.filter(photo => photo.id !== photoId);
       let newPrimaryPhotoId = prev.primaryPhotoId;
-
-      // If we're removing the primary photo, set the first remaining photo as primary
+      
       if (photoId === prev.primaryPhotoId) {
         newPrimaryPhotoId = newPhotos.length > 0 ? newPhotos[0].id : null;
       }
@@ -1233,7 +1235,11 @@ export default function BecomeHostPage() {
               )}
               <div 
                 className={styles.dropZone}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => {
+                  if (fileInputRef.current) {
+                    fileInputRef.current.click();
+                  }
+                }}
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.currentTarget.classList.add(styles.dragOver);
@@ -1253,7 +1259,10 @@ export default function BecomeHostPage() {
                     file.type === 'image/webp' || 
                     file.type === 'image/gif'
                   );
-                  if (imageFiles.length > 0) {
+                  if (imageFiles.length > 0 && fileInputRef.current) {
+                    const dataTransfer = new DataTransfer();
+                    imageFiles.forEach(file => dataTransfer.items.add(file));
+                    fileInputRef.current.files = dataTransfer.files;
                     handleFileUpload({ target: { files: imageFiles } });
                   }
                 }}
@@ -1266,7 +1275,13 @@ export default function BecomeHostPage() {
                   className={styles.fileInput}
                   accept=".jpg,.jpeg,.png,.webp,.gif"
                   multiple
-                  onChange={handleFileUpload}
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      handleFileUpload(e);
+                      // Clear the input value to allow uploading the same file again
+                      e.target.value = '';
+                    }
+                  }}
                 />
               </div>
 

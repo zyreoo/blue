@@ -46,7 +46,7 @@ export function useBookings() {
 export function useLocations() {
   const { data, error, isLoading } = useSWR('/api/locations', fetcher, {
     revalidateOnFocus: false,
-    dedupingInterval: 60000, // Cache for 1 minute
+    dedupingInterval: 60000,
   });
   
   return {
@@ -62,7 +62,7 @@ export function useLocationProperties(slug) {
     fetcher,
     {
       revalidateOnFocus: false,
-      dedupingInterval: 60000, // Cache for 1 minute
+      dedupingInterval: 60000, 
     }
   );
   
