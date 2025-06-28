@@ -3,22 +3,31 @@
 import { useEffect, useState, useRef } from 'react';
 import styles from './MapComponent.module.css';
 
+let L;
+if (typeof window !== 'undefined') {
+  L = require('leaflet');
+}
+
 export default function MapComponent({ onLocationSelect, initialLocation }) {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const containerRef = useRef(null);
   const defaultPosition = initialLocation || [44.4268, 26.1025];
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !containerRef.current) return;
+    if (typeof window === 'undefined' || !containerRef.current || isMapInitialized) return;
 
-    let L;
     async function initializeMap() {
       try {
-        const leaflet = await import('leaflet');
-        L = leaflet.default;
+        if (!L) {
+          L = (await import('leaflet')).default;
+        }
 
         if (mapRef.current) return;
+
+        // Import CSS
+        await import('leaflet/dist/leaflet.css');
 
         const map = L.map(containerRef.current).setView(defaultPosition, 13);
         mapRef.current = map;
@@ -63,6 +72,8 @@ export default function MapComponent({ onLocationSelect, initialLocation }) {
             console.error('Error fetching location data:', error);
           }
         });
+
+        setIsMapInitialized(true);
       } catch (error) {
         console.error('Error initializing map:', error);
       }
@@ -75,9 +86,10 @@ export default function MapComponent({ onLocationSelect, initialLocation }) {
         mapRef.current.remove();
         mapRef.current = null;
         markerRef.current = null;
+        setIsMapInitialized(false);
       }
     };
-  }, [defaultPosition, onLocationSelect]);
+  }, [defaultPosition, onLocationSelect, isMapInitialized]);
 
   const handleSearch = async (searchQuery) => {
     if (!mapRef.current || !markerRef.current) return;

@@ -70,20 +70,60 @@ export default function Header({ onTypeChange }) {
       }
 
       try {
-        const response = await fetch('/api/locations');
-        if (!response.ok) throw new Error('Failed to fetch locations');
-        const data = await response.json();
-        
-        
-        const filteredLocations = data.filter(location => 
-          location.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          location.country.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        // Fetch locations
+        const locationsResponse = await fetch('/api/locations');
+        if (!locationsResponse.ok) throw new Error('Failed to fetch locations');
+        const locations = await locationsResponse.json();
 
-        setSuggestions(filteredLocations);
+        // Fetch property names
+        const propertyResponse = await fetch('/api/properties/names');
+        if (!propertyResponse.ok) throw new Error('Failed to fetch properties');
+        const properties = await propertyResponse.json();
+
+        // Filter and combine results
+        const filteredLocations = locations
+          .filter(location => 
+            location.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            location.country.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map(location => ({
+            type: 'location',
+            id: location.slug,
+            displayName: `${location.city}, ${location.country}`,
+            city: location.city,
+            country: location.country,
+            slug: location.slug
+          }));
+
+        const filteredProperties = properties
+          .filter(property => 
+            property.name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map(property => ({
+            type: 'property',
+            id: property.propertyId,
+            displayName: property.name,
+            location: property.location,
+            propertyId: property.propertyId
+          }));
+
+        // Combine and sort results
+        const combinedResults = [
+          ...filteredLocations,
+          ...filteredProperties
+        ].sort((a, b) => {
+          // Sort by whether it starts with the search query
+          const aStartsWith = a.displayName.toLowerCase().startsWith(searchQuery.toLowerCase());
+          const bStartsWith = b.displayName.toLowerCase().startsWith(searchQuery.toLowerCase());
+          if (aStartsWith && !bStartsWith) return -1;
+          if (!aStartsWith && bStartsWith) return 1;
+          return 0;
+        });
+
+        setSuggestions(combinedResults);
         setShowSuggestions(true);
       } catch (error) {
-        console.error('Error fetching locations:', error);
+        console.error('Error fetching suggestions:', error);
         setSuggestions([]);
       }
     };
@@ -113,27 +153,39 @@ export default function Header({ onTypeChange }) {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      const selectedLocation = suggestions.find(loc => 
-        `${loc.city}, ${loc.country}`.toLowerCase() === searchQuery.toLowerCase()
+      const selected = suggestions.find(item => 
+        item.displayName.toLowerCase() === searchQuery.toLowerCase()
       );
       
-      if (selectedLocation) {
-        router.push(`/${selectedLocation.slug}`);
-      } else {
-       
-        const firstSuggestion = suggestions[0];
-        if (firstSuggestion) {
-          router.push(`/${firstSuggestion.slug}`);
-          setSearchQuery(`${firstSuggestion.city}, ${firstSuggestion.country}`);
+      if (selected) {
+        if (selected.type === 'location') {
+          router.push(`/${selected.slug}`);
+          setSearchQuery(selected.displayName);
+        } else {
+          router.push(`/${selected.location.toLowerCase().replace(/\s+/g, '-')}/${selected.propertyId}`);
+          setSearchQuery(selected.displayName);
         }
+      } else if (suggestions.length > 0) {
+        const first = suggestions[0];
+        if (first.type === 'location') {
+          router.push(`/${first.slug}`);
+        } else {
+          router.push(`/${first.location.toLowerCase().replace(/\s+/g, '-')}/${first.propertyId}`);
+        }
+        setSearchQuery(first.displayName);
       }
       setShowSuggestions(false);
     }
   };
 
-  const handleSuggestionClick = (location) => {
-    router.push(`/${location.slug}`);
-    setSearchQuery(`${location.city}, ${location.country}`);
+  const handleSuggestionClick = (item) => {
+    if (item.type === 'location') {
+      router.push(`/${item.slug}`);
+      setSearchQuery(item.displayName);
+    } else {
+      router.push(`/${item.location.toLowerCase().replace(/\s+/g, '-')}/${item.propertyId}`);
+      setSearchQuery(item.displayName);
+    }
     setShowSuggestions(false);
   };
 
@@ -275,33 +327,25 @@ export default function Header({ onTypeChange }) {
               </button>
             </div>
             {showSuggestions && suggestions.length > 0 && (
-              <ul className={styles.suggestions}>
-                {suggestions.map((location) => (
-                  <li key={location.slug}>
-                    <button 
-                      className={styles.suggestionButton}
-                      onClick={() => handleSuggestionClick(location)}
-                    >
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                        className={styles.locationIcon}
-                      >
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                      {location.city}, {location.country}
-                    </button>
-                  </li>
+              <div className={styles.suggestions} ref={suggestionsRef}>
+                {suggestions.map((item) => (
+                  <div
+                    key={`${item.type}-${item.id}`}
+                    className={styles.suggestionItem}
+                    onClick={() => handleSuggestionClick(item)}
+                  >
+                    <span className={styles.suggestionIcon}>
+                      {item.type === 'location' ? '📍' : '🏠'}
+                    </span>
+                    <div className={styles.suggestionInfo}>
+                      <div>{item.displayName}</div>
+                      {item.type === 'property' && (
+                        <div className={styles.suggestionLocation}>{item.location}</div>
+                      )}
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </form>
         </div>

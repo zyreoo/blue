@@ -13,8 +13,11 @@ import { AmenityIcons } from '@/components/icons/AmenityIcons';
 
 
 const MapComponent = dynamic(
-  () => import('@/components/MapComponent'),
-  { ssr: false }
+  () => import('@/components/MapComponent').then(mod => mod.default),
+  { 
+    ssr: false,
+    loading: () => <div className={styles.mapPlaceholder}>Loading map...</div>
+  }
 );
 
 const translations = {
@@ -443,7 +446,34 @@ export default function BecomeHostPage() {
     }
   };
 
+  const savePropertyName = async () => {
+    if (formData.name && formData.location.city && formData.location.country) {
+      try {
+        const response = await fetch('/api/properties/names', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            propertyId: formData.propertyId,
+            location: `${formData.location.city}, ${formData.location.country}`
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save property name');
+        }
+      } catch (error) {
+        console.error('Error saving property name:', error);
+      }
+    }
+  };
+
   const nextStep = () => {
+    if (currentStep === 'location' && formData.name) {
+      savePropertyName();
+    }
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
@@ -626,11 +656,11 @@ export default function BecomeHostPage() {
         })),
         pricing: {
           basePrice: parseFloat(formData.pricePerNight),
-          cleaningFee: 0, 
-          serviceFee: 0 
+          cleaningFee: 0,
+          serviceFee: 0
         },
         description: formData.description || `Beautiful ${formData.propertyType} in ${formData.location.city}`,
-        status: 'pending' 
+        status: 'pending'
       };
 
       const response = await fetch('/api/properties', {
@@ -643,6 +673,20 @@ export default function BecomeHostPage() {
 
       if (response.ok) {
         const result = await response.json();
+        
+        // Save to propertiesnames collection
+        await fetch('/api/properties/names', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            propertyId: result._id,
+            location: `${formData.location.city}, ${formData.location.country}`
+          }),
+        });
+
         router.push('/profile?success=true&propertyId=' + result._id);
       } else {
         const error = await response.json();

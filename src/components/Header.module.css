@@ -250,33 +250,52 @@
   max-height: 300px;
   overflow-y: auto;
   z-index: 1000;
-  list-style: none;
-  padding: 0.5rem 0;
-  margin: 0;
+  padding: 0.5rem;
 }
 
-.suggestions li {
-  margin: 0;
-  padding: 0;
-}
-
-.suggestionButton {
-  width: 100%;
-  text-align: left;
-  padding: 0.75rem 1.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
+.suggestionItem {
+  padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: #626F47;
-  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
-.suggestionButton:hover {
+.suggestionItem:hover {
   background-color: #A4B465;
+  color: #F5ECD5;
+}
+
+.suggestionIcon {
+  margin-right: 1rem;
+  font-size: 1.2rem;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.suggestionInfo {
+  flex: 1;
+  overflow: hidden;
+}
+
+.suggestionInfo > div:first-child {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestionLocation {
+  font-size: 0.9rem;
+  color: #626F47;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestionItem:hover .suggestionLocation {
   color: #F5ECD5;
 }
 
