@@ -173,7 +173,7 @@ export default function SearchFilters({ onFiltersChange }) {
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [isOpen, handleClickOutside]);
-
+  
   useEffect(() => {
     debouncedFiltersChange(filters);
   }, [filters, debouncedFiltersChange]);
