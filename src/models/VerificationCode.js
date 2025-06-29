@@ -13,10 +13,9 @@ const verificationCodeSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 600 
+    expires: 1800 // 30 minutes in seconds
   }
 });
-
 
 verificationCodeSchema.index({ email: 1, code: 1 });
 

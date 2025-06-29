@@ -87,7 +87,7 @@ export async function POST(request) {
 
     const existingCode = await VerificationCode.findOne({ email: email.toLowerCase() });
     if (existingCode) {
-      const timeLeft = Math.ceil((existingCode.createdAt.getTime() + 600000 - Date.now()) / 1000 / 60);
+      const timeLeft = Math.ceil((existingCode.createdAt.getTime() + 1800000 - Date.now()) / 1000 / 60);
       return NextResponse.json(
         { error: `Please wait ${timeLeft} minutes before requesting a new code` },
         { status: 429 }
@@ -102,12 +102,12 @@ export async function POST(request) {
     });
 
     try {
-
+        
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
         subject: 'Your Verification Code',
-        text: `Your verification code is: ${verificationCode}. This code will expire in 10 minutes.`,
+        text: `Your verification code is: ${verificationCode}. This code will expire in 30 minutes.`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Verification Code</h2>
@@ -115,7 +115,7 @@ export async function POST(request) {
             <h1 style="font-size: 32px; letter-spacing: 5px; color: #4a5568; text-align: center; padding: 20px; background: #f7fafc; border-radius: 8px;">
               ${verificationCode}
             </h1>
-            <p>This code will expire in 10 minutes.</p>
+            <p>This code will expire in 30 minutes.</p>
             <p>If you didn't request this code, please ignore this email.</p>
           </div>
         `,
@@ -154,7 +154,7 @@ export async function PUT(request) {
         { status: 400 }
       );
     }
-    
+
     await VerificationCode.deleteOne({ _id: verificationCode._id });
 
     return NextResponse.json({ message: 'Verification successful' });

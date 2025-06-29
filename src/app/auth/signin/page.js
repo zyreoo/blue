@@ -156,6 +156,9 @@ export default function SignIn() {
                 className={styles.input}
                 disabled={loading}
               />
+              <Link href="/auth/forgot-password" className={styles.linkButton}>
+                Forgot Password?
+              </Link>
             </div>
 
             <button 
