@@ -178,4 +178,30 @@
     grid-template-columns: 1fr;
     gap: 12px;
   }
+}
+
+.helperText {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0;
+  text-decoration: underline;
+  margin-top: 0.5rem;
+}
+
+.linkButton:hover {
+  color: #1d4ed8;
+}
+
+.linkButton:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
 } 

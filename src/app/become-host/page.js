@@ -408,7 +408,7 @@ export default function BecomeHostPage() {
 
   useEffect(() => {
     return () => {
-      // Cleanup file input ref on unmount
+      
       if (fileInputRef.current) {
         fileInputRef.current = null;
       }
