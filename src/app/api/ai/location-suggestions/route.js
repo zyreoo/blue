@@ -21,7 +21,7 @@ export async function POST(request) {
     await dbConnect();
     console.log('🔌 [AI Location Suggestions] Database connected');
 
-    // Fetch both locations and properties
+
     const [locations, properties] = await Promise.all([
       Location.find({})
         .populate({
@@ -36,8 +36,19 @@ export async function POST(request) {
     ]);
 
     console.log(`📊 [AI Location Suggestions] Found ${locations.length} locations and ${properties.length} active properties`);
+    
 
-    // Create a rich context with location and property information
+    locations.forEach(location => {
+      const activeProps = location.properties.filter(p => p !== null);
+      console.log(`🌍 Location: ${location.city}, ${location.country}`);
+      console.log(`   - Total properties: ${location.properties.length}`);
+      console.log(`   - Active properties: ${activeProps.length}`);
+      if (activeProps.length > 0) {
+        console.log(`   - Property names: ${activeProps.map(p => p.name).join(', ')}`);
+      }
+    });
+
+
     const locationContext = locations.map(location => {
       const activeProperties = location.properties.filter(p => p !== null);
       return {
