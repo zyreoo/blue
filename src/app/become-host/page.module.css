@@ -904,7 +904,7 @@
   text-align: center;
 }
 
-/* Remove spinner buttons from number input */
+
 .priceInput::-webkit-outer-spin-button,
 .priceInput::-webkit-inner-spin-button {
   -webkit-appearance: none;

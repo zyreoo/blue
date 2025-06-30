@@ -72,9 +72,29 @@
 .headerTop {
   width: 100%;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 1rem;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: flex-end;
 }
 
 .navigation {
@@ -109,6 +129,7 @@
   font-size: 1.2rem;
   font-weight: 600;
   transition: color 0.2s ease;
+  white-space: nowrap;
 }
 
 .homeLink:hover {
@@ -436,6 +457,34 @@
   display: none;
 }
 
+.centerSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.aiButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  color: #626F47;
+}
+
+.aiButton:hover {
+  background-color: rgba(164, 180, 101, 0.1);
+}
+
+.aiIcon {
+  width: 24px;
+  height: 24px;
+  color: #626F47;
+}
+
 @media (max-width: 1024px) {
   .header.scrolled .searchWrapper {
     width: 90%;
@@ -459,8 +508,8 @@
     gap: 0.8rem;
   }
 
-  .navigation {
-    justify-content: center;
+  .titleSection {
+    justify-content: flex-start;
   }
 
   .homeLink {
@@ -546,7 +595,7 @@
 
   .searchWrapper {
     width: 100%;
-  }
+  } 
 
   .searchInput {
     padding: 0.7rem 1rem;

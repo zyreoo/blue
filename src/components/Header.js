@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './Header.module.css';
 
 export default function Header({ onTypeChange }) {
@@ -107,12 +108,12 @@ export default function Header({ onTypeChange }) {
             propertyId: property.propertyId
           }));
 
-        // Combine and sort results
+
         const combinedResults = [
           ...filteredLocations,
           ...filteredProperties
         ].sort((a, b) => {
-          // Sort by whether it starts with the search query
+
           const aStartsWith = a.displayName.toLowerCase().startsWith(searchQuery.toLowerCase());
           const bStartsWith = b.displayName.toLowerCase().startsWith(searchQuery.toLowerCase());
           if (aStartsWith && !bStartsWith) return -1;
@@ -193,28 +194,28 @@ export default function Header({ onTypeChange }) {
     <header className={`${styles.header} ${isScrolled && !isLocationPage ? styles.scrolled : ''} ${isLocationPage ? styles.static : ''}`}>
       <div className={styles.container}>
         <div className={styles.headerTop}>
-          <button 
-            className={styles.hamburgerButton}
-            onClick={() => setIsMobileMenuOpen(true)}
-            aria-label="Deschide meniul"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
+          <div className={styles.leftSection}>
+            <button 
+              className={styles.hamburgerButton}
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Deschide meniul"
             >
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <div className={styles.navigation}>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
             {isLocationPage && (
               <button 
                 onClick={() => window.history.back()} 
@@ -236,64 +237,79 @@ export default function Header({ onTypeChange }) {
                 </svg>
               </button>
             )}
+          </div>
+
+          <div className={styles.titleSection}>
             <Link href="/" className={styles.homeLink}>
               Cazări România
             </Link>
           </div>
-          <div className={styles.profileSection} ref={profileMenuRef}>
-            <button 
-              onClick={() => setShowProfileMenu(!showProfileMenu)} 
-              className={styles.profileButton} 
-              aria-label="Meniu profil"
-            >
-              {status === 'authenticated' && session?.user ? (
-                <div className={styles.userAvatar}>
-                  {session.user.name?.charAt(0) || session.user.email?.charAt(0)}
-                </div>
-              ) : (
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="24" 
-                  height="24" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              )}
-            </button>
-            {showProfileMenu && (
-              <div className={styles.profileMenu}>
+
+          <div className={styles.rightSection}>
+            <Link href="/ai-search" className={styles.aiButton}>
+              <Image
+                src="/robot.svg"
+                alt="AI Search"
+                width={24}
+                height={24}
+                className={styles.aiIcon}
+              />
+            </Link>
+            <div className={styles.profileSection} ref={profileMenuRef}>
+              <button 
+                onClick={() => setShowProfileMenu(!showProfileMenu)} 
+                className={styles.profileButton} 
+                aria-label="Meniu profil"
+              >
                 {status === 'authenticated' && session?.user ? (
-                  <>
-                    <div className={styles.userInfo}>
-                      <span className={styles.userName}>{session.user.name || session.user.email}</span>
-                      <span className={styles.userEmail}>{session.user.email}</span>
-                    </div>
-                    <Link href="/profile" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
-                      Profilul Meu
-                    </Link>
-                    <button onClick={handleSignOut} className={`${styles.menuItem} ${styles.signOutButton}`}>
-                      Deconectare
-                    </button>
-                  </>
+                  <div className={styles.userAvatar}>
+                    {session.user.name?.charAt(0) || session.user.email?.charAt(0)}
+                  </div>
                 ) : (
-                  <>
-                    <Link href="/auth/signin" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
-                      Conectare
-                    </Link>
-                    <Link href="/auth/signup" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
-                      Înregistrare
-                    </Link>
-                  </>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="24" 
+                    height="24" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
                 )}
-              </div>
-            )}
+              </button>
+              {showProfileMenu && (
+                <div className={styles.profileMenu}>
+                  {status === 'authenticated' && session?.user ? (
+                    <>
+                      <div className={styles.userInfo}>
+                        <span className={styles.userName}>{session.user.name || session.user.email}</span>
+                        <span className={styles.userEmail}>{session.user.email}</span>
+                      </div>
+                      <Link href="/profile" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
+                        Profilul Meu
+                      </Link>
+                      <button onClick={handleSignOut} className={`${styles.menuItem} ${styles.signOutButton}`}>
+                        Deconectare
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/auth/signin" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
+                        Conectare
+                      </Link>
+                      <Link href="/auth/signup" className={styles.menuItem} onClick={() => setShowProfileMenu(false)}>
+                        Înregistrare
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className={styles.searchContainer} ref={suggestionsRef}>
