@@ -24,6 +24,7 @@
   min-height: calc(100vh - 160px);
   background-color: var(--background-color);
   position: relative;
+  padding-top: 0;  /* Remove top padding to accommodate the progress bar */
 }
 
 .progressBar {
@@ -32,7 +33,7 @@
   background-color: var(--border-color);
   border-radius: var(--radius-sm);
   margin-bottom: 2rem;
-  position: fixed;
+  position: sticky;
   top: 80px;
   left: 0;
   z-index: 100;

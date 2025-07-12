@@ -40,6 +40,7 @@ export default function LocationProperties() {
       } finally {
         setLoading(false);
       }
+    
     };
 
     fetchProperties();
