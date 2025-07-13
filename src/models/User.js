@@ -23,14 +23,18 @@ const userSchema = new mongoose.Schema({
   },
   idNumber: {
     type: String,
-    required: [true, 'ID/Passport number is required'],
-    unique: true
+    unique: true,
+    sparse: true  // This allows multiple null values and makes the field optional
   },
   password: {
     type: String,
     required: [true, 'Password is required'],
   },
   isHost: {
+    type: Boolean,
+    default: false
+  },
+  isSuperAdmin: {
     type: Boolean,
     default: false
   },
@@ -54,6 +58,11 @@ userSchema.virtual('fullName').get(function() {
 userSchema.set('toJSON', { virtuals: true });
 userSchema.set('toObject', { virtuals: true });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+// Clear existing model to prevent OverwriteModelError
+if (mongoose.models.User) {
+  delete mongoose.models.User;
+}
+
+const User = mongoose.model('User', userSchema);
 
 export default User; 

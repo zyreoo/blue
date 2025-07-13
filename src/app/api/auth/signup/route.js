@@ -18,10 +18,9 @@ export async function POST(request) {
       );
     }
 
-    const { firstName, lastName, email, phoneNumber, idNumber, password } = body;
+    const { firstName, lastName, email, phoneNumber, password } = body;
 
-
-    if (!firstName || !lastName || !email || !phoneNumber || !idNumber || !password) {
+    if (!firstName || !lastName || !email || !phoneNumber || !password) {
       return NextResponse.json(
         { error: 'All fields are required', 
           missing: {
@@ -29,7 +28,6 @@ export async function POST(request) {
             lastName: !lastName,
             email: !email,
             phoneNumber: !phoneNumber,
-            idNumber: !idNumber,
             password: !password
           }
         },
@@ -65,20 +63,11 @@ export async function POST(request) {
 
     // Check for existing user
     try {
-      const existingUser = await User.findOne({ 
-        $or: [
-          { email: email.toLowerCase() },
-          { idNumber: idNumber }
-        ]
-      });
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
       
       if (existingUser) {
         return NextResponse.json(
-          { 
-            error: existingUser.email === email.toLowerCase() 
-              ? 'Email already registered' 
-              : 'ID number already registered'
-          },
+          { error: 'Email already registered' },
           { status: 400 }
         );
       }
@@ -108,7 +97,6 @@ export async function POST(request) {
         lastName,
         email: email.toLowerCase(),
         phoneNumber,
-        idNumber,
         password: hashedPassword
       });
 

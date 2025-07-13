@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from '../auth.module.css';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 export default function SignUp() {
   const router = useRouter();
@@ -12,7 +14,6 @@ export default function SignUp() {
     lastName: '',
     email: '',
     phoneNumber: '',
-    idNumber: '',
     password: '',
     confirmPassword: ''
   });
@@ -27,10 +28,26 @@ export default function SignUp() {
     }));
   };
 
+  const handlePhoneChange = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      phoneNumber: value || ''
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    const requiredFields = ['firstName', 'lastName', 'email', 'phoneNumber', 'password', 'confirmPassword'];
+    const emptyFields = requiredFields.filter(field => !formData[field]);
+    
+    if (emptyFields.length > 0) {
+      setError('Please fill in all required fields');
+      setLoading(false);
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -49,7 +66,6 @@ export default function SignUp() {
           lastName: formData.lastName,
           email: formData.email,
           phoneNumber: formData.phoneNumber,
-          idNumber: formData.idNumber,
           password: formData.password
         }),
       });
@@ -59,7 +75,6 @@ export default function SignUp() {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to create account');
       }
-
 
       router.push('/auth/signin');
     } catch (error) {
@@ -123,29 +138,18 @@ export default function SignUp() {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="phoneNumber">Phone Number</label>
-            <input
-              type="tel"
-              id="phoneNumber"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              required
-              className={styles.input}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="idNumber">ID/Passport Number</label>
-            <input
-              type="text"
-              id="idNumber"
-              name="idNumber"
-              value={formData.idNumber}
-              onChange={handleChange}
-              required
-              className={styles.input}
-            />
+            <label>Phone Number</label>
+            <div className={styles.phoneInputWrapper}>
+              <PhoneInput
+                international
+                countryCallingCodeEditable={false}
+                defaultCountry="HU"
+                value={formData.phoneNumber}
+                onChange={handlePhoneChange}
+                className={styles.phoneInput}
+                required
+              />
+            </div>
           </div>
 
           <div className={styles.formGroup}>
