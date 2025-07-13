@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import Image from 'next/image';
 import { AmenityIcons } from '@/components/icons/AmenityIcons';
+import { PropertyTypeIcons } from '@/components/icons/PropertyTypeIcons';
 
 
 const MapComponent = dynamic(
@@ -189,18 +190,18 @@ const t = (key) => {
 };
 
 const propertyTypes = [
-  { id: 'house', label: t('become_host.property_type.house'), icon: '🏠' },
-  { id: 'apartment', label: t('become_host.property_type.apartment'), icon: '🏢' },
-  { id: 'barn', label: t('become_host.property_type.barn'), icon: '🏚' },
-  { id: 'guesthouse', label: t('become_host.property_type.guesthouse'), icon: '🏨' },
-  { id: 'boat', label: t('become_host.property_type.boat'), icon: '⛵' },
-  { id: 'cabin', label: t('become_host.property_type.cabin'), icon: '🏡' },
-  { id: 'camper', label: t('become_host.property_type.camper'), icon: '🚐' },
-  { id: 'villa', label: t('become_host.property_type.villa'), icon: '🏘' },
-  { id: 'castle', label: t('become_host.property_type.castle'), icon: '🏰' },
-  { id: 'cave', label: t('become_host.property_type.cave'), icon: '🗿' },
-  { id: 'container', label: t('become_host.property_type.container'), icon: '📦' },
-  { id: 'cycladic', label: t('become_host.property_type.cycladic'), icon: '🏠' },
+  { id: 'house', label: t('become_host.property_type.house'), icon: PropertyTypeIcons.house },
+  { id: 'apartment', label: t('become_host.property_type.apartment'), icon: PropertyTypeIcons.apartment },
+  { id: 'barn', label: t('become_host.property_type.barn'), icon: PropertyTypeIcons.barn },
+  { id: 'guesthouse', label: t('become_host.property_type.guesthouse'), icon: PropertyTypeIcons.guesthouse },
+  { id: 'boat', label: t('become_host.property_type.boat'), icon: PropertyTypeIcons.boat },
+  { id: 'cabin', label: t('become_host.property_type.cabin'), icon: PropertyTypeIcons.cabin },
+  { id: 'camper', label: t('become_host.property_type.camper'), icon: PropertyTypeIcons.camper },
+  { id: 'villa', label: t('become_host.property_type.villa'), icon: PropertyTypeIcons.villa },
+  { id: 'castle', label: t('become_host.property_type.castle'), icon: PropertyTypeIcons.castle },
+  { id: 'cave', label: t('become_host.property_type.cave'), icon: PropertyTypeIcons.cave },
+  { id: 'container', label: t('become_host.property_type.container'), icon: PropertyTypeIcons.container },
+  { id: 'cycladic', label: t('become_host.property_type.cycladic'), icon: PropertyTypeIcons.cycladic }
 ];
 
 
@@ -701,6 +702,14 @@ export default function BecomeHostPage() {
   };
 
   const renderStep = () => {
+    const BackArrow = () => (
+      <button onClick={prevStep} className={styles.backArrow} aria-label="Go back">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+    );
+
     switch (currentStep) {
       case 'property_type':
         return (
@@ -710,6 +719,7 @@ export default function BecomeHostPage() {
             exit={{ opacity: 0, x: -50 }}
             className={styles.stepContainer}
           >
+            {currentStep !== 'property_type' && <BackArrow />}
             <h2 className={styles.stepTitle}>{t('become_host.property_type.title')}</h2>
             <div className={styles.propertyTypeGrid}>
               {propertyTypes.map((type) => (
@@ -736,6 +746,7 @@ export default function BecomeHostPage() {
             exit={{ opacity: 0, x: -50 }}
             className={styles.stepContainer}
           >
+            <BackArrow />
             <h2 className={styles.stepTitle}>{t('become_host.space_type.title')}</h2>
             <div className={styles.spaceTypeGrid}>
               {(propertySpaceTypes[formData.propertyType] || defaultSpaceTypes).map((type) => (
@@ -765,6 +776,7 @@ export default function BecomeHostPage() {
             exit={{ opacity: 0, x: -50 }}
             className={styles.stepContainer}
           >
+            <BackArrow />
             <h2 className={styles.stepTitle}>{t('become_host.location.title')}</h2>
             <div className={styles.locationForm}>
               <div className={styles.mapContainer}>
@@ -844,6 +856,7 @@ export default function BecomeHostPage() {
             exit={{ opacity: 0, x: -50 }}
             className={styles.stepContainer}
           >
+            <BackArrow />
             <h2 className={styles.stepTitle}>{t('become_host.property_name.title')}</h2>
             <div className={styles.propertyNameForm}>
               <div className={styles.formGroup}>
@@ -880,6 +893,7 @@ export default function BecomeHostPage() {
             exit={{ opacity: 0, x: -50 }}
             className={styles.stepContainer}
           >
+            <BackArrow />
             <h2 className={styles.stepTitle}>{t('become_host.details.title')}</h2>
             <div className={styles.guestDetailsForm}>
               <div className={styles.formGroup}>
@@ -1060,6 +1074,7 @@ export default function BecomeHostPage() {
             exit={{ opacity: 0, x: -50 }}
             className={styles.stepContainer}
           >
+            <BackArrow />
             <h2 className={styles.stepTitle}>{t('become_host.amenities.title')}</h2>
             <div className={styles.amenitiesForm}>
               <div className={styles.amenityCategory}>
@@ -1268,6 +1283,7 @@ export default function BecomeHostPage() {
             exit={{ opacity: 0, x: -50 }}
             className={styles.stepContainer}
           >
+            <BackArrow />
             <h2 className={styles.stepTitle}>{t('become_host.photos.title')}</h2>
             <p className={styles.stepDescription}>
               {t('become_host.photos.description')}
@@ -1412,6 +1428,7 @@ export default function BecomeHostPage() {
             exit={{ opacity: 0, x: -50 }}
             className={styles.stepContainer}
           >
+            <BackArrow />
             <h2 className={styles.stepTitle}>{t('become_host.pricing.title')}</h2>
             <div className={styles.priceCard}>
               <div className={styles.formGroup}>
@@ -1448,6 +1465,7 @@ export default function BecomeHostPage() {
             exit={{ x: -300, opacity: 0 }}
             className={styles.formStep}
           >
+            <BackArrow />
             <h2 className={styles.stepTitle}>{t('become_host.description.title')}</h2>
             <div className={styles.descriptionCard}>
               <div className={styles.descriptionSection}>
@@ -1487,6 +1505,7 @@ export default function BecomeHostPage() {
             exit={{ x: -300, opacity: 0 }}
             className={`${styles.formStep} ${styles.finalStep}`}
           >
+            <BackArrow />
             <div className={styles.thankYouContainer}>
               <h2>{t('become_host.final.title')}</h2>
               <p>{t('become_host.final.message')}</p>
@@ -1597,21 +1616,6 @@ export default function BecomeHostPage() {
             style={{ width: `${(steps.indexOf(currentStep) / steps.length) * 100}%` }}
           />
         </div>
-        <button 
-          onClick={prevStep} 
-          className={styles.backArrow}
-          style={{ visibility: steps.indexOf(currentStep) === 0 ? 'hidden' : 'visible' }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path 
-              d="M15 18L9 12L15 6" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
         <AnimatePresence mode="wait">
           {renderStep()}
         </AnimatePresence>
