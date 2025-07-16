@@ -1,20 +1,23 @@
 'use client';
 
+// Add dynamic export
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
+import { dynamic as dynamicImport } from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
 import { useSession } from 'next-auth/react';
 import { AmenityIcons } from '@/components/icons/AmenityIcons';
 
-const DateRangePicker = dynamic(() => import('@/components/DateRangePicker'), {
+const DateRangePicker = dynamicImport(() => import('@/components/DateRangePicker'), {
   ssr: false,
 });
 
-const PhotoViewer = dynamic(() => import('@/components/PhotoViewer'), {
+const PhotoViewer = dynamicImport(() => import('@/components/PhotoViewer'), {
   ssr: false
 });
 

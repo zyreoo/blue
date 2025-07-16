@@ -1,10 +1,12 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
+import { dynamic as dynamicImport } from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import styles from './page.module.css';
@@ -12,11 +14,11 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { AmenityIcons } from '@/components/icons/AmenityIcons';
 import ErrorMessage from '@/components/ErrorMessage';
 
-const PhotoViewer = dynamic(() => import('@/components/PhotoViewer'), {
+const PhotoViewer = dynamicImport(() => import('@/components/PhotoViewer'), {
   ssr: false
 });
 
-const MapComponent = dynamic(
+const MapComponent = dynamicImport(
   () => import('@/components/MapComponent'),
   { ssr: false }
 );

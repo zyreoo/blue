@@ -11,10 +11,6 @@ export const metadata = {
   description: 'Discover and book the perfect accommodation for your next trip.',
 };
 
-export const dynamic = 'force-dynamic';
-
-export const revalidate = 3600;
-
 export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
   

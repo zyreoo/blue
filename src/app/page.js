@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 import { useState, useEffect, Suspense, useCallback } from 'react';
 import styles from './page.module.css';
 import Header from '@/components/Header';
